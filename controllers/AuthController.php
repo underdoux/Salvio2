@@ -10,179 +10,149 @@ class AuthController extends Controller {
         $this->userModel = new User();
     }
 
-    public function showLogin() {
-        // If already logged in, redirect to dashboard
+    public function login() {
+        // If already logged in, redirect to home
         if (isset($_SESSION['user_id'])) {
-            redirect('/');
+            redirect('');
         }
 
-        // Generate CSRF token
-        $csrf_token = $this->generateCSRFToken();
-        
-        // Show login page
-        $this->view('user/login', [
-            'csrf_token' => $csrf_token
-        ]);
-    }
+        // Handle POST request
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = $_POST['username'] ?? '';
+            $password = $_POST['password'] ?? '';
+            $csrf_token = $_POST['csrf_token'] ?? '';
 
-    public function login($username = null, $password = null) {
-        try {
             // Validate CSRF token
-            $this->validateCSRF();
-
-            // Get POST data if not provided
-            if ($username === null || $password === null) {
-                $data = $this->getPostData();
-                $username = $data['username'] ?? '';
-                $password = $data['password'] ?? '';
+            if (!validate_csrf($csrf_token)) {
+                redirect('login', 'Invalid request. Please try again.', 'error');
             }
 
             // Validate input
-            $errors = $this->validateRequired([
-                'username' => $username,
-                'password' => $password
-            ], ['username', 'password']);
-
-            if (!empty($errors)) {
-                $_SESSION['error'] = 'Username and password are required';
-                redirect('/login');
-                return;
+            if (!$this->validate($_POST, [
+                'username' => 'required',
+                'password' => 'required'
+            ])) {
+                redirect('login');
             }
 
-            // Sanitize input
-            $username = $this->sanitizeInput($username);
+            try {
+                // Attempt login
+                $user = $this->userModel->findByUsername($username);
+                
+                if ($user && password_verify($password, $user['password'])) {
+                    // Set session data
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['role_name'] = $this->userModel->getRoleName($user['role_id']);
 
-            // Get user by username
-            $user = $this->userModel->getByUsername($username);
+                    // Log successful login
+                    $this->logAudit('user_login', [
+                        'user_id' => $user['id'],
+                        'username' => $user['username'],
+                        'ip_address' => $_SERVER['REMOTE_ADDR']
+                    ]);
 
-            // Verify user exists and password is correct
-            if (!$user || !password_verify($password, $user['password'])) {
-                // Log failed login attempt
-                $this->log('login_failed', [
-                    'username' => $username,
-                    'ip' => $_SERVER['REMOTE_ADDR'],
-                    'user_agent' => $_SERVER['HTTP_USER_AGENT']
-                ]);
+                    // Redirect to home page
+                    redirect('');
+                } else {
+                    // Log failed login attempt
+                    $this->logAudit('login_failed', [
+                        'username' => $username,
+                        'ip_address' => $_SERVER['REMOTE_ADDR']
+                    ]);
 
-                $_SESSION['error'] = 'Invalid username or password';
-                redirect('/login');
-                return;
+                    redirect('login', 'Invalid username or password.', 'error');
+                }
+            } catch (Exception $e) {
+                error_log($e->getMessage());
+                redirect('login', 'An error occurred. Please try again.', 'error');
             }
-
-            // Set session variables
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role_id'] = $user['role_id'];
-            $_SESSION['role_name'] = $user['role_name'];
-
-            // Generate new CSRF token after login
-            $this->generateCSRFToken();
-
-            // Log successful login
-            $this->log('login_success', [
-                'username' => $user['username'],
-                'ip' => $_SERVER['REMOTE_ADDR'],
-                'user_agent' => $_SERVER['HTTP_USER_AGENT']
-            ]);
-
-            // Redirect to dashboard
-            redirect('/');
-
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            $_SESSION['error'] = 'An error occurred during login. Please try again.';
-            redirect('/login');
         }
+
+        // Show login form
+        return $this->view('user/login');
     }
 
     public function logout() {
-        try {
-            // Log logout if user was logged in
-            if (isset($_SESSION['user_id'])) {
-                $this->log('logout', [
-                    'username' => $_SESSION['username'],
-                    'ip' => $_SERVER['REMOTE_ADDR']
-                ]);
-            }
+        if (isset($_SESSION['user_id'])) {
+            // Log logout
+            $this->logAudit('user_logout', [
+                'user_id' => $_SESSION['user_id'],
+                'username' => $_SESSION['username'],
+                'ip_address' => $_SERVER['REMOTE_ADDR']
+            ]);
 
-            // Destroy session
+            // Clear session
             session_destroy();
-            
-            // Redirect to login page with message
-            $_SESSION['flash'] = [
-                'type' => 'success',
-                'message' => 'You have been successfully logged out.'
-            ];
-            redirect('/login');
-
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            redirect('/login');
         }
+
+        redirect('login', 'You have been logged out.', 'success');
     }
 
     public function changePassword() {
-        // Require login
         $this->requireLogin();
 
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('403');
+        }
+
         // Validate CSRF token
-        $this->validateCSRF();
+        if (!validate_csrf($_POST['csrf_token'] ?? '')) {
+            if (is_ajax()) {
+                json_response(['error' => 'Invalid request.'], 400);
+            }
+            redirect('', 'Invalid request.', 'error');
+        }
 
-        // Get POST data
-        $data = $this->getPostData();
-        
         // Validate input
-        $errors = $this->validateRequired($data, [
-            'current_password',
-            'new_password',
-            'confirm_password'
-        ]);
-
-        if (!empty($errors)) {
-            $this->jsonResponse([
-                'success' => false,
-                'errors' => $errors
-            ], 400);
+        if (!$this->validate($_POST, [
+            'current_password' => 'required',
+            'new_password' => 'required|min:8',
+            'confirm_password' => 'required|matches:new_password'
+        ])) {
+            if (is_ajax()) {
+                json_response(['error' => 'Please check your input.'], 400);
+            }
+            redirect('');
         }
 
-        // Verify new password matches confirmation
-        if ($data['new_password'] !== $data['confirm_password']) {
-            $this->jsonResponse([
-                'success' => false,
-                'error' => 'New password and confirmation do not match'
-            ], 400);
+        try {
+            $user = $this->userModel->findById($_SESSION['user_id']);
+            
+            // Verify current password
+            if (!password_verify($_POST['current_password'], $user['password'])) {
+                if (is_ajax()) {
+                    json_response(['error' => 'Current password is incorrect.'], 400);
+                }
+                redirect('', 'Current password is incorrect.', 'error');
+            }
+
+            // Update password
+            $this->userModel->updatePassword(
+                $_SESSION['user_id'],
+                password_hash($_POST['new_password'], PASSWORD_DEFAULT)
+            );
+
+            // Log password change
+            $this->logAudit('password_changed', [
+                'user_id' => $_SESSION['user_id'],
+                'ip_address' => $_SERVER['REMOTE_ADDR']
+            ]);
+
+            if (is_ajax()) {
+                json_response([
+                    'success' => true,
+                    'message' => 'Password changed successfully.'
+                ]);
+            }
+
+            redirect('', 'Password changed successfully.', 'success');
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            if (is_ajax()) {
+                json_response(['error' => 'An error occurred. Please try again.'], 500);
+            }
+            redirect('', 'An error occurred. Please try again.', 'error');
         }
-
-        // Validate password strength
-        if (!$this->userModel->validatePassword($data['new_password'])) {
-            $this->jsonResponse([
-                'success' => false,
-                'error' => 'Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character'
-            ], 400);
-        }
-
-        // Change password
-        if (!$this->userModel->changePassword(
-            $_SESSION['user_id'],
-            $data['current_password'],
-            $data['new_password']
-        )) {
-            $this->jsonResponse([
-                'success' => false,
-                'error' => 'Current password is incorrect'
-            ], 400);
-        }
-
-        // Log password change
-        $this->log('password_changed', [
-            'user_id' => $_SESSION['user_id'],
-            'ip' => $_SERVER['REMOTE_ADDR']
-        ]);
-
-        // Return success response
-        $this->jsonResponse([
-            'success' => true,
-            'message' => 'Password changed successfully'
-        ]);
     }
 }

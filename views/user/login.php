@@ -1,7 +1,7 @@
 <?php
 // Set page title and body class
 $title = 'Login';
-$bodyClass = 'bg-light d-flex align-items-center';
+$bodyClass = 'bg-light d-flex align-items-center min-vh-100';
 $hideNav = true;
 
 // Define inline styles
@@ -27,17 +27,18 @@ $inlineStyles = '
     }
     .brand-icon {
         font-size: 3rem;
-        color: #0d6efd;
+        color: var(--bs-primary);
         margin-bottom: 1rem;
     }
 ';
 
-// Define content
-ob_start(); 
+// Start output buffering
+ob_start();
 ?>
+
 <main class="form-signin text-center">
     <form action="<?php echo base_url('auth/login'); ?>" method="POST">
-        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token ?? ''); ?>">
+        <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
         
         <div class="brand-icon">
             <i class="bi bi-capsule"></i>
@@ -65,24 +66,32 @@ ob_start();
 
         <div class="form-floating mb-2">
             <input type="text" 
-                   class="form-control" 
+                   class="form-control <?php echo has_error('username') ? 'is-invalid' : ''; ?>" 
                    id="username" 
                    name="username" 
                    placeholder="Username" 
+                   value="<?php echo htmlspecialchars(old('username')); ?>"
                    required 
                    autocomplete="username"
                    autofocus>
             <label for="username">Username</label>
+            <?php if (has_error('username')): ?>
+                <div class="invalid-feedback"><?php echo get_error('username'); ?></div>
+            <?php endif; ?>
         </div>
+
         <div class="form-floating mb-3">
             <input type="password" 
-                   class="form-control" 
+                   class="form-control <?php echo has_error('password') ? 'is-invalid' : ''; ?>" 
                    id="password" 
                    name="password" 
                    placeholder="Password" 
                    required 
                    autocomplete="current-password">
             <label for="password">Password</label>
+            <?php if (has_error('password')): ?>
+                <div class="invalid-feedback"><?php echo get_error('password'); ?></div>
+            <?php endif; ?>
         </div>
 
         <button class="w-100 btn btn-lg btn-primary mb-3" type="submit">
@@ -96,9 +105,8 @@ ob_start();
         </p>
     </form>
 </main>
+
 <?php 
 $content = ob_get_clean();
-
-// Include base layout
 require_once __DIR__ . '/../layouts/base.php';
 ?>

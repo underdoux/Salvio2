@@ -1,52 +1,25 @@
 <?php
-// Set page title and body class
 $title = '404 Not Found';
-$bodyClass = 'bg-light d-flex align-items-center';
-
-// Define inline styles
-$inlineStyles = '
-    .error-page {
-        width: 100%;
-        max-width: 600px;
-        padding: 15px;
-        margin: auto;
-        text-align: center;
-    }
-    .error-icon {
-        font-size: 5rem;
-        color: #6c757d;
-        margin-bottom: 1rem;
-    }
-';
-
-// Define content
-ob_start(); 
+$bodyClass = 'bg-light d-flex align-items-center min-vh-100';
+ob_start();
 ?>
-<main class="error-page">
-    <div class="error-icon">
-        <i class="bi bi-question-circle"></i>
-    </div>
-    <h1 class="display-1">404</h1>
-    <h2 class="h3 mb-3">Page Not Found</h2>
-    <p class="text-muted mb-4">
-        The page you are looking for might have been removed, had its name changed, 
-        or is temporarily unavailable.
-    </p>
-    <div class="d-grid gap-2 col-6 mx-auto">
-        <a href="<?php echo base_url('/'); ?>" class="btn btn-primary">
-            <i class="bi bi-house-door"></i> Go to Home
-        </a>
-        <button onclick="history.back()" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Go Back
-        </button>
-    </div>
-    <p class="mt-5 mb-3 text-muted">
-        &copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(config('app_name')); ?>
-    </p>
-</main>
-<?php 
-$content = ob_get_clean();
 
-// Include base layout
+<div class="container text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="error-page">
+                <h1 class="display-1 text-muted">404</h1>
+                <h2 class="mb-4">Page Not Found</h2>
+                <p class="lead text-muted mb-4">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+                <a href="<?php echo base_url(); ?>" class="btn btn-primary">
+                    <i class="bi bi-house-door"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php
+$content = ob_get_clean();
 require_once __DIR__ . '/../layouts/base.php';
 ?>
