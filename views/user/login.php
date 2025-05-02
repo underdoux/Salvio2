@@ -1,30 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Login - POS Pharma</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h1 class="text-2xl font-bold mb-6 text-center">Login to POS Pharma</h1>
-        <?php if (!empty($error)): ?>
-            <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-                <?= htmlspecialchars($error) ?>
+<?php
+// Set page title and body class
+$title = 'Login';
+$bodyClass = 'bg-light d-flex align-items-center';
+$hideNav = true;
+
+// Define inline styles
+$inlineStyles = '
+    .form-signin {
+        width: 100%;
+        max-width: 330px;
+        padding: 15px;
+        margin: auto;
+    }
+    .form-signin .form-floating:focus-within {
+        z-index: 2;
+    }
+    .form-signin input[type="text"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    .form-signin input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+    .brand-icon {
+        font-size: 3rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+';
+
+// Define content
+ob_start(); 
+?>
+<main class="form-signin text-center">
+    <form action="<?php echo base_url('auth/login'); ?>" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token ?? ''); ?>">
+        
+        <div class="brand-icon">
+            <i class="bi bi-capsule"></i>
+        </div>
+        <h1 class="h3 mb-3 fw-normal"><?php echo htmlspecialchars(config('app_name')); ?></h1>
+
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <?php 
+                    echo htmlspecialchars($_SESSION['error']); 
+                    unset($_SESSION['error']); 
+                ?>
             </div>
         <?php endif; ?>
-        <form method="POST" action="/login" class="space-y-4">
-            <div>
-                <label for="username" class="block text-gray-700">Username</label>
-                <input type="text" id="username" name="username" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+        <?php if (isset($_SESSION['flash'])): ?>
+            <div class="alert alert-<?php echo htmlspecialchars($_SESSION['flash']['type'] ?? 'info'); ?>">
+                <?php 
+                    echo htmlspecialchars($_SESSION['flash']['message'] ?? ''); 
+                    unset($_SESSION['flash']); 
+                ?>
             </div>
-            <div>
-                <label for="password" class="block text-gray-700">Password</label>
-                <input type="password" id="password" name="password" autocomplete="current-password" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">Login</button>
-        </form>
-    </div>
-</body>
-</html>
+        <?php endif; ?>
+
+        <div class="form-floating mb-2">
+            <input type="text" 
+                   class="form-control" 
+                   id="username" 
+                   name="username" 
+                   placeholder="Username" 
+                   required 
+                   autocomplete="username"
+                   autofocus>
+            <label for="username">Username</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="password" 
+                   class="form-control" 
+                   id="password" 
+                   name="password" 
+                   placeholder="Password" 
+                   required 
+                   autocomplete="current-password">
+            <label for="password">Password</label>
+        </div>
+
+        <button class="w-100 btn btn-lg btn-primary mb-3" type="submit">
+            <i class="bi bi-box-arrow-in-right"></i> Sign in
+        </button>
+        
+        <p class="mt-5 mb-3 text-muted">
+            &copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(config('app_name')); ?>
+            <br>
+            <small>Version <?php echo htmlspecialchars(config('app_version')); ?></small>
+        </p>
+    </form>
+</main>
+<?php 
+$content = ob_get_clean();
+
+// Include base layout
+require_once __DIR__ . '/../layouts/base.php';
+?>

@@ -1,157 +1,156 @@
 <?php
-// Set page title
 $title = 'Dashboard';
 $bodyClass = 'bg-light';
-
-// Define inline styles
-$inlineStyles = '
-    .feature-icon {
-        font-size: 2rem;
-        color: #0d6efd;
-        margin-bottom: 1rem;
-    }
-    .card {
-        transition: transform 0.2s;
-    }
-    .card:hover {
-        transform: translateY(-5px);
-    }
-';
-
-// Define content
-ob_start(); 
+ob_start();
 ?>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="<?php echo base_url('/'); ?>">
-            <i class="bi bi-capsule"></i>
-            <?php echo htmlspecialchars(config('app_name')); ?>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="<?php echo base_url('/'); ?>">
-                        <i class="bi bi-house-door"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?php echo base_url('/products'); ?>">
-                        <i class="bi bi-box"></i> Products
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?php echo base_url('/orders'); ?>">
-                        <i class="bi bi-cart"></i> Orders
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?php echo base_url('/commissions'); ?>">
-                        <i class="bi bi-currency-dollar"></i> Commissions
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?php echo base_url('/profits'); ?>">
-                        <i class="bi bi-graph-up"></i> Profits
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?php echo base_url('/reports'); ?>">
-                        <i class="bi bi-file-earmark-text"></i> Reports
-                    </a>
-                </li>
-            </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle"></i> 
-                        <?php echo htmlspecialchars($_SESSION['username']); ?>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <span class="dropdown-item-text text-muted">
-                                <small>Role: <?php echo htmlspecialchars($_SESSION['role_name']); ?></small>
-                            </span>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="<?php echo base_url('/settings'); ?>">
-                                <i class="bi bi-gear"></i> Settings
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item text-danger" href="<?php echo base_url('/logout'); ?>">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
 
-<div class="container py-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h2>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h2>
-            <p class="text-muted">Here's an overview of your pharmacy management system.</p>
+<div class="container-fluid py-4">
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <i class="bi bi-box fs-1 text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle mb-1 text-muted">Total Products</h6>
+                            <h2 class="card-title mb-0"><?php echo number_format($counts['products']); ?></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <i class="bi bi-cart-check fs-1 text-success"></i>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle mb-1 text-muted">Total Orders</h6>
+                            <h2 class="card-title mb-0"><?php echo number_format($counts['orders']); ?></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <i class="bi bi-hourglass-split fs-1 text-warning"></i>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle mb-1 text-muted">Pending Orders</h6>
+                            <h2 class="card-title mb-0"><?php echo number_format($counts['pending_orders']); ?></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <i class="bi bi-currency-dollar fs-1 text-info"></i>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle mb-1 text-muted">Today's Sales</h6>
+                            <h2 class="card-title mb-0"><?php echo format_money($today_sales); ?></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="row g-4">
-        <div class="col-md-4">
+        <!-- Recent Orders -->
+        <div class="col-md-8">
             <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="feature-icon">
-                        <i class="bi bi-box"></i>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Orders</h5>
+                    <a href="<?php echo base_url('orders'); ?>" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($recent_orders as $order): ?>
+                                    <tr>
+                                        <td>#<?php echo $order['id']; ?></td>
+                                        <td><?php echo htmlspecialchars($order['username']); ?></td>
+                                        <td><?php echo format_money($order['total']); ?></td>
+                                        <td>
+                                            <span class="badge bg-<?php 
+                                                echo match($order['status']) {
+                                                    'completed' => 'success',
+                                                    'shipped' => 'info',
+                                                    'in_progress' => 'warning',
+                                                    default => 'secondary'
+                                                };
+                                            ?>">
+                                                <?php echo ucfirst(str_replace('_', ' ', $order['status'])); ?>
+                                            </span>
+                                        </td>
+                                        <td><?php echo format_datetime($order['created_at']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
-                    <h5 class="card-title">Products</h5>
-                    <p class="card-text">Manage your inventory, categories, and prices.</p>
-                    <a href="<?php echo base_url('/products'); ?>" class="btn btn-primary">
-                        View Products
-                    </a>
                 </div>
             </div>
         </div>
 
+        <!-- Low Stock Products -->
         <div class="col-md-4">
             <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="feature-icon">
-                        <i class="bi bi-cart"></i>
-                    </div>
-                    <h5 class="card-title">Orders</h5>
-                    <p class="card-text">Process transactions and track order status.</p>
-                    <a href="<?php echo base_url('/orders'); ?>" class="btn btn-primary">
-                        View Orders
-                    </a>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Low Stock Alert</h5>
+                    <a href="<?php echo base_url('products'); ?>" class="btn btn-sm btn-primary">View All</a>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="feature-icon">
-                        <i class="bi bi-graph-up"></i>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <?php foreach ($low_stock_products as $product): ?>
+                            <div class="list-group-item px-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1"><?php echo htmlspecialchars($product['name']); ?></h6>
+                                        <small class="text-muted">Stock: <?php echo $product['stock']; ?> units</small>
+                                    </div>
+                                    <a href="<?php echo base_url('products/edit/' . $product['id']); ?>" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        Update Stock
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <h5 class="card-title">Reports</h5>
-                    <p class="card-text">View sales, commissions, and profit reports.</p>
-                    <a href="<?php echo base_url('/reports'); ?>" class="btn btn-primary">
-                        View Reports
-                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<?php 
+<?php
 $content = ob_get_clean();
-
-// Include base layout
 require_once __DIR__ . '/layouts/base.php';
 ?>

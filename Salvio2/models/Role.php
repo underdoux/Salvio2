@@ -1,155 +1,84 @@
 <?php
+require_once __DIR__ . '/../config/database.php';
+
 class Role {
     private $conn;
     private $table_name = "roles";
 
-    public $id;
-    public $name;
-    public $created_at;
-
     public function __construct() {
-        $app = require_once __DIR__ . '/../config/bootstrap.php';
-        $this->conn = $app['conn'];
+        $database = new Database();
+        $this->conn = $database->getConnection();
     }
 
-    public function create($name) {
-        try {
-            $query = "INSERT INTO " . $this->table_name . " (name) VALUES (:name)";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':name', $name);
-
-            if ($stmt->execute()) {
-                $this->id = $this->conn->lastInsertId();
-                return true;
-            }
-            return false;
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            return false;
-        }
-    }
-
-    public function update($id, $name) {
-        try {
-            $query = "UPDATE " . $this->table_name . " SET name = :name WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':name', $name);
-            $stmt->bindParam(':id', $id);
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            return false;
-        }
-    }
-
-    public function delete($id) {
-        try {
-            // Check if role is in use
-            $checkQuery = "SELECT COUNT(*) FROM users WHERE role_id = :id";
-            $checkStmt = $this->conn->prepare($checkQuery);
-            $checkStmt->bindParam(':id', $id);
-            $checkStmt->execute();
-            
-            if ($checkStmt->fetchColumn() > 0) {
-                return false; // Role is in use
-            }
-
-            $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $id);
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            return false;
-        }
-    }
-
-    public function getById($id) {
-        try {
-            $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id LIMIT 1";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $id);
-            $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            return false;
-        }
-    }
-
-    public function getByName($name) {
-        try {
-            $query = "SELECT * FROM " . $this->table_name . " WHERE name = :name LIMIT 1";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':name', $name);
-            $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            return false;
-        }
+    public function findById($id) {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getAll() {
-        try {
-            $query = "SELECT * FROM " . $this->table_name . " ORDER BY name ASC";
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            return [];
-        }
+        $query = "SELECT * FROM " . $this->table_name . " ORDER BY name";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getUserCount($roleId) {
-        try {
-            $query = "SELECT COUNT(*) as count FROM users WHERE role_id = :role_id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':role_id', $roleId);
-            $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $result['count'];
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            return 0;
-        }
+    public function hasPermission($role_id, $permission_name) {
+        $query = "SELECT COUNT(*) FROM role_permissions rp 
+                 JOIN permissions p ON rp.permission_id = p.id 
+                 WHERE rp.role_id = :role_id AND p.name = :permission_name";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':role_id', $role_id);
+        $stmt->bindParam(':permission_name', $permission_name);
+        $stmt->execute();
+        
+        return $stmt->fetchColumn() > 0;
     }
 
-    public function getRoleStats() {
-        try {
-            $query = "SELECT r.*, COUNT(u.id) as user_count 
-                     FROM " . $this->table_name . " r 
-                     LEFT JOIN users u ON r.id = u.role_id 
-                     GROUP BY r.id 
-                     ORDER BY r.name ASC";
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            return [];
-        }
+    public function getPermissions($role_id) {
+        $query = "SELECT p.* FROM permissions p 
+                 JOIN role_permissions rp ON p.id = rp.permission_id 
+                 WHERE rp.role_id = :role_id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':role_id', $role_id);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function ensureDefaultRoles() {
+    public function updatePermissions($role_id, $permissions) {
+        // Start transaction
+        $this->conn->beginTransaction();
+        
         try {
-            $defaultRoles = ['admin', 'cashier', 'sales'];
+            // Delete existing permissions
+            $query = "DELETE FROM role_permissions WHERE role_id = :role_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':role_id', $role_id);
+            $stmt->execute();
             
-            foreach ($defaultRoles as $roleName) {
-                // Check if role exists
-                $role = $this->getByName($roleName);
-                
-                // If role doesn't exist, create it
-                if (!$role) {
-                    $this->create($roleName);
-                }
+            // Insert new permissions
+            $query = "INSERT INTO role_permissions (role_id, permission_id) VALUES (:role_id, :permission_id)";
+            $stmt = $this->conn->prepare($query);
+            
+            foreach ($permissions as $permission_id) {
+                $stmt->bindParam(':role_id', $role_id);
+                $stmt->bindParam(':permission_id', $permission_id);
+                $stmt->execute();
             }
             
+            // Commit transaction
+            $this->conn->commit();
             return true;
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            return false;
+            
+        } catch (Exception $e) {
+            // Rollback transaction on error
+            $this->conn->rollBack();
+            throw $e;
         }
     }
 }

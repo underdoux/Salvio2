@@ -1,46 +1,49 @@
-<?php
-// Load bootstrap if not already loaded
-if (!function_exists('config')) {
-    $app = require_once __DIR__ . '/../../config/bootstrap.php';
-    extract($app);
-}
-
-// Get app name and version from config
-$appName = config('app_name', 'POS Pharma');
-$appVersion = config('app_version', '1.0.0');
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($title) ? htmlspecialchars($title) . ' - ' : ''; ?><?php echo htmlspecialchars($appName); ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-    <?php if (isset($styles)): ?>
-        <?php foreach ($styles as $style): ?>
+    <title><?php echo isset($title) ? htmlspecialchars($title) . ' - ' : ''; ?><?php echo htmlspecialchars(config('app_name')); ?></title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="<?php echo asset('css/style.css'); ?>" rel="stylesheet">
+    
+    <?php if (isset($pageStyles)): ?>
+        <?php foreach ($pageStyles as $style): ?>
             <link href="<?php echo asset($style); ?>" rel="stylesheet">
         <?php endforeach; ?>
     <?php endif; ?>
+
     <?php if (isset($inlineStyles)): ?>
-        <style>
-            <?php echo $inlineStyles; ?>
-        </style>
+        <style><?php echo $inlineStyles; ?></style>
     <?php endif; ?>
 </head>
-<body class="<?php echo isset($bodyClass) ? htmlspecialchars($bodyClass) : ''; ?>">
-    <?php echo $content ?? ''; ?>
+<body class="<?php echo $bodyClass ?? ''; ?>">
+    <?php if (!isset($hideNav)): ?>
+        <?php include __DIR__ . '/nav.php'; ?>
+    <?php endif; ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <?php if (isset($scripts)): ?>
-        <?php foreach ($scripts as $script): ?>
+    <?php echo $content; ?>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery (required for some Bootstrap features) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="<?php echo asset('js/app.js'); ?>"></script>
+
+    <?php if (isset($pageScripts)): ?>
+        <?php foreach ($pageScripts as $script): ?>
             <script src="<?php echo asset($script); ?>"></script>
         <?php endforeach; ?>
     <?php endif; ?>
+
     <?php if (isset($inlineScripts)): ?>
-        <script>
-            <?php echo $inlineScripts; ?>
-        </script>
+        <script><?php echo $inlineScripts; ?></script>
     <?php endif; ?>
 </body>
 </html>
