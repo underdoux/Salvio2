@@ -1,112 +1,84 @@
 <?php
-// Set page title and body class
-$title = 'Login';
-$bodyClass = 'bg-light d-flex align-items-center min-vh-100';
 $hideNav = true;
-
-// Define inline styles
-$inlineStyles = '
-    .form-signin {
-        width: 100%;
-        max-width: 330px;
-        padding: 15px;
-        margin: auto;
-    }
-    .form-signin .form-floating:focus-within {
-        z-index: 2;
-    }
-    .form-signin input[type="text"] {
-        margin-bottom: -1px;
-        border-bottom-right-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-    .form-signin input[type="password"] {
-        margin-bottom: 10px;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-    }
-    .brand-icon {
-        font-size: 3rem;
-        color: var(--bs-primary);
-        margin-bottom: 1rem;
-    }
-';
-
-// Start output buffering
+$bodyClass = 'bg-light';
 ob_start();
 ?>
 
-<main class="form-signin text-center">
-    <form action="<?php echo base_url('auth/login'); ?>" method="POST">
-        <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
-        
-        <div class="brand-icon">
-            <i class="bi bi-capsule"></i>
-        </div>
-        <h1 class="h3 mb-3 fw-normal"><?php echo htmlspecialchars(config('app_name')); ?></h1>
+<div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-capsule text-primary" style="font-size: 3rem;"></i>
+                        <h4 class="mt-2"><?php echo config('app_name'); ?></h4>
+                        <p class="text-muted">Please sign in to continue</p>
+                    </div>
 
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <?php 
-                    echo htmlspecialchars($_SESSION['error']); 
-                    unset($_SESSION['error']); 
-                ?>
+                    <?php if (isset($_SESSION['error'])): ?>
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <?php 
+                                echo $_SESSION['error'];
+                                unset($_SESSION['error']);
+                            ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <?php endif; ?>
+
+                    <form method="POST" action="<?php echo base_url('login'); ?>" class="needs-validation" novalidate>
+                        <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" 
+                                       class="form-control <?php echo has_error('username') ? 'is-invalid' : ''; ?>" 
+                                       id="username" 
+                                       name="username" 
+                                       value="<?php echo old('username'); ?>"
+                                       required 
+                                       autofocus>
+                                <?php if (has_error('username')): ?>
+                                    <div class="invalid-feedback"><?php echo get_error('username'); ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input type="password" 
+                                       class="form-control <?php echo has_error('password') ? 'is-invalid' : ''; ?>" 
+                                       id="password" 
+                                       name="password" 
+                                       required>
+                                <?php if (has_error('password')): ?>
+                                    <div class="invalid-feedback"><?php echo get_error('password'); ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                        </button>
+                    </form>
+                </div>
             </div>
-        <?php endif; ?>
 
-        <?php if (isset($_SESSION['flash'])): ?>
-            <div class="alert alert-<?php echo htmlspecialchars($_SESSION['flash']['type'] ?? 'info'); ?>">
-                <?php 
-                    echo htmlspecialchars($_SESSION['flash']['message'] ?? ''); 
-                    unset($_SESSION['flash']); 
-                ?>
+            <div class="text-center mt-4">
+                <small class="text-muted">
+                    &copy; <?php echo date('Y'); ?> <?php echo config('app_name'); ?>
+                    <br>
+                    Version <?php echo config('app_version'); ?>
+                </small>
             </div>
-        <?php endif; ?>
-
-        <div class="form-floating mb-2">
-            <input type="text" 
-                   class="form-control <?php echo has_error('username') ? 'is-invalid' : ''; ?>" 
-                   id="username" 
-                   name="username" 
-                   placeholder="Username" 
-                   value="<?php echo htmlspecialchars(old('username')); ?>"
-                   required 
-                   autocomplete="username"
-                   autofocus>
-            <label for="username">Username</label>
-            <?php if (has_error('username')): ?>
-                <div class="invalid-feedback"><?php echo get_error('username'); ?></div>
-            <?php endif; ?>
         </div>
+    </div>
+</div>
 
-        <div class="form-floating mb-3">
-            <input type="password" 
-                   class="form-control <?php echo has_error('password') ? 'is-invalid' : ''; ?>" 
-                   id="password" 
-                   name="password" 
-                   placeholder="Password" 
-                   required 
-                   autocomplete="current-password">
-            <label for="password">Password</label>
-            <?php if (has_error('password')): ?>
-                <div class="invalid-feedback"><?php echo get_error('password'); ?></div>
-            <?php endif; ?>
-        </div>
-
-        <button class="w-100 btn btn-lg btn-primary mb-3" type="submit">
-            <i class="bi bi-box-arrow-in-right"></i> Sign in
-        </button>
-        
-        <p class="mt-5 mb-3 text-muted">
-            &copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(config('app_name')); ?>
-            <br>
-            <small>Version <?php echo htmlspecialchars(config('app_version')); ?></small>
-        </p>
-    </form>
-</main>
-
-<?php 
+<?php
 $content = ob_get_clean();
-require_once __DIR__ . '/../layouts/base.php';
+require_once __DIR__ . '/../layouts/main.php';
 ?>

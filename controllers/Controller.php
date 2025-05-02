@@ -1,53 +1,31 @@
 <?php
+
 class Controller {
     protected $db;
     protected $user;
 
     public function __construct() {
-        // Initialize database connection
-        $database = new Database();
-        $this->db = $database->getConnection();
-
-        // Set current user for audit logs if logged in
-        if (isset($_SESSION['user_id'])) {
-            $this->setCurrentUser($_SESSION['user_id']);
-        }
+        $this->db = Database::getInstance();
+        $this->user = user();
     }
 
-    protected function requireLogin() {
-        if (!isset($_SESSION['user_id'])) {
-            redirect('login', 'Please login to continue.', 'warning');
-        }
-    }
-
-    protected function requirePermission($permission) {
-        if (!has_permission($permission)) {
-            if (is_ajax()) {
-                json_response(['error' => 'Unauthorized access.'], 403);
-            } else {
-                redirect('403', 'You do not have permission to access this page.', 'error');
-            }
-        }
-    }
-
-    protected function view($name, $data = []) {
+    protected function view($view, $data = []) {
         // Extract data to make variables available in view
         extract($data);
-        
+
         // Start output buffering
         ob_start();
-        
+
         // Include the view file
-        $viewPath = __DIR__ . "/../views/{$name}.php";
-        if (!file_exists($viewPath)) {
-            throw new Exception("View {$name} not found");
+        $view_file = __DIR__ . "/../views/{$view}.php";
+        if (!file_exists($view_file)) {
+            throw new Exception("View file not found: {$view}");
         }
-        
-        require $viewPath;
-        
+        require $view_file;
+
         // Get the buffered content
         $content = ob_get_clean();
-        
+
         // Return the content
         return $content;
     }
@@ -55,7 +33,26 @@ class Controller {
     protected function json($data, $status = 200) {
         http_response_code($status);
         header('Content-Type: application/json');
-        echo json_encode($data);
+        return json_encode($data);
+    }
+
+    protected function redirect($url, $with = []) {
+        if (!empty($with)) {
+            foreach ($with as $key => $value) {
+                $_SESSION[$key] = $value;
+            }
+        }
+        header("Location: " . base_url($url));
+        exit;
+    }
+
+    protected function back($with = []) {
+        if (!empty($with)) {
+            foreach ($with as $key => $value) {
+                $_SESSION[$key] = $value;
+            }
+        }
+        header("Location: " . $_SERVER['HTTP_REFERER']);
         exit;
     }
 
@@ -64,17 +61,17 @@ class Controller {
         
         foreach ($rules as $field => $rule) {
             $value = $data[$field] ?? null;
-            $ruleArray = explode('|', $rule);
+            $rule_parts = explode('|', $rule);
             
-            foreach ($ruleArray as $singleRule) {
-                if (strpos($singleRule, ':') !== false) {
-                    [$ruleName, $ruleValue] = explode(':', $singleRule);
+            foreach ($rule_parts as $rule_part) {
+                if (strpos($rule_part, ':') !== false) {
+                    list($rule_name, $rule_value) = explode(':', $rule_part);
                 } else {
-                    $ruleName = $singleRule;
-                    $ruleValue = null;
+                    $rule_name = $rule_part;
+                    $rule_value = null;
                 }
                 
-                switch ($ruleName) {
+                switch ($rule_name) {
                     case 'required':
                         if (empty($value)) {
                             $errors[$field] = ucfirst($field) . ' is required';
@@ -82,20 +79,20 @@ class Controller {
                         break;
                         
                     case 'min':
-                        if (strlen($value) < $ruleValue) {
-                            $errors[$field] = ucfirst($field) . ' must be at least ' . $ruleValue . ' characters';
+                        if (strlen($value) < $rule_value) {
+                            $errors[$field] = ucfirst($field) . ' must be at least ' . $rule_value . ' characters';
                         }
                         break;
                         
                     case 'max':
-                        if (strlen($value) > $ruleValue) {
-                            $errors[$field] = ucfirst($field) . ' must not exceed ' . $ruleValue . ' characters';
+                        if (strlen($value) > $rule_value) {
+                            $errors[$field] = ucfirst($field) . ' must not exceed ' . $rule_value . ' characters';
                         }
                         break;
                         
                     case 'email':
                         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                            $errors[$field] = 'Invalid email address';
+                            $errors[$field] = 'Invalid email format';
                         }
                         break;
                         
@@ -108,12 +105,6 @@ class Controller {
                     case 'date':
                         if (!strtotime($value)) {
                             $errors[$field] = 'Invalid date format';
-                        }
-                        break;
-                        
-                    case 'matches':
-                        if ($value !== $data[$ruleValue]) {
-                            $errors[$field] = ucfirst($field) . ' does not match ' . $ruleValue;
                         }
                         break;
                 }
@@ -129,41 +120,24 @@ class Controller {
         return true;
     }
 
-    protected function setCurrentUser($userId) {
-        try {
-            $stmt = $this->db->prepare("CALL set_current_user(?)");
-            $stmt->execute([$userId]);
-        } catch (PDOException $e) {
-            error_log("Error setting current user: " . $e->getMessage());
+    protected function requirePermission($permission) {
+        if (!has_permission($permission)) {
+            if (!auth()) {
+                $this->redirect('login', ['error' => 'Please login to continue']);
+            }
+            http_response_code(403);
+            require __DIR__ . '/../views/errors/403.php';
+            exit;
         }
     }
 
-    protected function logAudit($action, $details = []) {
-        try {
-            $stmt = $this->db->prepare("
-                INSERT INTO audit_log (user_id, action, details)
-                VALUES (?, ?, ?)
-            ");
-            
-            $stmt->execute([
-                $_SESSION['user_id'] ?? null,
-                $action,
-                json_encode($details)
-            ]);
-        } catch (PDOException $e) {
-            error_log("Error logging audit: " . $e->getMessage());
+    protected function logActivity($action, $details = []) {
+        if (!auth()) {
+            return false;
         }
-    }
 
-    protected function beginTransaction() {
-        return $this->db->beginTransaction();
-    }
-
-    protected function commit() {
-        return $this->db->commit();
-    }
-
-    protected function rollback() {
-        return $this->db->rollBack();
+        require_once __DIR__ . '/../models/AuditLog.php';
+        $audit = new AuditLog();
+        return $audit->log($this->user['id'], $action, $details);
     }
 }

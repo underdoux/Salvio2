@@ -1,51 +1,51 @@
 <?php
 require_once __DIR__ . '/Controller.php';
-require_once __DIR__ . '/../models/Order.php';
-require_once __DIR__ . '/../models/Product.php';
 
 class HomeController extends Controller {
-    private $orderModel;
-    private $productModel;
-
-    public function __construct() {
-        parent::__construct();
-        $this->orderModel = new Order();
-        $this->productModel = new Product();
-    }
-
     public function index() {
-        // Require login
-        $this->requireLogin();
-
-        // Get dashboard data based on role
-        $data = [];
-
-        if ($_SESSION['role_name'] === 'admin') {
-            // Get today's sales
-            $today = date('Y-m-d');
-            $todaySales = $this->orderModel->getDailySales($today);
-            $data['today_sales'] = $todaySales['total'] ?? 0;
-            $data['today_orders'] = $todaySales['count'] ?? 0;
-
-            // Get low stock products
-            $data['low_stock_count'] = $this->productModel->getLowStockCount();
-
-            // Get pending orders
-            $data['pending_orders'] = $this->orderModel->getPendingOrderCount();
-
-            // Get monthly revenue
-            $month = date('Y-m');
-            $monthlyRevenue = $this->orderModel->getMonthlySales($month);
-            $data['monthly_revenue'] = $monthlyRevenue['total'] ?? 0;
-
-            // Get recent orders
-            $data['recent_orders'] = $this->orderModel->getRecent(5);
-
-            // Get low stock products
-            $data['low_stock_products'] = $this->productModel->getLowStock(5);
+        if (!auth()) {
+            return $this->redirect('login');
         }
 
-        // Show dashboard view
-        $this->view('home', $data);
+        // Get counts for dashboard
+        $counts = [
+            'products' => $this->db->count("SELECT COUNT(*) FROM products"),
+            'orders' => $this->db->count("SELECT COUNT(*) FROM orders"),
+            'pending_orders' => $this->db->count("SELECT COUNT(*) FROM orders WHERE status != 'completed'"),
+            'low_stock' => $this->db->count("SELECT COUNT(*) FROM products WHERE stock <= 10 AND by_order = 0")
+        ];
+
+        // Get recent orders
+        $recent_orders = $this->db->fetchAll(
+            "SELECT o.*, u.username 
+             FROM orders o 
+             JOIN users u ON o.user_id = u.id 
+             ORDER BY o.created_at DESC 
+             LIMIT 5"
+        );
+
+        // Get low stock products
+        $low_stock_products = $this->db->fetchAll(
+            "SELECT * FROM products 
+             WHERE stock <= 10 
+             AND by_order = 0 
+             ORDER BY stock ASC 
+             LIMIT 5"
+        );
+
+        // Get today's sales
+        $today_sales = $this->db->fetchOne(
+            "SELECT COALESCE(SUM(total), 0) as total 
+             FROM orders 
+             WHERE DATE(created_at) = CURDATE()"
+        );
+
+        return $this->view('home', [
+            'title' => 'Dashboard',
+            'counts' => $counts,
+            'recent_orders' => $recent_orders,
+            'low_stock_products' => $low_stock_products,
+            'today_sales' => $today_sales['total'] ?? 0
+        ]);
     }
 }

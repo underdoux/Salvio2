@@ -1,169 +1,121 @@
 <?php
+
 class Database {
-    private $host = "localhost";
-    private $db_name = "pos_pharma";
-    private $username = "root";
-    private $password = "";
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
     private $conn;
+    private static $instance = null;
+
+    public function __construct() {
+        $config = require __DIR__ . '/app.php';
+        $this->host = $config['db']['host'];
+        $this->db_name = $config['db']['database'];
+        $this->username = $config['db']['username'];
+        $this->password = $config['db']['password'];
+    }
+
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
 
     public function getConnection() {
-        $this->conn = null;
-
-        try {
-            $this->conn = new PDO(
-                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
-                $this->username,
-                $this->password,
-                [
+        if ($this->conn === null) {
+            try {
+                $dsn = "mysql:host={$this->host};dbname={$this->db_name};charset=utf8mb4";
+                $options = [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
-                ]
-            );
-        } catch(PDOException $e) {
-            error_log("Connection Error: " . $e->getMessage());
-            throw new Exception("Database connection failed. Please check your configuration.");
+                ];
+                
+                $this->conn = new PDO($dsn, $this->username, $this->password, $options);
+            } catch(PDOException $e) {
+                error_log("Database Connection Error: " . $e->getMessage());
+                throw new Exception("Database connection failed. Please check your configuration.");
+            }
         }
-
         return $this->conn;
     }
 
     public function beginTransaction() {
-        return $this->conn->beginTransaction();
+        return $this->getConnection()->beginTransaction();
     }
 
     public function commit() {
-        return $this->conn->commit();
+        return $this->getConnection()->commit();
     }
 
     public function rollback() {
-        return $this->conn->rollBack();
-    }
-
-    public function lastInsertId() {
-        return $this->conn->lastInsertId();
+        return $this->getConnection()->rollBack();
     }
 
     public function prepare($sql) {
-        return $this->conn->prepare($sql);
+        return $this->getConnection()->prepare($sql);
+    }
+
+    public function lastInsertId() {
+        return $this->getConnection()->lastInsertId();
+    }
+
+    public function quote($value) {
+        return $this->getConnection()->quote($value);
+    }
+
+    public function close() {
+        $this->conn = null;
+    }
+
+    public function __destruct() {
+        $this->close();
+    }
+
+    // Helper methods for common queries
+    public function fetchAll($sql, $params = []) {
+        try {
+            $stmt = $this->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            error_log("Query Error: " . $e->getMessage());
+            throw new Exception("Failed to execute query.");
+        }
+    }
+
+    public function fetchOne($sql, $params = []) {
+        try {
+            $stmt = $this->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            error_log("Query Error: " . $e->getMessage());
+            throw new Exception("Failed to execute query.");
+        }
     }
 
     public function execute($sql, $params = []) {
         try {
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute($params);
-            return $stmt;
-        } catch(PDOException $e) {
+            $stmt = $this->prepare($sql);
+            return $stmt->execute($params);
+        } catch (PDOException $e) {
             error_log("Query Error: " . $e->getMessage());
-            throw new Exception("Database query failed.");
-        }
-    }
-
-    public function query($sql) {
-        try {
-            return $this->conn->query($sql);
-        } catch(PDOException $e) {
-            error_log("Query Error: " . $e->getMessage());
-            throw new Exception("Database query failed.");
-        }
-    }
-
-    public function fetchAll($sql, $params = []) {
-        try {
-            $stmt = $this->execute($sql, $params);
-            return $stmt->fetchAll();
-        } catch(PDOException $e) {
-            error_log("Query Error: " . $e->getMessage());
-            throw new Exception("Database query failed.");
-        }
-    }
-
-    public function fetch($sql, $params = []) {
-        try {
-            $stmt = $this->execute($sql, $params);
-            return $stmt->fetch();
-        } catch(PDOException $e) {
-            error_log("Query Error: " . $e->getMessage());
-            throw new Exception("Database query failed.");
-        }
-    }
-
-    public function fetchColumn($sql, $params = []) {
-        try {
-            $stmt = $this->execute($sql, $params);
-            return $stmt->fetchColumn();
-        } catch(PDOException $e) {
-            error_log("Query Error: " . $e->getMessage());
-            throw new Exception("Database query failed.");
+            throw new Exception("Failed to execute query.");
         }
     }
 
     public function count($sql, $params = []) {
         try {
-            $stmt = $this->execute($sql, $params);
-            return $stmt->rowCount();
-        } catch(PDOException $e) {
+            $stmt = $this->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchColumn();
+        } catch (PDOException $e) {
             error_log("Query Error: " . $e->getMessage());
-            throw new Exception("Database query failed.");
-        }
-    }
-
-    public function insert($table, $data) {
-        try {
-            $fields = array_keys($data);
-            $values = array_values($data);
-            $placeholders = str_repeat('?,', count($fields) - 1) . '?';
-            
-            $sql = "INSERT INTO {$table} (" . implode(',', $fields) . ") VALUES ({$placeholders})";
-            
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute($values);
-            
-            return $this->conn->lastInsertId();
-        } catch(PDOException $e) {
-            error_log("Insert Error: " . $e->getMessage());
-            throw new Exception("Database insert failed.");
-        }
-    }
-
-    public function update($table, $data, $where) {
-        try {
-            $fields = array_keys($data);
-            $set = implode('=?,', $fields) . '=?';
-            $values = array_values($data);
-            
-            $whereFields = array_keys($where);
-            $whereClause = implode('=? AND ', $whereFields) . '=?';
-            $whereValues = array_values($where);
-            
-            $sql = "UPDATE {$table} SET {$set} WHERE {$whereClause}";
-            
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute(array_merge($values, $whereValues));
-            
-            return $stmt->rowCount();
-        } catch(PDOException $e) {
-            error_log("Update Error: " . $e->getMessage());
-            throw new Exception("Database update failed.");
-        }
-    }
-
-    public function delete($table, $where) {
-        try {
-            $whereFields = array_keys($where);
-            $whereClause = implode('=? AND ', $whereFields) . '=?';
-            $whereValues = array_values($where);
-            
-            $sql = "DELETE FROM {$table} WHERE {$whereClause}";
-            
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute($whereValues);
-            
-            return $stmt->rowCount();
-        } catch(PDOException $e) {
-            error_log("Delete Error: " . $e->getMessage());
-            throw new Exception("Database delete failed.");
+            throw new Exception("Failed to execute query.");
         }
     }
 }

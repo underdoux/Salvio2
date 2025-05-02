@@ -1,42 +1,43 @@
 <?php
-if (!function_exists('base_url')) {
-    function base_url($path = '') {
-        $config = require_once __DIR__ . '/app.php';
-        return $config['base_path'] . '/' . ltrim($path, '/');
-    }
-}
-
-if (!function_exists('redirect')) {
-    function redirect($path, $message = null, $type = 'success') {
-        if ($message) {
-            $_SESSION['flash'] = [
-                'message' => $message,
-                'type' => $type
-            ];
-        }
-        header('Location: ' . base_url($path));
-        exit;
-    }
-}
 
 if (!function_exists('config')) {
     function config($key, $default = null) {
         static $config = null;
         if ($config === null) {
-            $config = require_once __DIR__ . '/app.php';
+            $configFile = __DIR__ . '/app.php';
+            if (!file_exists($configFile)) {
+                return $default;
+            }
+            $config = include $configFile;
+            if (!is_array($config)) {
+                return $default;
+            }
         }
-
+        
         $keys = explode('.', $key);
         $value = $config;
         
-        foreach ($keys as $k) {
-            if (!isset($value[$k])) {
+        foreach ($keys as $segment) {
+            if (!is_array($value) || !array_key_exists($segment, $value)) {
                 return $default;
             }
-            $value = $value[$k];
+            $value = $value[$segment];
         }
         
         return $value;
+    }
+}
+
+if (!function_exists('base_url')) {
+    function base_url($path = '') {
+        $base_url = config('base_url', '');
+        return rtrim($base_url, '/') . '/' . ltrim($path, '/');
+    }
+}
+
+if (!function_exists('asset')) {
+    function asset($path) {
+        return base_url('assets/' . ltrim($path, '/'));
     }
 }
 
@@ -49,8 +50,8 @@ if (!function_exists('csrf_token')) {
     }
 }
 
-if (!function_exists('validate_csrf')) {
-    function validate_csrf($token) {
+if (!function_exists('verify_csrf_token')) {
+    function verify_csrf_token($token) {
         return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
     }
 }
@@ -69,9 +70,57 @@ if (!function_exists('has_error')) {
 
 if (!function_exists('get_error')) {
     function get_error($field) {
-        $error = $_SESSION['errors'][$field] ?? '';
-        unset($_SESSION['errors'][$field]);
-        return $error;
+        return $_SESSION['errors'][$field] ?? '';
+    }
+}
+
+if (!function_exists('flash')) {
+    function flash($type, $message) {
+        $_SESSION['flash'] = [
+            'type' => $type,
+            'message' => $message
+        ];
+    }
+}
+
+if (!function_exists('redirect')) {
+    function redirect($path) {
+        header('Location: ' . base_url($path));
+        exit;
+    }
+}
+
+if (!function_exists('auth')) {
+    function auth() {
+        return isset($_SESSION['user_id']);
+    }
+}
+
+if (!function_exists('user')) {
+    function user() {
+        if (!auth()) {
+            return null;
+        }
+        
+        static $user = null;
+        if ($user === null) {
+            require_once __DIR__ . '/../models/User.php';
+            $userModel = new User();
+            $user = $userModel->findById($_SESSION['user_id']);
+        }
+        return $user;
+    }
+}
+
+if (!function_exists('has_permission')) {
+    function has_permission($permission) {
+        if (!auth()) {
+            return false;
+        }
+        
+        require_once __DIR__ . '/../models/Role.php';
+        $roleModel = new Role();
+        return $roleModel->hasPermission(user()['role_id'], $permission);
     }
 }
 
@@ -87,43 +136,15 @@ if (!function_exists('format_date')) {
     }
 }
 
-if (!function_exists('is_active')) {
-    function is_active($path) {
-        $current_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $base_path = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
-        $path = $base_path . '/' . ltrim($path, '/');
-        return $current_path === $path;
+if (!function_exists('format_datetime')) {
+    function format_datetime($datetime, $format = 'd M Y H:i') {
+        return date($format, strtotime($datetime));
     }
 }
 
 if (!function_exists('sanitize')) {
-    function sanitize($data) {
-        if (is_array($data)) {
-            return array_map('sanitize', $data);
-        }
-        return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
-    }
-}
-
-if (!function_exists('is_ajax')) {
-    function is_ajax() {
-        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-    }
-}
-
-if (!function_exists('json_response')) {
-    function json_response($data, $status = 200) {
-        http_response_code($status);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit;
-    }
-}
-
-if (!function_exists('asset')) {
-    function asset($path) {
-        return base_url('public/assets/' . ltrim($path, '/'));
+    function sanitize($string) {
+        return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
     }
 }
 
@@ -135,41 +156,5 @@ if (!function_exists('generate_random_string')) {
             $string .= $characters[rand(0, strlen($characters) - 1)];
         }
         return $string;
-    }
-}
-
-if (!function_exists('get_flash')) {
-    function get_flash($key = null) {
-        if ($key === null) {
-            $flash = $_SESSION['flash'] ?? [];
-            unset($_SESSION['flash']);
-            return $flash;
-        }
-        
-        $value = $_SESSION['flash'][$key] ?? null;
-        unset($_SESSION['flash'][$key]);
-        return $value;
-    }
-}
-
-if (!function_exists('has_permission')) {
-    function has_permission($permission) {
-        if (!isset($_SESSION['user_id'])) {
-            return false;
-        }
-
-        // Admin has all permissions
-        if ($_SESSION['role_name'] === 'admin') {
-            return true;
-        }
-
-        // Check specific permissions based on role
-        $permissions = [
-            'cashier' => ['process_order', 'view_products'],
-            'sales' => ['create_order', 'view_products', 'view_commissions']
-        ];
-
-        return isset($permissions[$_SESSION['role_name']]) && 
-               in_array($permission, $permissions[$_SESSION['role_name']]);
     }
 }

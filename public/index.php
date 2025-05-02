@@ -1,58 +1,75 @@
 <?php
-// Initialize application
+
+// Load bootstrap file
 require_once __DIR__ . '/../config/bootstrap.php';
 
 // Parse URL
-$url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$base_path = config('base_path');
+$request_uri = $_SERVER['REQUEST_URI'];
+$base_path = parse_url(config('base_url'), PHP_URL_PATH);
 
-// Remove base path from URL
-if (strpos($url, $base_path) === 0) {
-    $url = substr($url, strlen($base_path));
-}
-$url = trim($url, '/');
-
-// Default route
-if (empty($url)) {
-    $url = 'home';
+if ($base_path && strpos($request_uri, $base_path) === 0) {
+    $request_uri = substr($request_uri, strlen($base_path));
 }
 
-// Route to appropriate controller/action
-$parts = explode('/', $url);
-$controller_name = ucfirst($parts[0]) . 'Controller';
-$action = $parts[1] ?? 'index';
-$params = array_slice($parts, 2);
+$request_uri = trim($request_uri, '/');
+$uri_parts = explode('?', $request_uri);
+$path = $uri_parts[0];
+
+if (empty($path)) {
+    $path = 'home';
+}
+
+// Route the request
+$path_parts = explode('/', $path);
+$controller_name = ucfirst(array_shift($path_parts)) . 'Controller';
+$action = array_shift($path_parts) ?: 'index';
+$params = $path_parts;
 
 // Load controller
 $controller_file = __DIR__ . "/../controllers/{$controller_name}.php";
 
+if (!file_exists($controller_file)) {
+    http_response_code(404);
+    include __DIR__ . '/../views/errors/404.php';
+    exit;
+}
+
+require_once $controller_file;
+
+// Create controller instance
+if (!class_exists($controller_name)) {
+    http_response_code(404);
+    include __DIR__ . '/../views/errors/404.php';
+    exit;
+}
+
+$controller = new $controller_name();
+
+// Call action
+if (!method_exists($controller, $action)) {
+    http_response_code(404);
+    include __DIR__ . '/../views/errors/404.php';
+    exit;
+}
+
 try {
-    if (!file_exists($controller_file)) {
-        throw new Exception("Controller not found: {$controller_name}");
-    }
-
-    require_once $controller_file;
+    // Call action with parameters
+    $response = call_user_func_array([$controller, $action], $params);
     
-    if (!class_exists($controller_name)) {
-        throw new Exception("Controller class not found: {$controller_name}");
+    // Output response
+    if (is_string($response)) {
+        echo $response;
     }
-
-    $controller = new $controller_name();
     
-    if (!method_exists($controller, $action)) {
-        throw new Exception("Action not found: {$action}");
-    }
-
-    // Call controller action with parameters
-    echo call_user_func_array([$controller, $action], $params);
-
 } catch (Exception $e) {
-    error_log($e->getMessage());
-    
     if (config('debug')) {
-        echo "<pre>" . $e->getMessage() . "\n" . $e->getTraceAsString() . "</pre>";
+        throw $e;
     } else {
-        http_response_code(404);
-        require __DIR__ . '/../views/errors/404.php';
+        error_log($e->getMessage());
+        http_response_code(500);
+        include __DIR__ . '/../views/errors/500.php';
     }
 }
+
+// Flush output buffer
+ob_end_flush();
