@@ -14,13 +14,20 @@ class AuthController extends BaseController {
         if (isset($_SESSION['user'])) {
             $this->redirect('/Salvio2/public/');
         }
+
+        // Handle POST request for login
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->handleLogin();
+            return;
+        }
         
+        // Show login form for GET request
         $this->render('auth/login', [
             'title' => 'Login - Salvio POS'
         ]);
     }
 
-    public function login() {
+    private function handleLogin() {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
 
