@@ -134,5 +134,5 @@ This project is licensed under the MIT License.
 
 For support or inquiries:
 
-- Email: your.email@example.com
-- GitHub: [your-username](https://github.com/your-username)
+- Email: cunleen@gmail.com
+- GitHub: [JustAjie A.K.A UndeRDoux](https://github.com/underdoux)
