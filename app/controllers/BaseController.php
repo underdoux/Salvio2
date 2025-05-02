@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/Logger.php';
+
 class BaseController {
     protected $db;
     protected $view;
@@ -11,6 +13,8 @@ class BaseController {
 
         // Check authentication if required
         if ($this->requiresAuth && !$this->isAuthenticated()) {
+            $requestUri = $_SERVER['REQUEST_URI'] ?? 'unknown';
+            Logger::log("Unauthorized access attempt to {$requestUri}");
             $this->redirect('/Salvio2/public/auth');
         }
     }
@@ -41,5 +45,15 @@ class BaseController {
     protected function redirect($url) {
         header("Location: {$url}");
         exit;
+    }
+
+    protected function getStatusBadgeClass($status) {
+        return match($status) {
+            'new' => 'primary',
+            'in_progress' => 'warning',
+            'completed' => 'success',
+            'paid' => 'info',
+            default => 'secondary'
+        };
     }
 }
