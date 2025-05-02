@@ -42,6 +42,12 @@
                             <i class="fas fa-percentage"></i> Commissions
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/profit-sharing') !== false ? 'active' : '' ?>" 
+                           href="<?= $baseUrl ?>/profit-sharing">
+                            <i class="fas fa-chart-pie"></i> Profit Sharing
+                        </a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     <?php if (isset($_SESSION['user'])): ?>
