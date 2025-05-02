@@ -1,138 +1,127 @@
+# Salvio POS & Pharmaceutical Distribution Management System
 
-# 💊 Salvio Pharmaceutical POS & Inventory Management System
+A comprehensive system for managing pharmaceutical distribution, sales tracking, and profit sharing.
 
-A fullstack modular Point of Sale (POS) and pharmaceutical inventory management system built with **pure PHP (no framework)** and **MySQL**, using an **MVC-like folder structure**. This system is designed for businesses with multiple investors, supporting stocked and by-order medicines, commission rules, profit sharing, installment payments, and modern reporting. Fully responsive for desktop and mobile.
+## System Requirements
 
----
+- PHP 7.4 or higher
+- MySQL 5.7 or higher
+- Apache with mod_rewrite enabled
+- Composer (for future package management)
 
-## 🚀 Features
-
-- Modular MVC-like architecture
-- Responsive frontend (mobile & desktop)
-- Role-based access: **Admin** & **Sales**
-- Product categorization using **BPOM reference data**
-- Support for **stocked** and **by-order** medicines
-- Price adjustment with discount validation and reason logs
-- Commission system:
-  - Global rates
-  - Category-based rates
-  - Product-specific rates
-- Profit sharing based on investor capital percentage
-- Handles **cash** and **installment** payments (suppliers/customers)
-- Integrated **Email & WhatsApp notifications**
-- Detailed reports, audit logs & business insights
-
----
-
-## 🧱 Tech Stack
-
-| Layer       | Technology      |
-|-------------|-----------------|
-| Backend     | PHP (no framework) |
-| Database    | MySQL           |
-| Frontend    | HTML, CSS, JavaScript |
-| Architecture| Custom MVC-like |
-
----
-
-## 🗂️ Folder Structure
+## Project Structure
 
 ```
-/app
-  /controllers
-  /models
-  /views
-/assets
-  /css
-  /js
-/config
-/database
-  /migrations
-  /seeders
-/public
-  index.php
+/project-root/
+├── app/
+│   ├── controllers/    # Application controllers
+│   ├── models/        # Database models
+│   ├── views/         # View templates
+│   └── helpers/       # Helper functions
+├── public/           # Public-facing files
+│   ├── index.php     # Entry point
+│   ├── assets/       # CSS, JS, images
+│   └── uploads/      # User uploads
+├── config/          # Configuration files
+├── database/        # Database migrations & seeds
+└── storage/         # Logs and cache
 ```
 
----
+## Installation
 
-## 📦 Installation
+1. Clone the repository:
+```bash
+git clone [repository-url]
+cd salvio-pos
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/pharma-pos.git
-   cd pharma-pos
-   ```
+2. Create a MySQL database:
+```sql
+CREATE DATABASE salvio_pos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-2. **Set up your database**
-   - Create a MySQL database
-   - Import the SQL file from `/database/`
-   - Configure `/config/database.php` with your DB credentials
+3. Import the database schema:
+```bash
+mysql -u root -p salvio_pos < database/migrations/001_initial_schema.sql
+```
 
-3. **Run the app**
-   - Use a local webserver (e.g., XAMPP, Laragon)
-   - Place the project in `htdocs` or `www`
-   - Open `http://localhost/pharma-pos/public` in your browser
+4. Configure your web server:
+- Point the document root to the `public` directory
+- Ensure mod_rewrite is enabled
+- Set appropriate permissions:
+```bash
+chmod -R 755 public/uploads
+chmod -R 755 storage/logs
+```
 
----
+5. Update database configuration:
+- Copy `config/database.php` to `config/database.local.php`
+- Update the database credentials in `database.local.php`
 
-## 🔐 User Roles
+## Default Access
 
-### 👑 Admin
-- Full system access
-- Manage users, roles, commissions, product pricing
-- Distribute investor profit
-- Access all reports
+- URL: http://localhost/
+- Admin Username: admin
+- Admin Password: admin123
 
-### 🧾 Sales
-- Create orders
-- View assigned reports
-- Suggest new products (manual entry for by-order)
+## Features
 
----
+1. User & Role Management
+   - Login/logout functionality
+   - Role-based access control
+   - User management (Admin only)
 
-## 📊 Reporting & Analytics
+2. Investor & Capital Management
+   - Add investors and capital amounts
+   - Calculate ownership percentages
+   - Monthly profit distribution reports
 
-- Revenue reports (daily/weekly/monthly/yearly)
-- Commission summaries by user/product
-- Investor profit reports
-- Price adjustment logs
-- Product & market insights
+3. Product & Inventory Management
+   - Product management (stocked/by-order)
+   - BPOM data integration
+   - Automatic category assignment
+   - Stock tracking
 
----
+4. Sales & Order Management
+   - Sales transaction input
+   - Discount validation
+   - Order status tracking
+   - Payment handling (Cash/Installments)
 
-## 📬 Notifications
+5. Commission Management
+   - Commission calculation
+   - Multi-level commission rates
+   - Sales commission reports
 
-Integrated with **Email & WhatsApp API** for:
-- New order alerts
-- Delays or stock issues
-- Shipping & order completion updates
+6. Profit Sharing
+   - Net profit calculation
+   - Investor profit distribution
+   - Transparent reporting
 
----
+7. Reporting & Analytics
+   - Sales reports
+   - Commission reports
+   - Price adjustment logs
+   - Profit distribution reports
+   - Market response tracking
 
-## 📈 Insight Features
+## Security
 
-- Best-selling products & categories
-- Least-performing products
-- Market response by customer type (e.g., clinic, pharmacy)
-- Graphs & trends for better decisions
+- Password hashing using bcrypt
+- CSRF protection
+- XSS prevention
+- SQL injection prevention
+- Input validation
+- Role-based access control
 
----
+## Contributing
 
-## 🤝 Contribution
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+## License
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-## 📫 Contact
-
-For support or inquiries:
-
-- Email: cunleen@gmail.com
-- GitHub: [JustAjie A.K.A UndeRDoux](https://github.com/underdoux)
+This project is proprietary software. All rights reserved.
