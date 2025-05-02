@@ -1,5 +1,5 @@
 
-# 💊 Pharmaceutical POS & Inventory Management System
+# 💊 Salvio Pharmaceutical POS & Inventory Management System
 
 A fullstack modular Point of Sale (POS) and pharmaceutical inventory management system built with **pure PHP (no framework)** and **MySQL**, using an **MVC-like folder structure**. This system is designed for businesses with multiple investors, supporting stocked and by-order medicines, commission rules, profit sharing, installment payments, and modern reporting. Fully responsive for desktop and mobile.
 
