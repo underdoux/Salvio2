@@ -116,6 +116,15 @@ class OrdersController extends BaseController {
             $newStatus = $_POST['status'];
             $this->orderModel->updateStatus($id, $newStatus);
             
+            // Calculate commission when order is completed
+            if ($newStatus === 'completed') {
+                $order = $this->orderModel->getById($id);
+                if ($order && $order['created_by']) {
+                    $commission = new Commission();
+                    $commission->calculateCommission($id, $order['created_by']);
+                }
+            }
+            
             $_SESSION['flash'] = [
                 'type' => 'success',
                 'message' => "Order status updated to {$newStatus}"

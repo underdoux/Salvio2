@@ -36,6 +36,12 @@
                             <i class="fas fa-chart-bar"></i> Reports
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/commissions') !== false ? 'active' : '' ?>" 
+                           href="<?= $baseUrl ?>/commissions">
+                            <i class="fas fa-percentage"></i> Commissions
+                        </a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     <?php if (isset($_SESSION['user'])): ?>

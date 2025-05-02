@@ -38,3 +38,18 @@
 [2025-05-02 21:40:54] User 'admin' accessed products list.
 [2025-05-02 21:40:56] User 'admin' accessed orders list
 [2025-05-02 21:41:17] User 'admin' accessed products list.
+[2025-05-02 21:49:04] Unauthorized access attempt to /Salvio2/public/commissions
+[2025-05-02 21:49:51] User 'admin' logged in successfully.
+[2025-05-02 21:50:42] Unauthorized access attempt to /Salvio2/public/commissions
+[2025-05-02 21:52:16] User 'admin' logged in successfully.
+[2025-05-02 21:52:21] User 'admin' accessed products list.
+[2025-05-02 21:52:26] User 'admin' logged out.
+[2025-05-02 21:52:27] User 'admin' logged in successfully.
+[2025-05-02 21:52:28] User 'admin' accessed orders list
+[2025-05-02 21:52:31] User 'admin' accessed products list.
+[2025-05-02 21:52:37] User 'admin' accessed orders list
+[2025-05-02 21:52:39] User 'admin' accessed products list.
+[2025-05-02 21:52:44] User 'admin' accessed orders list
+[2025-05-02 21:52:51] User 'admin' accessed products list.
+[2025-05-02 21:54:20] Unauthorized access attempt to /Salvio2/public/commissions
+[2025-05-02 21:55:11] User 'admin' logged in successfully.
