@@ -1,6 +1,6 @@
 <?php
 // Set page title and body class
-$title = '404 Not Found';
+$title = '500 Server Error';
 $bodyClass = 'bg-light d-flex align-items-center';
 
 // Define inline styles
@@ -14,7 +14,7 @@ $inlineStyles = '
     }
     .error-icon {
         font-size: 5rem;
-        color: #6c757d;
+        color: #dc3545;
         margin-bottom: 1rem;
     }
 ';
@@ -24,13 +24,15 @@ ob_start();
 ?>
 <main class="error-page">
     <div class="error-icon">
-        <i class="bi bi-question-circle"></i>
+        <i class="bi bi-exclamation-triangle"></i>
     </div>
-    <h1 class="display-1">404</h1>
-    <h2 class="h3 mb-3">Page Not Found</h2>
+    <h1 class="display-1">500</h1>
+    <h2 class="h3 mb-3">Internal Server Error</h2>
     <p class="text-muted mb-4">
-        The page you are looking for might have been removed, had its name changed, 
-        or is temporarily unavailable.
+        Something went wrong on our end. Please try again later or contact support if the problem persists.
+        <?php if (config('debug')): ?>
+            <br><small class="text-danger">Error: <?php echo htmlspecialchars($e->getMessage()); ?></small>
+        <?php endif; ?>
     </p>
     <div class="d-grid gap-2 col-6 mx-auto">
         <a href="<?php echo base_url('/'); ?>" class="btn btn-primary">

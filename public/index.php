@@ -1,119 +1,105 @@
 <?php
 // Load bootstrap
 $app = require_once __DIR__ . '/../config/bootstrap.php';
-$config = $app['config'];
-$conn = $app['conn'];
 
-// Get the request URI and remove base path
-$requestUri = $_SERVER['REQUEST_URI'];
-$basePath = $config['base_path'];
+// Parse URL
+$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$script_name = dirname($_SERVER['SCRIPT_NAME']);
+$base_path = rtrim($script_name, '/');
+$path = substr(urldecode($request_uri), strlen($base_path));
 
-// Remove base path from request URI
-if (strpos($requestUri, $basePath) === 0) {
-    $requestUri = substr($requestUri, strlen($basePath));
+// Default route
+if ($path == '' || $path == '/') {
+    $path = '/home';
 }
 
-// Remove /public from request URI if present
-if (strpos($requestUri, '/public') === 0) {
-    $requestUri = substr($requestUri, strlen('/public'));
-}
+// Route definitions
+$routes = [
+    '/login' => ['AuthController', 'showLogin'],
+    '/auth/login' => ['AuthController', 'login'],
+    '/logout' => ['AuthController', 'logout'],
+    '/auth/change-password' => ['AuthController', 'changePassword'],
+    '/home' => ['HomeController', 'index'],
+    '/products' => ['ProductController', 'index'],
+    '/products/create' => ['ProductController', 'create'],
+    '/products/edit' => ['ProductController', 'edit'],
+    '/products/delete' => ['ProductController', 'delete'],
+    '/orders' => ['OrderController', 'index'],
+    '/orders/create' => ['OrderController', 'create'],
+    '/orders/edit' => ['OrderController', 'edit'],
+    '/orders/delete' => ['OrderController', 'delete'],
+    '/commissions' => ['CommissionController', 'index'],
+    '/profits' => ['ProfitDistributionController', 'index'],
+    '/reports' => ['ReportController', 'index'],
+    '/settings' => ['SettingController', 'index']
+];
 
-// Parse the path
-$path = parse_url($requestUri, PHP_URL_PATH);
+// Extract controller and action from path
+$path = strtok($path, '?');
+$path = rtrim($path, '/');
 
-// Simple router
-switch ($path) {
-    case '/login':
-        if (!isset($_SESSION['user_id'])) {
-            view('user/login', ['config' => $config]);
-        } else {
-            redirect('/');
-        }
-        break;
-
-    case '/auth/login':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once __DIR__ . '/../controllers/AuthController.php';
-            $auth = new AuthController();
-            $auth->login($_POST['username'], $_POST['password']);
-        } else {
-            redirect('/login');
-        }
-        break;
-
-    case '/logout':
-        session_destroy();
-        redirect('/login');
-        break;
-
-    case '':
-    case '/':
-        if (isset($_SESSION['user_id'])) {
-            view('home', [
-                'config' => $config,
-                'user' => [
-                    'id' => $_SESSION['user_id'],
-                    'username' => $_SESSION['username'] ?? 'User',
-                    'role' => $_SESSION['role_id'] ?? 'user'
-                ]
-            ]);
-        } else {
-            redirect('/login');
-        }
-        break;
-
-    default:
-        if (!isset($_SESSION['user_id'])) {
-            redirect('/login');
-        }
+try {
+    if (isset($routes[$path])) {
+        // Get controller and action
+        list($controller_name, $action) = $routes[$path];
         
-        // Check if file exists in public directory (for assets)
-        $publicFile = __DIR__ . $path;
-        if (file_exists($publicFile) && !is_dir($publicFile)) {
-            $extension = pathinfo($publicFile, PATHINFO_EXTENSION);
-            $mimeTypes = [
-                'css' => 'text/css',
-                'js' => 'application/javascript',
-                'png' => 'image/png',
-                'jpg' => 'image/jpeg',
-                'jpeg' => 'image/jpeg',
-                'gif' => 'image/gif',
-                'svg' => 'image/svg+xml',
-                'woff' => 'application/font-woff',
-                'woff2' => 'application/font-woff2',
-                'ttf' => 'application/font-ttf',
-                'eot' => 'application/vnd.ms-fontobject'
-            ];
+        // Include controller file
+        $controller_file = __DIR__ . "/../controllers/{$controller_name}.php";
+        if (!file_exists($controller_file)) {
+            throw new Exception("Controller file not found: {$controller_file}");
+        }
+        require_once $controller_file;
+        
+        // Create controller instance
+        $controller = new $controller_name();
+        
+        // Call action
+        if (method_exists($controller, $action)) {
+            // Get query parameters
+            $params = $_GET;
+            unset($params['route']);
             
-            if (isset($mimeTypes[$extension])) {
-                header('Content-Type: ' . $mimeTypes[$extension]);
-                readfile($publicFile);
-                exit;
+            // Call action with parameters
+            call_user_func_array([$controller, $action], $params);
+        } else {
+            throw new Exception("Action not found: {$action}");
+        }
+    } else {
+        // Check if it's an asset request
+        if (preg_match('/\.(css|js|jpg|jpeg|png|gif|ico)$/', $path)) {
+            $file = __DIR__ . $path;
+            if (file_exists($file)) {
+                // Get file extension
+                $ext = pathinfo($file, PATHINFO_EXTENSION);
+                
+                // Set content type
+                $content_types = [
+                    'css' => 'text/css',
+                    'js' => 'application/javascript',
+                    'jpg' => 'image/jpeg',
+                    'jpeg' => 'image/jpeg',
+                    'png' => 'image/png',
+                    'gif' => 'image/gif',
+                    'ico' => 'image/x-icon'
+                ];
+                
+                if (isset($content_types[$ext])) {
+                    header('Content-Type: ' . $content_types[$ext]);
+                    readfile($file);
+                    exit;
+                }
             }
         }
-
-        // If not a public file, check for a view file
-        $viewFile = __DIR__ . '/../views' . $path . '.php';
-        if (file_exists($viewFile)) {
-            view(ltrim($path, '/'), [
-                'config' => $config,
-                'user' => [
-                    'id' => $_SESSION['user_id'],
-                    'username' => $_SESSION['username'] ?? 'User',
-                    'role' => $_SESSION['role_id'] ?? 'user'
-                ]
-            ]);
-            exit;
-        }
-
-        // If no matching route or file found, show 404
+        
+        // Route not found
         http_response_code(404);
-        if ($config['debug']) {
-            echo "404 Not Found: " . htmlspecialchars($path);
-            echo "<br>Request URI: " . htmlspecialchars($requestUri);
-            echo "<br>Base Path: " . htmlspecialchars($basePath);
-        } else {
-            view('errors/404', ['config' => $config]);
-        }
-        break;
+        require_once __DIR__ . '/../views/errors/404.php';
+    }
+} catch (Exception $e) {
+    // Log error
+    error_log($e->getMessage());
+    
+    // Show error page
+    http_response_code(500);
+    require_once __DIR__ . '/../views/errors/500.php';
 }

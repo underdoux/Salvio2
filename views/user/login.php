@@ -2,6 +2,7 @@
 // Set page title and body class
 $title = 'Login';
 $bodyClass = 'bg-light d-flex align-items-center';
+$hideNav = true;
 
 // Define inline styles
 $inlineStyles = '
@@ -35,8 +36,8 @@ $inlineStyles = '
 ob_start(); 
 ?>
 <main class="form-signin text-center">
-    <form action="<?php echo base_url('/public/auth/login'); ?>" method="POST">
-        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+    <form action="<?php echo base_url('auth/login'); ?>" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token ?? ''); ?>">
         
         <div class="brand-icon">
             <i class="bi bi-capsule"></i>
@@ -54,9 +55,9 @@ ob_start();
         <?php endif; ?>
 
         <?php if (isset($_SESSION['flash'])): ?>
-            <div class="alert alert-<?php echo htmlspecialchars($_SESSION['flash']['type']); ?>">
+            <div class="alert alert-<?php echo htmlspecialchars($_SESSION['flash']['type'] ?? 'info'); ?>">
                 <?php 
-                    echo htmlspecialchars($_SESSION['flash']['message']); 
+                    echo htmlspecialchars($_SESSION['flash']['message'] ?? ''); 
                     unset($_SESSION['flash']); 
                 ?>
             </div>

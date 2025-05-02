@@ -1,12 +1,9 @@
+# Enable URL rewriting
 RewriteEngine On
+
+# Set base directory
 RewriteBase /Salvio2/
 
 # Redirect all requests to public directory
 RewriteCond %{REQUEST_URI} !^/Salvio2/public/
 RewriteRule ^(.*)$ public/$1 [L]
-
-# Set default character set
-AddDefaultCharset UTF-8
-
-# Prevent directory listing
-Options -Indexes
