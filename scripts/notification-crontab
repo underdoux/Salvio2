@@ -1,0 +1,19 @@
+# Notification System Cron Jobs
+
+# Process notifications every minute
+* * * * * /usr/bin/php /path/to/Salvio2/Salvio2/scripts/process_notifications.php --limit=50 >> /var/log/salvio2/notification-processor.log 2>&1
+
+# Clean up old notifications daily at 2 AM
+0 2 * * * /usr/bin/php /path/to/Salvio2/Salvio2/scripts/cleanup_notifications.php --verbose >> /var/log/salvio2/notification-cleanup.log 2>&1
+
+# Retry failed notifications every hour
+0 * * * * /usr/bin/php -r "require '/path/to/Salvio2/Salvio2/models/NotificationQueue.php'; (new NotificationQueue())->retryFailed();" >> /var/log/salvio2/notification-retry.log 2>&1
+
+# Update notification metrics every 5 minutes
+*/5 * * * * /usr/bin/php -r "require '/path/to/Salvio2/Salvio2/models/NotificationMetrics.php'; (new NotificationMetrics())->update();" >> /var/log/salvio2/notification-metrics.log 2>&1
+
+# Monitor notification service status every 15 minutes
+*/15 * * * * /usr/bin/systemctl is-active --quiet notification-processor.service || /usr/bin/systemctl restart notification-processor.service
+
+# Rotate notification logs weekly
+0 0 * * 0 /usr/sbin/logrotate /etc/logrotate.d/salvio2-notifications

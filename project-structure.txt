@@ -1,0 +1,50 @@
+/config
+    database.php          # Database connection configuration
+/controllers
+    UserController.php
+    ProductController.php
+    OrderController.php
+    CommissionController.php
+    ProfitSharingController.php
+    NotificationController.php
+    ReportController.php
+/models
+    User.php
+    Role.php
+    Product.php
+    Category.php
+    Order.php
+    OrderItem.php
+    Commission.php
+    ProfitShare.php
+    Notification.php
+    Report.php
+/services
+    AuthService.php
+    BPOMService.php       # For BPOM data integration and scraping
+    NotificationService.php
+    ReportService.php
+/public
+    index.php             # Front controller
+    assets/
+        css/
+        js/
+        images/
+/views
+    layouts/
+        main.php
+    user/
+    product/
+    order/
+    commission/
+    profit_sharing/
+    notification/
+    report/
+/migrations
+    create_tables.sql
+/seeders
+    seed_initial_data.sql
+/tests
+    unit/
+    feature/
+README.md
