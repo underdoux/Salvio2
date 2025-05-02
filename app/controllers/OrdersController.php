@@ -30,6 +30,17 @@ class OrdersController extends BaseController {
         ]);
     }
 
+    protected function getStatusBadgeClass($status) {
+        return match($status) {
+            'new' => 'primary',
+            'in_progress' => 'warning',
+            'completed' => 'success',
+            'paid' => 'info',
+            'cancelled' => 'danger',
+            default => 'secondary'
+        };
+    }
+
     public function create() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {

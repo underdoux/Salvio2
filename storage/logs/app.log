@@ -1,1 +1,40 @@
 [2025-05-02 21:30:52] Unauthorized access attempt to /Salvio2/public/orders
+[2025-05-02 21:32:06] User 'admin' logged out.
+[2025-05-02 21:32:08] User 'admin' logged in successfully.
+[2025-05-02 21:32:10] User 'admin' accessed products list.
+[2025-05-02 21:32:11] User 'admin' logged in successfully.
+[2025-05-02 21:32:15] User 'admin' accessed orders list
+[2025-05-02 21:32:20] User 'admin' accessed orders list
+[2025-05-02 21:32:25] User 'admin' accessed orders list
+[2025-05-02 21:32:30] User 'admin' accessed products list.
+[2025-05-02 21:32:35] User 'admin' accessed orders list
+[2025-05-02 21:32:37] User 'admin' accessed orders list
+[2025-05-02 21:32:55] User 'admin' logged out.
+[2025-05-02 21:32:59] Unauthorized access attempt to /Salvio2/public/
+[2025-05-02 21:33:01] User 'admin' logged in successfully.
+[2025-05-02 21:33:03] User 'admin' accessed orders list
+[2025-05-02 21:33:09] User 'admin' accessed orders list
+[2025-05-02 21:33:14] User 'admin' logged out.
+[2025-05-02 21:33:15] User 'admin' logged in successfully.
+[2025-05-02 21:33:19] User 'admin' accessed orders list
+[2025-05-02 21:34:26] Unauthorized access attempt to /Salvio2/public/orders
+[2025-05-02 21:35:15] User 'admin' logged in successfully.
+[2025-05-02 21:37:35] Unauthorized access attempt to /Salvio2/public/orders
+[2025-05-02 21:38:23] User 'admin' logged in successfully.
+[2025-05-02 21:38:44] User 'admin' accessed orders list
+[2025-05-02 21:38:52] User 'admin' accessed orders list
+[2025-05-02 21:38:59] User 'admin' accessed orders list
+[2025-05-02 21:39:00] User 'admin' accessed products list.
+[2025-05-02 21:39:05] User 'admin' viewed order #1
+[2025-05-02 21:39:06] User 'admin' accessed orders list
+[2025-05-02 21:39:10] User 'admin' accessed orders list
+[2025-05-02 21:39:16] User 'admin' accessed products list.
+[2025-05-02 21:39:19] User 'admin' accessed orders list
+[2025-05-02 21:39:23] User 'admin' viewed order #1
+[2025-05-02 21:39:32] User 'admin' accessed orders list
+[2025-05-02 21:39:37] User 'admin' accessed orders list
+[2025-05-02 21:39:51] Unauthorized access attempt to /Salvio2/public/orders
+[2025-05-02 21:40:50] User 'admin' logged in successfully.
+[2025-05-02 21:40:54] User 'admin' accessed products list.
+[2025-05-02 21:40:56] User 'admin' accessed orders list
+[2025-05-02 21:41:17] User 'admin' accessed products list.

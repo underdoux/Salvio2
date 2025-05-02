@@ -1,47 +1,44 @@
--- Insert expense categories
-INSERT INTO expense_categories (name, description) VALUES
-('Rent', 'Office and warehouse rent'),
-('Utilities', 'Electricity, water, internet'),
-('Salaries', 'Employee salaries'),
-('Transportation', 'Delivery and transportation costs'),
-('Office Supplies', 'General office supplies');
-
--- Insert product categories
-INSERT INTO categories (name, commission_rate) VALUES
-('Antibiotics', 2.50),
-('Pain Relief', 2.00),
-('Vitamins', 3.00),
-('First Aid', 2.00),
-('Chronic Disease', 2.50);
-
--- Insert sample customers
+-- Insert test customers
 INSERT INTO customers (name, type, contact_person, phone, email, address) VALUES
-('Pharmacy Plus', 'pharmacy', 'John Doe', '081234567890', 'contact@pharmacyplus.com', 'Jl. Pharmacy No. 123'),
-('City Clinic', 'clinic', 'Jane Smith', '081234567891', 'info@cityclinic.com', 'Jl. Health No. 456'),
-('General Hospital', 'hospital', 'Dr. Wilson', '081234567892', 'procurement@generalhospital.com', 'Jl. Hospital No. 789');
+('ABC Pharmacy', 'pharmacy', 'John Doe', '123-456-7890', 'john@abcpharmacy.com', '123 Main St'),
+('City Clinic', 'clinic', 'Jane Smith', '098-765-4321', 'jane@cityclinic.com', '456 Oak Ave'),
+('General Hospital', 'hospital', 'Bob Wilson', '555-123-4567', 'bob@genhospital.com', '789 Pine Rd');
 
--- Insert notification templates
-INSERT INTO notification_templates (type, name, subject, content, variables) VALUES
-('new_order', 'New Order Notification', 'New Order #{order_number}', 'Dear {recipient_name},\n\nA new order #{order_number} has been placed by {customer_name}.\n\nTotal Amount: {total_amount}\n\nBest regards,\nSalvio POS', '["order_number", "recipient_name", "customer_name", "total_amount"]'),
-('order_status', 'Order Status Update', 'Order #{order_number} Status Update', 'Dear {recipient_name},\n\nYour order #{order_number} status has been updated to {status}.\n\nBest regards,\nSalvio POS', '["order_number", "recipient_name", "status"]'),
-('low_stock', 'Low Stock Alert', 'Low Stock Alert - {product_name}', 'Dear {recipient_name},\n\nProduct {product_name} is running low on stock. Current quantity: {current_stock}\n\nPlease restock soon.\n\nBest regards,\nSalvio POS', '["product_name", "recipient_name", "current_stock"]');
-
--- Insert commission rates
-INSERT INTO commission_rates (type, rate) VALUES
-('global', 2.00);  -- Default global commission rate
-
--- Insert sample products
-INSERT INTO products (name, bpom_id, category_id, description, purchase_price, selling_price, stock_type, min_stock) VALUES
-('Amoxicillin 500mg', 'BPOM001', 1, 'Antibiotic capsules 500mg', 25000.00, 35000.00, 'stocked', 100),
-('Paracetamol 500mg', 'BPOM002', 2, 'Pain relief tablets 500mg', 15000.00, 22000.00, 'stocked', 200),
-('Vitamin C 1000mg', 'BPOM003', 3, 'Vitamin C tablets 1000mg', 35000.00, 48000.00, 'stocked', 150),
-('Bandage Roll', 'BPOM004', 4, 'Sterile bandage roll 10cm x 5m', 12000.00, 18000.00, 'stocked', 50),
-('Metformin 500mg', 'BPOM005', 5, 'Diabetes medication 500mg', 45000.00, 62000.00, 'stocked', 100);
+-- Insert test products (if not exists)
+INSERT IGNORE INTO products (name, bpom_id, category_id, purchase_price, selling_price, stock_type, min_stock) VALUES
+('Paracetamol 500mg', 'BPOM001', 1, 5000, 7500, 'stocked', 100),
+('Amoxicillin 500mg', 'BPOM002', 1, 8000, 12000, 'stocked', 50),
+('Vitamin C 1000mg', 'BPOM003', 2, 15000, 25000, 'stocked', 75);
 
 -- Insert initial stock
-INSERT INTO stock (product_id, quantity, batch_number, expiry_date) VALUES
-(1, 500, 'BATCH001', '2024-12-31'),
-(2, 1000, 'BATCH002', '2024-12-31'),
-(3, 750, 'BATCH003', '2024-12-31'),
-(4, 200, 'BATCH004', '2024-12-31'),
-(5, 300, 'BATCH005', '2024-12-31');
+INSERT INTO stock (product_id, quantity, batch_number, expiry_date) 
+SELECT id, 200, CONCAT('BATCH', id, '2024'), '2024-12-31' FROM products;
+
+-- Insert test orders
+INSERT INTO orders (customer_id, order_number, total_amount, status, payment_type, created_by) VALUES
+(1, 'ORD-2024-001', 150000, 'completed', 'cash', 1),
+(2, 'ORD-2024-002', 240000, 'in_progress', 'installment', 1),
+(3, 'ORD-2024-003', 375000, 'new', 'cash', 1);
+
+-- Insert order items
+INSERT INTO order_items (order_id, product_id, quantity, unit_price, total_price) VALUES
+(1, 1, 10, 7500, 75000),
+(1, 2, 5, 12000, 60000),
+(2, 2, 20, 12000, 240000),
+(3, 3, 15, 25000, 375000);
+
+-- Insert payments for completed orders
+INSERT INTO payments (order_id, amount, payment_date, payment_method, reference_number, created_by) VALUES
+(1, 150000, CURDATE(), 'cash', 'PAY-2024-001', 1);
+
+-- Insert commission rates
+INSERT INTO commission_rates (type, reference_id, rate) VALUES
+('global', NULL, 2.5),
+('category', 1, 3.0),
+('product', 3, 5.0);
+
+-- Insert sales commissions
+INSERT INTO sales_commissions (order_id, user_id, amount, status) VALUES
+(1, 1, 3750, 'paid'),
+(2, 1, 7200, 'pending'),
+(3, 1, 18750, 'pending');

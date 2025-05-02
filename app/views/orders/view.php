@@ -90,7 +90,7 @@
                         </dd>
 
                         <dt class="col-sm-4">Customer:</dt>
-                        <dd class="col-sm-8"><?= htmlspecialchars($order['customer_id']) ?></dd>
+                        <dd class="col-sm-8"><?= htmlspecialchars($order['customer_name']) ?></dd>
 
                         <dt class="col-sm-4">Created By:</dt>
                         <dd class="col-sm-8"><?= htmlspecialchars($order['created_by_name']) ?></dd>

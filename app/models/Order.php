@@ -59,9 +59,10 @@ class Order extends BaseModel {
     }
 
     public function getById($id) {
-        $sql = "SELECT o.*, u.username as created_by_name 
+        $sql = "SELECT o.*, u.username as created_by_name, c.name as customer_name 
                 FROM orders o 
                 JOIN users u ON o.created_by = u.id 
+                JOIN customers c ON o.customer_id = c.id 
                 WHERE o.id = ?";
         
         $stmt = $this->db->prepare($sql);
@@ -76,7 +77,8 @@ class Order extends BaseModel {
     }
 
     private function getOrderItems($orderId) {
-        $sql = "SELECT oi.*, p.name as product_name 
+        $sql = "SELECT oi.*, p.name as product_name,
+                       COALESCE(oi.discount, 0) as discount
                 FROM order_items oi 
                 JOIN products p ON oi.product_id = p.id 
                 WHERE oi.order_id = ?";
@@ -101,9 +103,10 @@ class Order extends BaseModel {
     }
 
     public function getAll($filters = []) {
-        $sql = "SELECT o.*, u.username as created_by_name 
+        $sql = "SELECT o.*, u.username as created_by_name, c.name as customer_name 
                 FROM orders o 
                 JOIN users u ON o.created_by = u.id 
+                JOIN customers c ON o.customer_id = c.id 
                 WHERE 1=1";
         
         $params = [];

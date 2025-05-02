@@ -1,64 +1,52 @@
 <?php
 
-$config = [
-    'host' => 'localhost',
-    'dbname' => 'salvio_pos',
-    'username' => 'root',
-    'password' => '',
-    'charset' => 'utf8',
-    'options' => [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-    ]
-];
+// Load database configuration
+$config = require_once __DIR__ . '/../config/database.php';
 
 try {
-    // Create connection without database
-    $pdo = new PDO(
-        "mysql:host={$config['host']}", 
-        $config['username'], 
-        $config['password'], 
-        $config['options']
-    );
-
+    // Create database connection
+    $dsn = "mysql:host={$config['host']};charset={$config['charset']}";
+    $db = new PDO($dsn, $config['username'], $config['password'], $config['options']);
+    
     // Create database if not exists
-    $pdo->exec("DROP DATABASE IF EXISTS {$config['dbname']}");
-    $pdo->exec("CREATE DATABASE {$config['dbname']} CHARACTER SET utf8 COLLATE utf8_unicode_ci");
-    echo "Database '{$config['dbname']}' created successfully.\n";
-
+    $sql = "CREATE DATABASE IF NOT EXISTS {$config['dbname']} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+    $db->exec($sql);
+    echo "Database '{$config['dbname']}' created or already exists.\n";
+    
     // Select the database
-    $pdo->exec("USE {$config['dbname']}");
-
-    // Run migrations in order
-    $migrations = [
-        '001_initial_schema.sql',
-        '002_create_investors.sql',
-        '003_create_products.sql',
-        '004_create_orders.sql',
-        '005_create_profit_sharing.sql',
-        '006_create_notifications.sql'
-    ];
-
+    $db->exec("USE {$config['dbname']}");
+    
+    // Get all migration files
+    $migrations = glob(__DIR__ . '/migrations/*.sql');
+    sort($migrations); // Sort to ensure correct order
+    
+    // Execute each migration file
     foreach ($migrations as $migration) {
-        $sql = file_get_contents(__DIR__ . '/migrations/' . $migration);
-        $pdo->exec($sql);
-        echo "Migration {$migration} executed successfully.\n";
+        $sql = file_get_contents($migration);
+        
+        try {
+            $db->exec($sql);
+            echo "Executed migration: " . basename($migration) . "\n";
+        } catch (PDOException $e) {
+            echo "Error executing " . basename($migration) . ": " . $e->getMessage() . "\n";
+        }
     }
-
-    // Run seeders
-    $seeders = [
-        'initial_data.sql'
-    ];
-
+    
+    // Execute seeders if they exist
+    $seeders = glob(__DIR__ . '/seeders/*.sql');
     foreach ($seeders as $seeder) {
-        $sql = file_get_contents(__DIR__ . '/seeders/' . $seeder);
-        $pdo->exec($sql);
-        echo "Seeder {$seeder} executed successfully.\n";
+        $sql = file_get_contents($seeder);
+        
+        try {
+            $db->exec($sql);
+            echo "Executed seeder: " . basename($seeder) . "\n";
+        } catch (PDOException $e) {
+            echo "Error executing " . basename($seeder) . ": " . $e->getMessage() . "\n";
+        }
     }
-
-    echo "Database setup completed successfully.\n";
-
+    
+    echo "\nDatabase setup completed successfully!\n";
+    
 } catch (PDOException $e) {
     die("Database setup failed: " . $e->getMessage() . "\n");
 }

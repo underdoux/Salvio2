@@ -65,7 +65,7 @@
                                 <tr>
                                     <td><?= $order['id'] ?></td>
                                     <td><?= date('Y-m-d H:i', strtotime($order['created_at'])) ?></td>
-                                    <td><?= htmlspecialchars($order['customer_id']) ?></td>
+                                    <td><?= htmlspecialchars($order['customer_name']) ?></td>
                                     <td>₱<?= number_format($order['total_amount'], 2) ?></td>
                                     <td>
                                         <span class="badge bg-<?= $this->getStatusBadgeClass($order['status']) ?>">
