@@ -29,10 +29,14 @@ class BaseController {
 
     protected function render($view, $data = []) {
         extract($data);
-        ob_start();
-        require_once "../app/views/{$view}.php";
-        $content = ob_get_clean();
-        require_once "../app/views/layouts/main.php";
+        if ($view === 'layouts/main') {
+            require_once "../app/views/layouts/main.php";
+        } else {
+            ob_start();
+            require_once "../app/views/{$view}.php";
+            $content = ob_get_clean();
+            require_once "../app/views/layouts/main.php";
+        }
     }
 
     protected function json($data, $status = 200) {

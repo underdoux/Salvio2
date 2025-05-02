@@ -66,3 +66,15 @@
 [2025-05-02 22:10:53] User 'admin' logged in successfully.
 [2025-05-02 22:14:18] Unauthorized access attempt to /Salvio2/public/profit-sharing
 [2025-05-02 22:15:15] User 'admin' logged in successfully.
+[2025-05-02 22:19:00] Unauthorized access attempt to /Salvio2/public/products
+[2025-05-02 22:20:18] User 'admin' logged in successfully.
+[2025-05-02 22:20:46] User 'admin' accessed products list.
+[2025-05-02 22:21:24] User 'admin' accessed orders list
+[2025-05-02 22:27:01] Unauthorized access attempt to /Salvio2/public/commissions
+[2025-05-02 22:28:12] User 'admin' logged in successfully.
+[2025-05-02 22:29:17] User 'admin' accessed products list.
+[2025-05-02 22:29:18] User 'admin' accessed orders list
+[2025-05-02 22:29:54] Unauthorized access attempt to /Salvio2/public/commissions
+[2025-05-02 22:30:53] User 'admin' logged in successfully.
+[2025-05-02 22:32:25] Unauthorized access attempt to /Salvio2/public/commissions
+[2025-05-02 22:33:28] User 'admin' logged in successfully.
