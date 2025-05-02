@@ -1,8 +1,15 @@
 <?php
+// Set session cookie path to /Salvio2/public to ensure cookie is sent on all requests
+session_set_cookie_params([
+    'path' => '/Salvio2/public',
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
 session_start();
 
 // Load configuration
 $config = require_once __DIR__ . '/../config/database.php';
+
 
 // Database connection
 try {

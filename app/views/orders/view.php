@@ -38,9 +38,9 @@
                                     <td><?= htmlspecialchars($item['product_name']) ?></td>
                                     <td class="text-center"><?= $item['quantity'] ?></td>
                                     <td class="text-end">₱<?= number_format($item['unit_price'], 2) ?></td>
-                                    <td class="text-end"><?= $item['discount'] ?>%</td>
+                                    <td class="text-end"><?= $item['discount_amount'] ?>%</td>
                                     <td class="text-end">₱<?= number_format(
-                                        $item['quantity'] * $item['unit_price'] * (1 - $item['discount']/100), 
+                                        $item['quantity'] * $item['unit_price'] * (1 - $item['discount_amount']/100), 
                                         2
                                     ) ?></td>
                                 </tr>
@@ -51,11 +51,11 @@
                                     <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
                                     <td class="text-end">₱<?= number_format($order['total_amount'], 2) ?></td>
                                 </tr>
-                                <?php if ($order['discount'] > 0): ?>
+                                <?php if ($order['discount_amount'] > 0): ?>
                                 <tr>
-                                    <td colspan="4" class="text-end"><strong>Order Discount (<?= $order['discount'] ?>%):</strong></td>
+                                    <td colspan="4" class="text-end"><strong>Order Discount (<?= $order['discount_amount'] ?>%):</strong></td>
                                     <td class="text-end">-₱<?= number_format(
-                                        $order['total_amount'] * ($order['discount']/100), 
+                                        $order['total_amount'] * ($order['discount_amount']/100), 
                                         2
                                     ) ?></td>
                                 </tr>
@@ -63,7 +63,7 @@
                                 <tr>
                                     <td colspan="4" class="text-end"><strong>Total:</strong></td>
                                     <td class="text-end"><strong>₱<?= number_format(
-                                        $order['total_amount'] * (1 - $order['discount']/100), 
+                                        $order['total_amount'] * (1 - $order['discount_amount']/100), 
                                         2
                                     ) ?></strong></td>
                                 </tr>

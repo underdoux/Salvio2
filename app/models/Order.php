@@ -11,7 +11,7 @@ class Order extends BaseModel {
             $orderId = parent::create([
                 'customer_id' => $data['customer_id'],
                 'total_amount' => $data['total_amount'],
-                'discount' => $data['discount'] ?? 0,
+                'discount_amount' => $data['discount'] ?? 0,
                 'status' => 'new',
                 'payment_type' => $data['payment_type'],
                 'created_by' => $_SESSION['user']['id']
@@ -34,7 +34,7 @@ class Order extends BaseModel {
     }
 
     private function createOrderItem($orderId, $item) {
-        $sql = "INSERT INTO order_items (order_id, product_id, quantity, unit_price, discount) 
+        $sql = "INSERT INTO order_items (order_id, product_id, quantity, unit_price, discount_amount) 
                 VALUES (?, ?, ?, ?, ?)";
         
         $stmt = $this->db->prepare($sql);
@@ -78,7 +78,7 @@ class Order extends BaseModel {
 
     private function getOrderItems($orderId) {
         $sql = "SELECT oi.*, p.name as product_name,
-                       COALESCE(oi.discount, 0) as discount
+                       COALESCE(oi.discount_amount, 0) as discount
                 FROM order_items oi 
                 JOIN products p ON oi.product_id = p.id 
                 WHERE oi.order_id = ?";

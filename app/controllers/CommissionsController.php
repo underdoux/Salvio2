@@ -27,19 +27,28 @@ class CommissionsController extends BaseController {
     }
 
     public function rates() {
-        // Get categories and products for dropdowns
-        $categories = (new Category())->all();
-        $products = (new Product())->all();
-        
-        // Get current commission rates
-        $rates = $this->commission->getRates();
+        try {
+            // Get categories with commission rates
+            $categories = (new Category())->all();
+            $products = (new Product())->all();
+            
+            // Get current commission rates
+            $rates = $this->commission->getRates();
 
-        $this->render('commissions/rates', [
-            'title' => 'Commission Rates',
-            'rates' => $rates,
-            'categories' => $categories,
-            'products' => $products
-        ]);
+            $this->render('commissions/rates', [
+                'title' => 'Commission Rates',
+                'rates' => $rates,
+                'categories' => $categories,
+                'products' => $products
+            ]);
+        } catch (Exception $e) {
+            $_SESSION['flash'] = [
+                'type' => 'danger',
+                'message' => 'Error loading commission rates: ' . $e->getMessage()
+            ];
+            header('Location: /Salvio2/public/commissions');
+            exit;
+        }
     }
 
     public function details($userId = null) {
