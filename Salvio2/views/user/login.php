@@ -1,33 +1,14 @@
 <?php
-session_start();
-
-// Initialize default config
-$config = [
-    'app_name' => 'POS Pharma',
-    'app_version' => '1.0.0'
-];
-
-// Try to load config file
-$configFile = __DIR__ . '/../../config/app.php';
-if (file_exists($configFile)) {
-    $loadedConfig = @include $configFile;
-    if (is_array($loadedConfig)) {
-        $config = array_merge($config, $loadedConfig);
-    }
-}
-
-// Set error reporting
-error_reporting(E_ALL & ~E_NOTICE);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/../../storage/logs/php_errors.log');
+// Get app name from config
+$appName = config('app_name', 'POS Pharma');
+$appVersion = config('app_version', '1.0.0');
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - <?php echo htmlspecialchars($config['app_name']); ?></title>
+    <title>Login - <?php echo htmlspecialchars($appName); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -65,11 +46,11 @@ ini_set('error_log', __DIR__ . '/../../storage/logs/php_errors.log');
 </head>
 <body class="bg-light">
     <main class="form-signin text-center">
-        <form action="/Salvio2/public/auth/login" method="POST">
+        <form action="<?php echo base_url('/public/auth/login'); ?>" method="POST">
             <div class="brand-icon">
                 <i class="bi bi-capsule"></i>
             </div>
-            <h1 class="h3 mb-3 fw-normal"><?php echo htmlspecialchars($config['app_name']); ?></h1>
+            <h1 class="h3 mb-3 fw-normal"><?php echo htmlspecialchars($appName); ?></h1>
 
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="alert alert-danger">
@@ -108,9 +89,9 @@ ini_set('error_log', __DIR__ . '/../../storage/logs/php_errors.log');
             </button>
             
             <p class="mt-5 mb-3 text-muted">
-                &copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($config['app_name']); ?>
+                &copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($appName); ?>
                 <br>
-                <small>Version <?php echo htmlspecialchars($config['app_version']); ?></small>
+                <small>Version <?php echo htmlspecialchars($appVersion); ?></small>
             </p>
         </form>
     </main>
