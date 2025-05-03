@@ -1,168 +1,167 @@
 <?php
 
+require_once __DIR__ . '/../models/Commission.php';
+
 class CommissionsController extends BaseController {
-    private $commission;
+    protected $requiresAuth = true;
+    protected $commission;
 
     public function __construct() {
         parent::__construct();
         $this->commission = new Commission();
-        
-        // Check if user has admin role
-        $user = $this->getCurrentUser();
-if (!$user || $user['role'] !== 'admin') {
-    $_SESSION['flash'] = [
-        'type' => 'danger',
-        'message' => 'Access denied. Admin privileges required.'
-    ];
-    $this->redirect('/Salvio2/public/auth');
-}
     }
 
-    public function index() {
-        // Get filter parameters
+    public function reports() {
         $filters = [
-            'status' => $_GET['status'] ?? '',
-            'date_from' => $_GET['date_from'] ?? '',
-            'date_to' => $_GET['date_to'] ?? ''
+            'start_date' => $_GET['start_date'] ?? date('Y-m-01'),
+            'end_date' => $_GET['end_date'] ?? date('Y-m-t'),
+            'status' => $_GET['status'] ?? null,
+            'user_id' => $_GET['user_id'] ?? null
         ];
 
-        // Get commission summary
-        $summary = $this->commission->getSummary($filters);
+        $period = $_GET['period'] ?? 'monthly';
+        $year = $_GET['year'] ?? date('Y');
 
-        $this->render('commissions/index', [
-            'title' => 'Sales Commissions',
-            'summary' => $summary,
-            'filters' => $filters
+        $data = [
+            'title' => 'Commission Reports',
+            'description' => 'View detailed commission reports and analytics',
+            'filters' => $filters,
+            'commissions' => $this->commission->getCommissionReport($filters),
+            'summary' => $this->commission->getCommissionSummaryByPeriod($period, $year),
+            'trends' => $this->commission->getCommissionTrendsByProduct($filters['start_date'], $filters['end_date']),
+            'metrics' => $this->commission->getCommissionPerformanceMetrics(null, 30) // Last 30 days
+        ];
+
+        $this->render('commissions/reports', $data);
+    }
+
+    public function exportReport() {
+        $filters = [
+            'start_date' => $_GET['start_date'] ?? null,
+            'end_date' => $_GET['end_date'] ?? null,
+            'status' => $_GET['status'] ?? null,
+            'user_id' => $_GET['user_id'] ?? null
+        ];
+
+        $data = $this->commission->exportCommissionReport($filters);
+        
+        // Set headers for CSV download
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="commission_report_' . date('Y-m-d') . '.csv"');
+        
+        // Open output stream
+        $output = fopen('php://output', 'w');
+        
+        // Add headers
+        if (!empty($data)) {
+            fputcsv($output, array_keys($data[0]));
+        }
+        
+        // Add data rows
+        foreach ($data as $row) {
+            fputcsv($output, $row);
+        }
+        
+        fclose($output);
+        exit;
+    }
+
+    public function performanceMetrics($userId = null) {
+        $period = $_GET['period'] ?? 30; // Default to last 30 days
+        $metrics = $this->commission->getCommissionPerformanceMetrics($userId, $period);
+        
+        $this->json([
+            'success' => true,
+            'metrics' => $metrics
         ]);
     }
 
-    public function rates() {
+    public function productTrends() {
+        $startDate = $_GET['start_date'] ?? date('Y-m-01');
+        $endDate = $_GET['end_date'] ?? date('Y-m-t');
+        
+        $trends = $this->commission->getCommissionTrendsByProduct($startDate, $endDate);
+        
+        $this->json([
+            'success' => true,
+            'trends' => $trends
+        ]);
+    }
+
+    public function periodSummary() {
+        $period = $_GET['period'] ?? 'monthly';
+        $year = $_GET['year'] ?? date('Y');
+        
+        $summary = $this->commission->getCommissionSummaryByPeriod($period, $year);
+        
+        $this->json([
+            'success' => true,
+            'summary' => $summary
+        ]);
+    }
+
+    public function recordPayment($id) {
         try {
-            // Get categories with commission rates
-            $categories = (new Category())->all();
-            $products = (new Product())->all();
-            
-            // Get current commission rates
-            $rates = $this->commission->getRates();
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('Invalid request method');
+            }
 
-            $this->render('commissions/rates', [
-                'title' => 'Commission Rates',
-                'rates' => $rates,
-                'categories' => $categories,
-                'products' => $products
+            $data = [
+                'amount' => $_POST['amount'] ?? null,
+                'payment_date' => $_POST['payment_date'] ?? date('Y-m-d'),
+                'payment_method' => $_POST['payment_method'] ?? null,
+                'reference_number' => $_POST['reference_number'] ?? null,
+                'notes' => $_POST['notes'] ?? null
+            ];
+
+            // Validate required fields
+            if (!$data['amount'] || !$data['payment_method']) {
+                throw new Exception('Amount and payment method are required');
+            }
+
+            $paymentId = $this->commission->recordPayment($id, $data);
+            Logger::log("Commission payment recorded for commission #{$id}");
+
+            $this->json([
+                'success' => true,
+                'message' => 'Payment recorded successfully',
+                'payment_id' => $paymentId
             ]);
+
         } catch (Exception $e) {
-            $_SESSION['flash'] = [
-                'type' => 'danger',
-                'message' => 'Error loading commission rates: ' . $e->getMessage()
-            ];
-            header('Location: /Salvio2/public/commissions');
-            exit;
+            Logger::log("Error recording commission payment: " . $e->getMessage(), 'ERROR');
+            $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
-    public function details($userId = null) {
-        if (!$userId) {
-            $_SESSION['flash'] = [
-                'type' => 'danger',
-                'message' => 'User ID is required'
-            ];
-            header('Location: /Salvio2/public/commissions');
-            exit;
+    public function voidPayment($id) {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('Invalid request method');
+            }
+
+            $reason = $_POST['reason'] ?? null;
+            if (!$reason) {
+                throw new Exception('Void reason is required');
+            }
+
+            $this->commission->voidPayment($id, $reason);
+            Logger::log("Commission payment #{$id} voided");
+
+            $this->json([
+                'success' => true,
+                'message' => 'Payment voided successfully'
+            ]);
+
+        } catch (Exception $e) {
+            Logger::log("Error voiding commission payment: " . $e->getMessage(), 'ERROR');
+            $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        // Get user details
-        $user = (new User())->find($userId);
-        if (!$user) {
-            $_SESSION['flash'] = [
-                'type' => 'danger',
-                'message' => 'User not found'
-            ];
-            header('Location: /Salvio2/public/commissions');
-            exit;
-        }
-
-        // Get commission details
-        $commissions = $this->commission->getDetailsByUser($userId);
-
-        $this->render('commissions/details', [
-            'title' => 'Commission Details',
-            'username' => $user['username'],
-            'commissions' => $commissions
-        ]);
-    }
-
-    public function updateRate() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->json(['error' => 'Invalid request method'], 405);
-            return;
-        }
-
-        $data = [
-            'type' => $_POST['type'] ?? null,
-            'reference_id' => $_POST['reference_id'] ?? null,
-            'rate' => $_POST['rate'] ?? null
-        ];
-
-        if (!$data['type'] || !$data['rate']) {
-            $_SESSION['flash'] = [
-                'type' => 'danger',
-                'message' => 'Type and rate are required'
-            ];
-            header('Location: /Salvio2/public/commissions/rates');
-            exit;
-        }
-
-        // Update rate
-        $success = $this->commission->updateRate($data);
-
-        $_SESSION['flash'] = [
-            'type' => $success ? 'success' : 'danger',
-            'message' => $success ? 'Commission rate updated successfully' : 'Failed to update commission rate'
-        ];
-
-        header('Location: /Salvio2/public/commissions/rates');
-        exit;
-    }
-
-    public function updateStatus() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->json(['error' => 'Invalid request method'], 405);
-            return;
-        }
-
-        $data = [
-            'commission_id' => $_POST['commission_id'] ?? null,
-            'status' => $_POST['status'] ?? null
-        ];
-
-        if (!$data['commission_id'] || !$data['status']) {
-            $_SESSION['flash'] = [
-                'type' => 'danger',
-                'message' => 'Commission ID and status are required'
-            ];
-            header('Location: ' . $_SERVER['HTTP_REFERER']);
-            exit;
-        }
-
-        // Update status
-        $success = $this->commission->updateStatus($data['commission_id'], $data['status']);
-
-        $_SESSION['flash'] = [
-            'type' => $success ? 'success' : 'danger',
-            'message' => $success ? 'Commission status updated successfully' : 'Failed to update commission status'
-        ];
-
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
-        exit;
-    }
-
-    protected function getStatusBadgeClass($status) {
-        return match($status) {
-            'pending' => 'warning',
-            'approved' => 'info',
-            'paid' => 'success',
-            default => 'secondary'
-        };
     }
 }

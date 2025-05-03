@@ -24,6 +24,16 @@ $routes = [
     'commissions/rates' => ['CommissionsController', 'rates'],
     'commissions/update-rate' => ['CommissionsController', 'updateRate'],
     'commissions/details/{id}' => ['CommissionsController', 'details'],
+    'commissions/payment/{id}' => ['CommissionsController', 'recordPayment'],
+    'commissions/void-payment/{id}' => ['CommissionsController', 'voidPayment'],
+    'commissions/payment-history/{id}' => ['CommissionsController', 'paymentHistory'],
+    'commissions/pending-payments' => ['CommissionsController', 'pendingPayments'],
+    'commissions/payment-summary' => ['CommissionsController', 'paymentSummary'],
+    'commissions/reports' => ['CommissionsController', 'reports'],
+    'commissions/export-report' => ['CommissionsController', 'exportReport'],
+    'commissions/performance-metrics/{id?}' => ['CommissionsController', 'performanceMetrics'],
+    'commissions/product-trends' => ['CommissionsController', 'productTrends'],
+    'commissions/period-summary' => ['CommissionsController', 'periodSummary'],
     
     // Profit Sharing routes
     'profit-sharing' => ['ProfitSharingController', 'index'],
@@ -31,6 +41,13 @@ $routes = [
     'profit-sharing/view/{id}' => ['ProfitSharingController', 'view'],
     'profit-sharing/finalize/{id}' => ['ProfitSharingController', 'finalize'],
     'profit-sharing/report/{id}' => ['ProfitSharingController', 'report'],
+    'profit-sharing/trends' => ['ProfitSharingController', 'trends'],
+    'profit-sharing/trend-data' => ['ProfitSharingController', 'getTrendData'],
+    'profit-sharing/investor-trends/{id}' => ['ProfitSharingController', 'getInvestorTrends'],
+    'profit-sharing/profit-breakdown/{id}' => ['ProfitSharingController', 'getProfitBreakdown'],
+    'profit-sharing/export/profit/{month}' => ['ProfitSharingController', 'exportProfitReport'],
+    'profit-sharing/export/distributions' => ['ProfitSharingController', 'exportDistributionHistory'],
+    'profit-sharing/export/investor/{id}' => ['ProfitSharingController', 'exportInvestorReport'],
     
     // Reports routes
     'reports' => ['HomeController', 'reports'],
@@ -43,6 +60,10 @@ $routes = [
     'analytics/sales-trends' => ['AnalyticsController', 'salesTrends'],
     'analytics/product/{id}' => ['AnalyticsController', 'productMetrics'],
     'analytics/category/{id}' => ['AnalyticsController', 'categoryMetrics'],
+    'analytics/export/best-selling' => ['AnalyticsController', 'exportBestSelling'],
+    'analytics/export/market-response' => ['AnalyticsController', 'exportMarketResponse'],
+    'analytics/export/sales-trends' => ['AnalyticsController', 'exportSalesTrends'],
+    'analytics/export/product/{id}' => ['AnalyticsController', 'exportProductMetrics'],
 
     // Default route
     '' => ['HomeController', 'index']

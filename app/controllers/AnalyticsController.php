@@ -14,46 +14,140 @@ class AnalyticsController extends BaseController {
     public function index() {
         $data = [
             'title' => 'Analytics Dashboard',
-            'description' => 'Insightful analytics on sales and market response',
-            'best_selling' => $this->analytics->getBestSellingProducts(5),
-            'market_response' => $this->analytics->getMarketResponseByCustomerType(),
-            'sales_trends' => $this->analytics->getSalesTrends(6)
+            'description' => 'View sales and performance analytics'
         ];
         $this->render('analytics/index', $data);
     }
 
-    public function bestSelling() {
-        $products = $this->analytics->getBestSellingProducts();
-        $categories = $this->analytics->getBestSellingCategories();
+    public function exportBestSelling() {
+        try {
+            $startDate = $_GET['start_date'] ?? null;
+            $endDate = $_GET['end_date'] ?? null;
+            $limit = $_GET['limit'] ?? 100;
+            
+            $data = $this->analytics->exportBestSellingProducts($startDate, $endDate, $limit);
+            $filename = "best_selling_products.csv";
+            
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            
+            $fp = fopen('php://output', 'w');
+            foreach ($data as $row) {
+                fputcsv($fp, $row);
+            }
+            fclose($fp);
+            exit;
 
-        $this->json([
-            'best_selling_products' => $products,
-            'best_selling_categories' => $categories
-        ]);
+        } catch (Exception $e) {
+            $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    public function leastPerforming() {
-        $products = $this->analytics->getLeastPerformingProducts();
-        $this->json(['least_performing_products' => $products]);
+    public function exportMarketResponse() {
+        try {
+            $startDate = $_GET['start_date'] ?? null;
+            $endDate = $_GET['end_date'] ?? null;
+            
+            $data = $this->analytics->exportMarketResponse($startDate, $endDate);
+            $filename = "market_response_analysis.csv";
+            
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            
+            $fp = fopen('php://output', 'w');
+            foreach ($data as $row) {
+                fputcsv($fp, $row);
+            }
+            fclose($fp);
+            exit;
+
+        } catch (Exception $e) {
+            $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportSalesTrends() {
+        try {
+            $period = $_GET['period'] ?? 'monthly';
+            $limit = $_GET['limit'] ?? 12;
+            
+            $data = $this->analytics->exportSalesTrends($period, $limit);
+            $filename = "sales_trends_{$period}.csv";
+            
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            
+            $fp = fopen('php://output', 'w');
+            foreach ($data as $row) {
+                fputcsv($fp, $row);
+            }
+            fclose($fp);
+            exit;
+
+        } catch (Exception $e) {
+            $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportProductMetrics($productId) {
+        try {
+            $data = $this->analytics->exportProductMetrics($productId);
+            $filename = "product_metrics_{$productId}.csv";
+            
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            
+            $fp = fopen('php://output', 'w');
+            foreach ($data as $row) {
+                fputcsv($fp, $row);
+            }
+            fclose($fp);
+            exit;
+
+        } catch (Exception $e) {
+            $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function bestSelling() {
+        $startDate = $_GET['start_date'] ?? null;
+        $endDate = $_GET['end_date'] ?? null;
+        $limit = $_GET['limit'] ?? 10;
+
+        $data = $this->analytics->getBestSellingProducts($startDate, $endDate, $limit);
+        $this->json($data);
     }
 
     public function marketResponse() {
-        $response = $this->analytics->getMarketResponseByCustomerType();
-        $this->json(['market_response' => $response]);
+        $startDate = $_GET['start_date'] ?? null;
+        $endDate = $_GET['end_date'] ?? null;
+
+        $data = $this->analytics->getMarketResponse($startDate, $endDate);
+        $this->json($data);
     }
 
     public function salesTrends() {
-        $trends = $this->analytics->getSalesTrends();
-        $this->json(['sales_trends' => $trends]);
+        $period = $_GET['period'] ?? 'monthly';
+        $limit = $_GET['limit'] ?? 12;
+
+        $data = $this->analytics->getSalesTrends($period, $limit);
+        $this->json($data);
     }
 
-    public function productMetrics($id) {
-        $metrics = $this->analytics->getProductPerformanceMetrics($id);
-        $this->json(['product_metrics' => $metrics]);
-    }
-
-    public function categoryMetrics($id) {
-        $metrics = $this->analytics->getCategoryPerformanceMetrics($id);
-        $this->json(['category_metrics' => $metrics]);
+    public function productMetrics($productId) {
+        $data = $this->analytics->getProductMetrics($productId);
+        $this->json($data);
     }
 }
