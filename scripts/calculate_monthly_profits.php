@@ -1,142 +1,90 @@
 <?php
 
-require_once __DIR__ . '/../app/models/ProfitSharing.php';
 require_once __DIR__ . '/../app/helpers/Logger.php';
+require_once __DIR__ . '/../app/models/ProfitSharing.php';
 
-class MonthlyProfitCalculator {
-    private $profitSharing;
-    private $logger;
+// Lock file to prevent concurrent execution
+$lockFile = __DIR__ . '/../storage/locks/profit_calculation.lock';
+$lockFp = fopen($lockFile, 'c');
 
-    public function __construct() {
-        global $db;
-        $this->profitSharing = new ProfitSharing();
-        $this->logger = new Logger();
-    }
-
-    public function calculate() {
-        try {
-            $this->logger->log("Starting monthly profit calculation...");
-
-            // Get last month's date range
-            $lastMonth = date('Y-m', strtotime('-1 month'));
-            $startDate = date('Y-m-01', strtotime('-1 month'));
-            $endDate = date('Y-m-t', strtotime('-1 month'));
-
-            // Check if calculation already exists
-            if ($this->profitSharing->isProfitCalculated($lastMonth)) {
-                $this->logger->log("Profit already calculated for {$lastMonth}");
-                return;
-            }
-
-            // Calculate total sales
-            $sales = $this->calculateTotalSales($startDate, $endDate);
-            
-            // Calculate total costs
-            $costs = $this->calculateTotalCosts($startDate, $endDate);
-            
-            // Calculate total commissions
-            $commissions = $this->calculateTotalCommissions($startDate, $endDate);
-            
-            // Calculate total expenses
-            $expenses = $this->calculateTotalExpenses($startDate, $endDate);
-            
-            // Calculate net profit
-            $netProfit = $sales - $costs - $commissions - $expenses;
-
-            // Save profit calculation
-            $profitId = $this->profitSharing->saveProfitCalculation([
-                'month' => $lastMonth,
-                'total_sales' => $sales,
-                'total_costs' => $costs,
-                'total_commissions' => $commissions,
-                'total_expenses' => $expenses,
-                'net_profit' => $netProfit,
-                'status' => 'draft',
-                'calculation_date' => date('Y-m-d H:i:s')
-            ]);
-
-            // Calculate investor distributions
-            $this->calculateInvestorDistributions($profitId, $netProfit);
-
-            $this->logger->log("Monthly profit calculation completed successfully for {$lastMonth}");
-            $this->logger->log("Net Profit: " . number_format($netProfit, 2));
-
-        } catch (Exception $e) {
-            $this->logger->log("Error calculating monthly profits: " . $e->getMessage(), 'ERROR');
-            throw $e;
-        }
-    }
-
-    private function calculateTotalSales($startDate, $endDate) {
-        $sql = "SELECT COALESCE(SUM(total_amount), 0) as total
-                FROM orders 
-                WHERE order_date BETWEEN ? AND ?
-                AND status = 'completed'";
-        
-        $result = $this->profitSharing->db->query($sql, [$startDate, $endDate])->fetch();
-        return floatval($result['total']);
-    }
-
-    private function calculateTotalCosts($startDate, $endDate) {
-        $sql = "SELECT COALESCE(SUM(oi.quantity * p.cost_price), 0) as total
-                FROM order_items oi
-                JOIN products p ON oi.product_id = p.id
-                JOIN orders o ON oi.order_id = o.id
-                WHERE o.order_date BETWEEN ? AND ?
-                AND o.status = 'completed'";
-        
-        $result = $this->profitSharing->db->query($sql, [$startDate, $endDate])->fetch();
-        return floatval($result['total']);
-    }
-
-    private function calculateTotalCommissions($startDate, $endDate) {
-        $sql = "SELECT COALESCE(SUM(amount), 0) as total
-                FROM commissions
-                WHERE created_at BETWEEN ? AND ?
-                AND status = 'paid'";
-        
-        $result = $this->profitSharing->db->query($sql, [$startDate, $endDate])->fetch();
-        return floatval($result['total']);
-    }
-
-    private function calculateTotalExpenses($startDate, $endDate) {
-        $sql = "SELECT COALESCE(SUM(amount), 0) as total
-                FROM expenses
-                WHERE expense_date BETWEEN ? AND ?
-                AND status = 'approved'";
-        
-        $result = $this->profitSharing->db->query($sql, [$startDate, $endDate])->fetch();
-        return floatval($result['total']);
-    }
-
-    private function calculateInvestorDistributions($profitId, $netProfit) {
-        // Get active investors and their percentages
-        $sql = "SELECT id, name, percentage 
-                FROM investors 
-                WHERE status = 'active'";
-        
-        $investors = $this->profitSharing->db->query($sql)->fetchAll();
-        
-        foreach ($investors as $investor) {
-            $amount = ($netProfit * $investor['percentage']) / 100;
-            
-            // Save distribution record
-            $this->profitSharing->saveDistribution([
-                'profit_id' => $profitId,
-                'investor_id' => $investor['id'],
-                'percentage' => $investor['percentage'],
-                'amount' => $amount,
-                'status' => 'pending'
-            ]);
-        }
-    }
-}
-
-// Run the calculation
-try {
-    $calculator = new MonthlyProfitCalculator();
-    $calculator->calculate();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage() . "\n";
+// Try to get an exclusive lock
+if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
+    Logger::log("Monthly profit calculation is already running");
     exit(1);
 }
+
+try {
+    Logger::log("Starting monthly profit calculation");
+    
+    // Create lock directory if it doesn't exist
+    if (!file_exists(dirname($lockFile))) {
+        mkdir(dirname($lockFile), 0755, true);
+    }
+
+    // Record start time
+    $startTime = microtime(true);
+    
+    // Initialize ProfitSharing model
+    $profitSharing = new ProfitSharing();
+    
+    // Check if calculation for current month already exists
+    if ($profitSharing->isProfitCalculated()) {
+        Logger::log("Profit for current month has already been calculated");
+        exit(0);
+    }
+    
+    // Calculate profits
+    Logger::log("Calculating profits for previous month");
+    $result = $profitSharing->calculateMonthlyProfit();
+    
+    if (!$result) {
+        throw new Exception("Failed to calculate monthly profits");
+    }
+    
+    // Save calculation results
+    Logger::log("Saving profit calculation results");
+    $profitSharing->saveProfitCalculation($result);
+    
+    // Calculate and save distributions
+    Logger::log("Calculating profit distributions");
+    $distributions = $profitSharing->calculateDistributions($result['net_profit']);
+    $profitSharing->saveDistributions($distributions);
+    
+    // Record execution time
+    $executionTime = microtime(true) - $startTime;
+    Logger::log("Monthly profit calculation completed in " . number_format($executionTime, 2) . " seconds");
+    
+    // Send success notification
+    Logger::log("Sending success notification");
+    $profitSharing->sendCalculationNotification([
+        'status' => 'success',
+        'execution_time' => $executionTime,
+        'total_profit' => $result['net_profit'],
+        'distribution_count' => count($distributions)
+    ]);
+    
+} catch (Exception $e) {
+    Logger::log("Error in monthly profit calculation: " . $e->getMessage());
+    
+    // Send failure notification
+    if (isset($profitSharing)) {
+        $profitSharing->sendCalculationNotification([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
+    
+    exit(1);
+} finally {
+    // Release the lock
+    flock($lockFp, LOCK_UN);
+    fclose($lockFp);
+    
+    // Clean up old lock file
+    if (file_exists($lockFile)) {
+        unlink($lockFile);
+    }
+}
+
+exit(0);

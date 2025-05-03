@@ -11,6 +11,62 @@ class Commission extends BaseModel {
         $this->notification = new Notification();
     }
 
+    public function getCommissionRates() {
+        try {
+            $sql = "SELECT cr.*, 
+                    CASE 
+                        WHEN cr.product_id IS NOT NULL THEN p.name
+                        WHEN cr.category_id IS NOT NULL THEN c.name
+                        ELSE 'Global'
+                    END as target_name,
+                    CASE 
+                        WHEN cr.product_id IS NOT NULL THEN 'Product'
+                        WHEN cr.category_id IS NOT NULL THEN 'Category'
+                        ELSE 'Global'
+                    END as rate_type
+                    FROM commission_rates cr
+                    LEFT JOIN products p ON cr.product_id = p.id
+                    LEFT JOIN categories c ON cr.category_id = c.id
+                    WHERE cr.status = 'active'
+                    ORDER BY cr.rate_type, cr.target_name";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            Logger::log("Error fetching commission rates: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    public function getCategories() {
+        try {
+            $sql = "SELECT * FROM categories WHERE status = 'active' ORDER BY name";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            Logger::log("Error fetching categories: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    public function getProducts() {
+        try {
+            $sql = "SELECT p.*, c.name as category_name 
+                    FROM products p 
+                    LEFT JOIN categories c ON p.category_id = c.id 
+                    WHERE p.status = 'active' 
+                    ORDER BY p.name";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            Logger::log("Error fetching products: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
     public function getAll($filters = []) {
         $sql = "SELECT c.*, 
                        u.username as user_name,
@@ -360,6 +416,94 @@ class Commission extends BaseModel {
 
             // Log the void
             Logger::log("Commission payment #{$paymentId} voided. Reason: {$reason}");
+
+            $this->db->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    public function saveCommissionRate($data) {
+        try {
+            $this->db->beginTransaction();
+
+            // Prepare fields based on rate type
+            $fields = ['rate'];
+            $values = [$data['rate']];
+            
+            if ($data['rate_type'] === 'category' && isset($data['category_id'])) {
+                $fields[] = 'category_id';
+                $values[] = $data['category_id'];
+            } elseif ($data['rate_type'] === 'product' && isset($data['product_id'])) {
+                $fields[] = 'product_id';
+                $values[] = $data['product_id'];
+            }
+
+            // Insert rate record
+            $sql = "INSERT INTO commission_rates (" . implode(', ', $fields) . ") 
+                    VALUES (" . implode(', ', array_fill(0, count($values), '?')) . ")";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($values);
+            $rateId = $this->db->lastInsertId();
+
+            $this->db->commit();
+            return $rateId;
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    public function getCommissionRate($id) {
+        try {
+            $sql = "SELECT cr.*, 
+                    CASE 
+                        WHEN cr.product_id IS NOT NULL THEN p.name
+                        WHEN cr.category_id IS NOT NULL THEN c.name
+                        ELSE 'Global'
+                    END as target_name,
+                    CASE 
+                        WHEN cr.product_id IS NOT NULL THEN 'Product'
+                        WHEN cr.category_id IS NOT NULL THEN 'Category'
+                        ELSE 'Global'
+                    END as rate_type
+                    FROM commission_rates cr
+                    LEFT JOIN products p ON cr.product_id = p.id
+                    LEFT JOIN categories c ON cr.category_id = c.id
+                    WHERE cr.id = ?";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            Logger::log("Error fetching commission rate: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    public function deleteCommissionRate($id) {
+        try {
+            $this->db->beginTransaction();
+
+            // Check if rate exists
+            $sql = "SELECT * FROM commission_rates WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$id]);
+            $rate = $stmt->fetch();
+
+            if (!$rate) {
+                throw new Exception("Commission rate not found");
+            }
+
+            // Delete rate
+            $sql = "DELETE FROM commission_rates WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$id]);
 
             $this->db->commit();
             return true;

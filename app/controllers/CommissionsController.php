@@ -11,6 +11,115 @@ class CommissionsController extends BaseController {
         $this->commission = new Commission();
     }
 
+    public function rates() {
+        try {
+            $data = [
+                'title' => 'Commission Rates',
+                'description' => 'View and manage commission rates',
+                'rates' => $this->commission->getCommissionRates(),
+                'categories' => $this->commission->getCategories(),
+                'products' => $this->commission->getProducts()
+            ];
+            
+            $this->render('commissions/rates', $data);
+        } catch (Exception $e) {
+            Logger::log("Error loading commission rates: " . $e->getMessage(), 'ERROR');
+            $this->redirect('/commissions', [
+                'error' => 'Failed to load commission rates'
+            ]);
+        }
+    }
+
+    public function saveRate() {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('Invalid request method');
+            }
+
+            $data = [
+                'rate' => $_POST['rate'] ?? null,
+                'rate_type' => $_POST['rate_type'] ?? null
+            ];
+
+            // Add target ID based on rate type
+            switch ($data['rate_type']) {
+                case 'category':
+                    $data['category_id'] = $_POST['category_id'] ?? null;
+                    break;
+                case 'product':
+                    $data['product_id'] = $_POST['product_id'] ?? null;
+                    break;
+            }
+
+            // Validate required fields
+            if (!$data['rate'] || !$data['rate_type']) {
+                throw new Exception('Rate and type are required');
+            }
+
+            // Save rate
+            $rateId = $this->commission->saveCommissionRate($data);
+            Logger::log("Commission rate saved successfully. ID: {$rateId}");
+
+            $this->json([
+                'success' => true,
+                'message' => 'Commission rate saved successfully',
+                'rate_id' => $rateId
+            ]);
+
+        } catch (Exception $e) {
+            Logger::log("Error saving commission rate: " . $e->getMessage(), 'ERROR');
+            $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getRate($id) {
+        try {
+            $rate = $this->commission->getCommissionRate($id);
+            
+            if (!$rate) {
+                throw new Exception('Commission rate not found');
+            }
+
+            $this->json([
+                'success' => true,
+                'rate' => $rate
+            ]);
+
+        } catch (Exception $e) {
+            Logger::log("Error fetching commission rate: " . $e->getMessage(), 'ERROR');
+            $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteRate($id) {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('Invalid request method');
+            }
+
+            $this->commission->deleteCommissionRate($id);
+            Logger::log("Commission rate #{$id} deleted successfully");
+
+            $this->json([
+                'success' => true,
+                'message' => 'Commission rate deleted successfully'
+            ]);
+
+        } catch (Exception $e) {
+            Logger::log("Error deleting commission rate: " . $e->getMessage(), 'ERROR');
+            $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     protected function getStatusBadgeClass($status) {
         switch ($status) {
             case 'pending':

@@ -7,6 +7,7 @@ class ProductsController extends BaseController {
 
     public function __construct() {
         parent::__construct();
+        require_once __DIR__ . '/../models/Product.php';
         $this->productModel = new Product();
     }
 
@@ -30,9 +31,18 @@ class ProductsController extends BaseController {
 
     public function create() {
         // Check if user is logged in and is admin
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-            Logger::log("Unauthorized access attempt to product creation by user '{$_SESSION['user']['username']}'");
+        if (!isset($_SESSION['user'])) {
+            Logger::log("Unauthorized access attempt to product creation - no user session");
             header('Location: /Salvio2/public/auth');
+            exit;
+        }
+
+        Logger::log("User attempting product creation - Role: " . ($_SESSION['user']['role'] ?? 'no role') . 
+                   ", Username: " . $_SESSION['user']['username']);
+
+        if ($_SESSION['user']['role'] !== 'admin') {
+            Logger::log("Unauthorized access attempt to product creation - not admin role");
+            header('Location: /Salvio2/public/products');
             exit;
         }
 
@@ -67,11 +77,24 @@ class ProductsController extends BaseController {
             }
         }
 
-        $categories = $this->productModel->getCategories();
-        $this->render('products/create', [
-            'categories' => $categories,
-            'user' => $_SESSION['user']
-        ]);
+        try {
+            Logger::log("User '{$_SESSION['user']['username']}' attempting to access create product page");
+            $categories = $this->productModel->getCategories();
+            
+            if (empty($categories)) {
+                Logger::log("Warning: No categories found when loading create product page");
+            }
+            
+            $this->render('products/create', [
+                'title' => 'Add New Product',
+                'description' => 'Create a new product in the inventory',
+                'categories' => $categories,
+                'user' => $_SESSION['user']
+            ]);
+        } catch (Exception $e) {
+            Logger::log("Error in create product page: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function edit($id) {

@@ -1,20 +1,23 @@
 <?php
 
 require_once __DIR__ . '/Notification.php';
+require_once __DIR__ . '/../helpers/Mailer.php';
 
 class ProfitSharing extends BaseModel {
     private $notification;
+    private $mailer;
 
     public function __construct() {
         parent::__construct();
         $this->notification = new Notification();
+        $this->mailer = new Mailer();
     }
 
     public function getMonthlyProfits($filters = []) {
         $sql = "SELECT 
                     mp.*,
-                    (mp.total_sales - mp.total_costs) as gross_profit,
-                    ((mp.total_sales - mp.total_costs) / mp.total_sales * 100) as gross_margin,
+                    (mp.total_sales - mp.total_product_cost) as gross_profit,
+                    ((mp.total_sales - mp.total_product_cost) / mp.total_sales * 100) as gross_margin,
                     (mp.net_profit / mp.total_sales * 100) as net_margin,
                     COUNT(pd.id) as total_distributions,
                     SUM(pd.amount) as total_distributed,
@@ -35,12 +38,12 @@ class ProfitSharing extends BaseModel {
         }
 
         if (isset($filters['year'])) {
-            $conditions[] = "YEAR(mp.month) = ?";
+            $conditions[] = "YEAR(mp.period) = ?";
             $params[] = $filters['year'];
         }
 
         $sql .= " WHERE " . implode(" AND ", $conditions);
-        $sql .= " GROUP BY mp.id ORDER BY mp.month DESC";
+        $sql .= " GROUP BY mp.id ORDER BY mp.period DESC";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
@@ -52,8 +55,10 @@ class ProfitSharing extends BaseModel {
             $this->db->beginTransaction();
 
             // Check if profit record already exists
-            $sql = "SELECT id FROM monthly_profits WHERE month = ?";
-            $existing = $this->db->query($sql, [$month])->fetch();
+            $sql = "SELECT id FROM monthly_profits WHERE period = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$month]);
+            $existing = $stmt->fetch();
             if ($existing) {
                 throw new Exception("Profit record already exists for this month");
             }
@@ -63,37 +68,45 @@ class ProfitSharing extends BaseModel {
                     FROM orders 
                     WHERE DATE_FORMAT(created_at, '%Y-%m') = ? 
                     AND status = 'completed'";
-            $totalSales = $this->db->query($sql, [$month])->fetch()['total_sales'];
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$month]);
+            $totalSales = $stmt->fetch()['total_sales'];
 
-            // Get total costs (from order items)
-            $sql = "SELECT COALESCE(SUM(oi.quantity * p.cost_price), 0) as total_costs
+            // Get total product costs (from order items)
+            $sql = "SELECT COALESCE(SUM(oi.quantity * p.cost_price), 0) as total_product_cost
                     FROM orders o
                     JOIN order_items oi ON o.id = oi.order_id
                     JOIN products p ON oi.product_id = p.id
                     WHERE DATE_FORMAT(o.created_at, '%Y-%m') = ?
                     AND o.status = 'completed'";
-            $totalCosts = $this->db->query($sql, [$month])->fetch()['total_costs'];
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$month]);
+            $totalProductCost = $stmt->fetch()['total_product_cost'];
 
             // Get total commissions
             $sql = "SELECT COALESCE(SUM(amount), 0) as total_commissions
                     FROM sales_commissions
                     WHERE DATE_FORMAT(created_at, '%Y-%m') = ?";
-            $totalCommissions = $this->db->query($sql, [$month])->fetch()['total_commissions'];
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$month]);
+            $totalCommissions = $stmt->fetch()['total_commissions'];
 
             // Get total expenses
             $sql = "SELECT COALESCE(SUM(amount), 0) as total_expenses
                     FROM expenses
                     WHERE DATE_FORMAT(date, '%Y-%m') = ?";
-            $totalExpenses = $this->db->query($sql, [$month])->fetch()['total_expenses'];
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$month]);
+            $totalExpenses = $stmt->fetch()['total_expenses'];
 
             // Calculate net profit
-            $netProfit = $totalSales - $totalCosts - $totalCommissions - $totalExpenses;
+            $netProfit = $totalSales - $totalProductCost - $totalCommissions - $totalExpenses;
 
             // Insert profit record
             $sql = "INSERT INTO monthly_profits (
-                        month,
+                        period,
                         total_sales,
-                        total_costs,
+                        total_product_cost,
                         total_commissions,
                         total_expenses,
                         net_profit,
@@ -104,7 +117,7 @@ class ProfitSharing extends BaseModel {
             $this->db->query($sql, [
                 $month,
                 $totalSales,
-                $totalCosts,
+                $totalProductCost,
                 $totalCommissions,
                 $totalExpenses,
                 $netProfit
@@ -189,7 +202,7 @@ class ProfitSharing extends BaseModel {
                     'title' => 'Profit Distribution Approved',
                     'message' => "Your profit share of ₱" . number_format($dist['amount'], 2) . 
                                " (" . $dist['percentage'] . "%) for " . 
-                               date('F Y', strtotime($profit['month'])) . " has been approved.",
+                               date('F Y', strtotime($profit['period'])) . " has been approved.",
                     'reference_type' => 'profit_distribution',
                     'reference_id' => $dist['id']
                 ];
@@ -239,5 +252,24 @@ class ProfitSharing extends BaseModel {
                 ORDER BY pd.percentage DESC";
 
         return $this->db->query($sql, [$profitId])->fetchAll();
+    }
+
+    public function sendCalculationNotification($data) {
+        try {
+            Logger::log("Sending profit calculation notification");
+            
+            $result = $this->mailer->sendProfitCalculationNotification($data);
+            
+            if ($result) {
+                Logger::log("Profit calculation notification sent successfully");
+            } else {
+                Logger::log("Failed to send profit calculation notification");
+            }
+            
+            return $result;
+        } catch (Exception $e) {
+            Logger::log("Error in sendCalculationNotification: " . $e->getMessage());
+            return false;
+        }
     }
 }

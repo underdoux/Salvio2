@@ -32,13 +32,13 @@ class ProfitSharingController extends BaseController {
                 throw new Exception('Invalid request method');
             }
 
-            $month = $_POST['month'] ?? null;
-            if (!$month) {
-                throw new Exception('Month is required');
+            $period = $_POST['period'] ?? null;
+            if (!$period) {
+                throw new Exception('Period is required');
             }
 
-            // Calculate profits for the month
-            $profitId = $this->profitSharing->calculateMonthlyProfit($month);
+            // Calculate profits for the period
+            $profitId = $this->profitSharing->calculateMonthlyProfit($period);
 
             $_SESSION['success'] = 'Monthly profit calculated successfully';
             header('Location: /Salvio2/public/profit-sharing');
@@ -82,7 +82,7 @@ class ProfitSharingController extends BaseController {
             $distributions = $this->profitSharing->getProfitDistributions($id);
 
             $data = [
-                'title' => 'Profit Details - ' . date('F Y', strtotime($profit['month'])),
+                'title' => 'Profit Details - ' . date('F Y', strtotime($profit['period'])),
                 'description' => 'View profit details and distributions',
                 'profit' => $profit,
                 'distributions' => $distributions
@@ -100,7 +100,7 @@ class ProfitSharingController extends BaseController {
     public function export($id) {
         try {
             $profit = $this->profitSharing->getProfitDetails($id);
-            $month = date('Y-m', strtotime($profit['month']));
+            $month = date('Y-m', strtotime($profit['period']));
             
             $data = $this->profitSharing->exportProfitReport($month);
             $filename = "profit_report_{$month}.csv";

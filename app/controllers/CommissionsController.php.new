@@ -1,0 +1,34 @@
+<?php
+
+require_once __DIR__ . '/../models/Commission.php';
+
+class CommissionsController extends BaseController {
+    protected $requiresAuth = true;
+    protected $commission;
+
+    public function __construct() {
+        parent::__construct();
+        $this->commission = new Commission();
+    }
+
+    public function rates() {
+        try {
+            $data = [
+                'title' => 'Commission Rates',
+                'description' => 'View and manage commission rates',
+                'rates' => $this->commission->getCommissionRates(),
+                'categories' => $this->commission->getCategories(),
+                'products' => $this->commission->getProducts()
+            ];
+            
+            $this->render('commissions/rates', $data);
+        } catch (Exception $e) {
+            Logger::log("Error loading commission rates: " . $e->getMessage(), 'ERROR');
+            $this->redirect('/commissions', [
+                'error' => 'Failed to load commission rates'
+            ]);
+        }
+    }
+
+    // ... rest of the existing methods
+}

@@ -485,3 +485,2905 @@
 [2025-05-03 08:37:32] Unauthorized access attempt to /Salvio2/public/
 [2025-05-03 08:37:33] User 'admin' logged in successfully.
 [2025-05-03 08:37:35] User 'admin' accessed products list.
+[2025-05-03 09:08:02] Unauthorized access attempt to /Salvio2/public/profit-sharing
+[2025-05-03 09:13:53] Unauthorized access attempt to /Salvio2/public/profit-sharing
+[2025-05-03 09:18:21] User 'admin' logged in successfully.
+[2025-05-03 09:21:35] User 'admin' logged in successfully.
+[2025-05-03 09:26:33] User 'admin' logged in successfully.
+[2025-05-03 09:29:16] User 'admin' logged in successfully.
+[2025-05-03 09:32:47] User 'admin' accessed products list.
+[2025-05-03 09:56:11] Database connection established successfully
+[2025-05-03 09:56:11] Session status: 2
+[2025-05-03 09:56:11] Session ID: j1o55ptbbnqehctinvb3nfna6v
+[2025-05-03 09:56:11] Session data: Array
+(
+)
+
+[2025-05-03 09:56:11] Unauthorized access attempt to /Salvio2/public/products/create
+[2025-05-03 09:56:11] User session data: no user data
+[2025-05-03 09:56:11] Database connection established successfully
+[2025-05-03 09:56:11] Session status: 2
+[2025-05-03 09:56:11] Session ID: j1o55ptbbnqehctinvb3nfna6v
+[2025-05-03 09:56:11] Session data: Array
+(
+)
+
+[2025-05-03 09:56:11] BaseModel initialized with database connection
+[2025-05-03 09:56:11] Rendering view: auth/login
+[2025-05-03 09:56:11] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 09:56:11] View path: ../app/views/auth/login.php
+[2025-05-03 09:56:11] Loading view content
+[2025-05-03 09:56:11] View content length: 1089
+[2025-05-03 09:56:11] Layout path: ../app/views/layouts/main.php
+[2025-05-03 09:56:11] Rendering with layout
+[2025-05-03 09:56:12] Database connection established successfully
+[2025-05-03 09:56:12] Session status: 2
+[2025-05-03 09:56:12] Session ID: j1o55ptbbnqehctinvb3nfna6v
+[2025-05-03 09:56:12] Session data: Array
+(
+)
+
+[2025-05-03 09:56:12] BaseModel initialized with database connection
+[2025-05-03 09:56:12] Attempting authentication for user: admin
+[2025-05-03 09:56:12] Looking up user: admin
+[2025-05-03 09:56:12] User found with role: admin
+[2025-05-03 09:56:12] Password verified for user 'admin' with role 'admin'
+[2025-05-03 09:56:12] User 'admin' logged in successfully.
+[2025-05-03 09:56:12] Database connection established successfully
+[2025-05-03 09:56:12] Session status: 2
+[2025-05-03 09:56:12] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:12] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258972
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 09:56:12] Authenticated user accessing /Salvio2/public/
+[2025-05-03 09:56:12] User role: admin
+[2025-05-03 09:56:12] Database connection established successfully
+[2025-05-03 09:56:12] Session status: 2
+[2025-05-03 09:56:12] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:12] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258972
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 09:56:12] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 09:56:12] User role: admin
+[2025-05-03 09:56:12] Rendering view: home/reports
+[2025-05-03 09:56:12] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 09:56:12] View path: ../app/views/home/reports.php
+[2025-05-03 09:56:12] Loading view content
+[2025-05-03 09:56:12] View content length: 1465
+[2025-05-03 09:56:12] Layout path: ../app/views/layouts/main.php
+[2025-05-03 09:56:12] Rendering with layout
+[2025-05-03 09:56:15] Database connection established successfully
+[2025-05-03 09:56:15] Session status: 2
+[2025-05-03 09:56:15] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:15] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258972
+)
+
+[2025-05-03 09:56:15] Authenticated user accessing /Salvio2/public/products
+[2025-05-03 09:56:15] User role: admin
+[2025-05-03 09:56:15] BaseModel initialized with database connection
+[2025-05-03 09:56:15] User 'admin' accessed products list.
+[2025-05-03 09:56:15] Fetching all products
+[2025-05-03 09:56:15] Successfully fetched 5 products
+[2025-05-03 09:56:15] Attempting to fetch categories from database
+[2025-05-03 09:56:15] Successfully fetched 5 categories
+[2025-05-03 09:56:15] Rendering view: products/index
+[2025-05-03 09:56:15] View data: Array
+(
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Amoxicillin 500mg
+                    [bpom_id] => BPOM001
+                    [category_id] => 1
+                    [description] => Antibiotic capsules 500mg
+                    [purchase_price] => 25000.00
+                    [selling_price] => 35000.00
+                    [stock_type] => stocked
+                    [min_stock] => 100
+                    [status] => 1
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                    [category_name] => Antibiotics
+                    [current_stock] => 200
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Paracetamol 500mg
+                    [bpom_id] => BPOM002
+                    [category_id] => 2
+                    [description] => Pain relief tablets 500mg
+                    [purchase_price] => 15000.00
+                    [selling_price] => 22000.00
+                    [stock_type] => stocked
+                    [min_stock] => 200
+                    [status] => 1
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                    [category_name] => Pain Relief
+                    [current_stock] => 200
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Vitamin C 1000mg
+                    [bpom_id] => BPOM003
+                    [category_id] => 3
+                    [description] => Vitamin C tablets 1000mg
+                    [purchase_price] => 35000.00
+                    [selling_price] => 48000.00
+                    [stock_type] => stocked
+                    [min_stock] => 150
+                    [status] => 1
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                    [category_name] => Vitamins
+                    [current_stock] => 200
+                )
+
+            [3] => Array
+                (
+                    [id] => 4
+                    [name] => Bandage Roll
+                    [bpom_id] => BPOM004
+                    [category_id] => 4
+                    [description] => Sterile bandage roll 10cm x 5m
+                    [purchase_price] => 12000.00
+                    [selling_price] => 18000.00
+                    [stock_type] => stocked
+                    [min_stock] => 50
+                    [status] => 1
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                    [category_name] => First Aid
+                    [current_stock] => 200
+                )
+
+            [4] => Array
+                (
+                    [id] => 5
+                    [name] => Metformin 500mg
+                    [bpom_id] => BPOM005
+                    [category_id] => 5
+                    [description] => Diabetes medication 500mg
+                    [purchase_price] => 45000.00
+                    [selling_price] => 62000.00
+                    [stock_type] => stocked
+                    [min_stock] => 100
+                    [status] => 1
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                    [category_name] => Chronic Disease
+                    [current_stock] => 200
+                )
+
+        )
+
+    [categories] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Antibiotics
+                    [commission_rate] => 2.50
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Chronic Disease
+                    [commission_rate] => 2.50
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [2] => Array
+                (
+                    [id] => 4
+                    [name] => First Aid
+                    [commission_rate] => 2.00
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [3] => Array
+                (
+                    [id] => 2
+                    [name] => Pain Relief
+                    [commission_rate] => 2.00
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [4] => Array
+                (
+                    [id] => 3
+                    [name] => Vitamins
+                    [commission_rate] => 3.00
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+        )
+
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+)
+
+[2025-05-03 09:56:15] View path: ../app/views/products/index.php
+[2025-05-03 09:56:15] Loading view content
+[2025-05-03 09:56:15] View content length: 5659
+[2025-05-03 09:56:15] Layout path: ../app/views/layouts/main.php
+[2025-05-03 09:56:15] Rendering with layout
+[2025-05-03 09:56:16] Database connection established successfully
+[2025-05-03 09:56:16] Session status: 2
+[2025-05-03 09:56:16] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:16] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258975
+)
+
+[2025-05-03 09:56:16] Authenticated user accessing /Salvio2/public/products/create
+[2025-05-03 09:56:16] User role: admin
+[2025-05-03 09:56:16] BaseModel initialized with database connection
+[2025-05-03 09:56:16] User attempting product creation - Role: admin, Username: admin
+[2025-05-03 09:56:16] User 'admin' attempting to access create product page
+[2025-05-03 09:56:16] Attempting to fetch categories from database
+[2025-05-03 09:56:16] Successfully fetched 5 categories
+[2025-05-03 09:56:16] Rendering view: products/create
+[2025-05-03 09:56:16] View data: Array
+(
+    [title] => Add New Product
+    [description] => Create a new product in the inventory
+    [categories] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Antibiotics
+                    [commission_rate] => 2.50
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Chronic Disease
+                    [commission_rate] => 2.50
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [2] => Array
+                (
+                    [id] => 4
+                    [name] => First Aid
+                    [commission_rate] => 2.00
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [3] => Array
+                (
+                    [id] => 2
+                    [name] => Pain Relief
+                    [commission_rate] => 2.00
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [4] => Array
+                (
+                    [id] => 3
+                    [name] => Vitamins
+                    [commission_rate] => 3.00
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+        )
+
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+)
+
+[2025-05-03 09:56:16] View path: ../app/views/products/create.php
+[2025-05-03 09:56:16] Loading view content
+[2025-05-03 09:56:16] View content length: 5326
+[2025-05-03 09:56:16] Layout path: ../app/views/layouts/main.php
+[2025-05-03 09:56:16] Rendering with layout
+[2025-05-03 09:56:25] Database connection established successfully
+[2025-05-03 09:56:25] Session status: 2
+[2025-05-03 09:56:25] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:25] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258976
+)
+
+[2025-05-03 09:56:25] Authenticated user accessing /Salvio2/public/orders
+[2025-05-03 09:56:25] User role: admin
+[2025-05-03 09:56:25] BaseModel initialized with database connection
+[2025-05-03 09:56:25] BaseModel initialized with database connection
+[2025-05-03 09:56:25] BaseModel initialized with database connection
+[2025-05-03 09:56:25] Rendering view: orders/index
+[2025-05-03 09:56:25] View data: Array
+(
+    [title] => Orders
+    [description] => Manage orders and track their status
+    [orders] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [customer_id] => 1
+                    [order_number] => ORD-2024-001
+                    [total_amount] => 150000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => completed
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => Pharmacy Plus
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [customer_id] => 2
+                    [order_number] => ORD-2024-002
+                    [total_amount] => 240000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => in_progress
+                    [payment_type] => installment
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => City Clinic
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [customer_id] => 3
+                    [order_number] => ORD-2024-003
+                    [total_amount] => 375000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => new
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => General Hospital
+                )
+
+        )
+
+)
+
+[2025-05-03 09:56:25] View path: ../app/views/orders/index.php
+[2025-05-03 09:56:25] Loading view content
+[2025-05-03 09:56:25] View content length: 6357
+[2025-05-03 09:56:25] Layout path: ../app/views/layouts/main.php
+[2025-05-03 09:56:25] Rendering with layout
+[2025-05-03 09:56:26] Database connection established successfully
+[2025-05-03 09:56:26] Session status: 2
+[2025-05-03 09:56:26] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:26] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258985
+)
+
+[2025-05-03 09:56:26] Authenticated user accessing /Salvio2/public/orders/create
+[2025-05-03 09:56:26] User role: admin
+[2025-05-03 09:56:26] BaseModel initialized with database connection
+[2025-05-03 09:56:26] BaseModel initialized with database connection
+[2025-05-03 09:56:26] BaseModel initialized with database connection
+[2025-05-03 09:56:26] Rendering view: orders/create
+[2025-05-03 09:56:26] View data: Array
+(
+    [title] => Create Order
+    [description] => Create a new order
+)
+
+[2025-05-03 09:56:26] View path: ../app/views/orders/create.php
+[2025-05-03 09:56:26] Loading view content
+[2025-05-03 09:56:26] View content length: 8161
+[2025-05-03 09:56:26] Layout path: ../app/views/layouts/main.php
+[2025-05-03 09:56:26] Rendering with layout
+[2025-05-03 09:56:28] Database connection established successfully
+[2025-05-03 09:56:28] Session status: 2
+[2025-05-03 09:56:28] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:28] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258986
+)
+
+[2025-05-03 09:56:28] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 09:56:28] User role: admin
+[2025-05-03 09:56:28] Rendering view: home/reports
+[2025-05-03 09:56:28] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 09:56:28] View path: ../app/views/home/reports.php
+[2025-05-03 09:56:28] Loading view content
+[2025-05-03 09:56:28] View content length: 1465
+[2025-05-03 09:56:28] Layout path: ../app/views/layouts/main.php
+[2025-05-03 09:56:28] Rendering with layout
+[2025-05-03 09:56:29] Database connection established successfully
+[2025-05-03 09:56:29] Session status: 2
+[2025-05-03 09:56:29] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:29] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258988
+)
+
+[2025-05-03 09:56:29] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 09:56:29] User role: admin
+[2025-05-03 09:56:29] BaseModel initialized with database connection
+[2025-05-03 09:56:29] BaseModel initialized with database connection
+[2025-05-03 09:56:29] Rendering view: commissions/index
+[2025-05-03 09:56:29] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 09:56:29] View path: ../app/views/commissions/index.php
+[2025-05-03 09:56:29] Loading view content
+[2025-05-03 09:56:29] View content length: 5619
+[2025-05-03 09:56:29] Layout path: ../app/views/layouts/main.php
+[2025-05-03 09:56:29] Rendering with layout
+[2025-05-03 09:56:31] Database connection established successfully
+[2025-05-03 09:56:31] Session status: 2
+[2025-05-03 09:56:31] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:31] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258989
+)
+
+[2025-05-03 09:56:31] Authenticated user accessing /Salvio2/public/profit-sharing
+[2025-05-03 09:56:31] User role: admin
+[2025-05-03 09:56:31] BaseModel initialized with database connection
+[2025-05-03 09:56:31] BaseModel initialized with database connection
+[2025-05-03 09:56:31] Rendering view: profit_sharing/index
+[2025-05-03 09:56:31] View data: Array
+(
+    [title] => Profit Sharing
+    [description] => Manage profit sharing and distributions
+    [profits] => Array
+        (
+        )
+
+)
+
+[2025-05-03 09:56:31] View path: ../app/views/profit_sharing/index.php
+[2025-05-03 09:56:31] Loading view content
+[2025-05-03 09:56:31] View content length: 5968
+[2025-05-03 09:56:31] Layout path: ../app/views/layouts/main.php
+[2025-05-03 09:56:31] Rendering with layout
+[2025-05-03 09:56:33] Database connection established successfully
+[2025-05-03 09:56:33] Session status: 2
+[2025-05-03 09:56:33] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:33] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258991
+)
+
+[2025-05-03 09:56:33] Authenticated user accessing /Salvio2/public/
+[2025-05-03 09:56:33] User role: admin
+[2025-05-03 09:56:33] Database connection established successfully
+[2025-05-03 09:56:33] Session status: 2
+[2025-05-03 09:56:33] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 09:56:33] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258993
+)
+
+[2025-05-03 09:56:33] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 09:56:33] User role: admin
+[2025-05-03 09:56:33] Rendering view: home/reports
+[2025-05-03 09:56:33] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 09:56:33] View path: ../app/views/home/reports.php
+[2025-05-03 09:56:33] Loading view content
+[2025-05-03 09:56:33] View content length: 1465
+[2025-05-03 09:56:33] Layout path: ../app/views/layouts/main.php
+[2025-05-03 09:56:33] Rendering with layout
+[2025-05-03 10:19:58] Database connection established successfully
+[2025-05-03 10:19:58] Session status: 2
+[2025-05-03 10:19:58] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:19:58] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746258993
+)
+
+[2025-05-03 10:19:58] Authenticated user accessing /Salvio2/public/
+[2025-05-03 10:19:58] User role: admin
+[2025-05-03 10:19:58] Database connection established successfully
+[2025-05-03 10:19:58] Session status: 2
+[2025-05-03 10:19:58] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:19:58] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260398
+)
+
+[2025-05-03 10:19:58] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 10:19:58] User role: admin
+[2025-05-03 10:19:58] Rendering view: home/reports
+[2025-05-03 10:19:58] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 10:19:58] View path: ../app/views/home/reports.php
+[2025-05-03 10:19:58] Loading view content
+[2025-05-03 10:19:58] View content length: 1465
+[2025-05-03 10:19:58] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:19:58] Rendering with layout
+[2025-05-03 10:19:59] Database connection established successfully
+[2025-05-03 10:19:59] Session status: 2
+[2025-05-03 10:19:59] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:19:59] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260398
+)
+
+[2025-05-03 10:19:59] Authenticated user accessing /Salvio2/public/
+[2025-05-03 10:19:59] User role: admin
+[2025-05-03 10:19:59] Database connection established successfully
+[2025-05-03 10:19:59] Session status: 2
+[2025-05-03 10:19:59] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:19:59] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260399
+)
+
+[2025-05-03 10:19:59] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 10:19:59] User role: admin
+[2025-05-03 10:19:59] Rendering view: home/reports
+[2025-05-03 10:19:59] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 10:19:59] View path: ../app/views/home/reports.php
+[2025-05-03 10:19:59] Loading view content
+[2025-05-03 10:19:59] View content length: 1465
+[2025-05-03 10:19:59] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:19:59] Rendering with layout
+[2025-05-03 10:20:00] Database connection established successfully
+[2025-05-03 10:20:00] Session status: 2
+[2025-05-03 10:20:00] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:20:00] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260399
+)
+
+[2025-05-03 10:20:00] Authenticated user accessing /Salvio2/public/products
+[2025-05-03 10:20:00] User role: admin
+[2025-05-03 10:20:00] BaseModel initialized with database connection
+[2025-05-03 10:20:00] User 'admin' accessed products list.
+[2025-05-03 10:20:00] Fetching all products
+[2025-05-03 10:20:00] Successfully fetched 5 products
+[2025-05-03 10:20:00] Attempting to fetch categories from database
+[2025-05-03 10:20:00] Successfully fetched 5 categories
+[2025-05-03 10:20:00] Rendering view: products/index
+[2025-05-03 10:20:00] View data: Array
+(
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Amoxicillin 500mg
+                    [bpom_id] => BPOM001
+                    [category_id] => 1
+                    [description] => Antibiotic capsules 500mg
+                    [purchase_price] => 25000.00
+                    [selling_price] => 35000.00
+                    [stock_type] => stocked
+                    [min_stock] => 100
+                    [status] => 1
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                    [category_name] => Antibiotics
+                    [current_stock] => 200
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [name] => Paracetamol 500mg
+                    [bpom_id] => BPOM002
+                    [category_id] => 2
+                    [description] => Pain relief tablets 500mg
+                    [purchase_price] => 15000.00
+                    [selling_price] => 22000.00
+                    [stock_type] => stocked
+                    [min_stock] => 200
+                    [status] => 1
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                    [category_name] => Pain Relief
+                    [current_stock] => 200
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [name] => Vitamin C 1000mg
+                    [bpom_id] => BPOM003
+                    [category_id] => 3
+                    [description] => Vitamin C tablets 1000mg
+                    [purchase_price] => 35000.00
+                    [selling_price] => 48000.00
+                    [stock_type] => stocked
+                    [min_stock] => 150
+                    [status] => 1
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                    [category_name] => Vitamins
+                    [current_stock] => 200
+                )
+
+            [3] => Array
+                (
+                    [id] => 4
+                    [name] => Bandage Roll
+                    [bpom_id] => BPOM004
+                    [category_id] => 4
+                    [description] => Sterile bandage roll 10cm x 5m
+                    [purchase_price] => 12000.00
+                    [selling_price] => 18000.00
+                    [stock_type] => stocked
+                    [min_stock] => 50
+                    [status] => 1
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                    [category_name] => First Aid
+                    [current_stock] => 200
+                )
+
+            [4] => Array
+                (
+                    [id] => 5
+                    [name] => Metformin 500mg
+                    [bpom_id] => BPOM005
+                    [category_id] => 5
+                    [description] => Diabetes medication 500mg
+                    [purchase_price] => 45000.00
+                    [selling_price] => 62000.00
+                    [stock_type] => stocked
+                    [min_stock] => 100
+                    [status] => 1
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                    [category_name] => Chronic Disease
+                    [current_stock] => 200
+                )
+
+        )
+
+    [categories] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [name] => Antibiotics
+                    [commission_rate] => 2.50
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [1] => Array
+                (
+                    [id] => 5
+                    [name] => Chronic Disease
+                    [commission_rate] => 2.50
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [2] => Array
+                (
+                    [id] => 4
+                    [name] => First Aid
+                    [commission_rate] => 2.00
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [3] => Array
+                (
+                    [id] => 2
+                    [name] => Pain Relief
+                    [commission_rate] => 2.00
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+            [4] => Array
+                (
+                    [id] => 3
+                    [name] => Vitamins
+                    [commission_rate] => 3.00
+                    [created_at] => 2025-05-03 02:15:15
+                    [updated_at] => 2025-05-03 02:15:15
+                )
+
+        )
+
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+)
+
+[2025-05-03 10:20:00] View path: ../app/views/products/index.php
+[2025-05-03 10:20:00] Loading view content
+[2025-05-03 10:20:00] View content length: 5659
+[2025-05-03 10:20:00] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:20:00] Rendering with layout
+[2025-05-03 10:20:01] Database connection established successfully
+[2025-05-03 10:20:01] Session status: 2
+[2025-05-03 10:20:01] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:20:01] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260400
+)
+
+[2025-05-03 10:20:01] Authenticated user accessing /Salvio2/public/orders
+[2025-05-03 10:20:01] User role: admin
+[2025-05-03 10:20:01] BaseModel initialized with database connection
+[2025-05-03 10:20:01] BaseModel initialized with database connection
+[2025-05-03 10:20:01] BaseModel initialized with database connection
+[2025-05-03 10:20:01] Rendering view: orders/index
+[2025-05-03 10:20:01] View data: Array
+(
+    [title] => Orders
+    [description] => Manage orders and track their status
+    [orders] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [customer_id] => 1
+                    [order_number] => ORD-2024-001
+                    [total_amount] => 150000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => completed
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => Pharmacy Plus
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [customer_id] => 2
+                    [order_number] => ORD-2024-002
+                    [total_amount] => 240000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => in_progress
+                    [payment_type] => installment
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => City Clinic
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [customer_id] => 3
+                    [order_number] => ORD-2024-003
+                    [total_amount] => 375000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => new
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => General Hospital
+                )
+
+        )
+
+)
+
+[2025-05-03 10:20:01] View path: ../app/views/orders/index.php
+[2025-05-03 10:20:01] Loading view content
+[2025-05-03 10:20:01] View content length: 6357
+[2025-05-03 10:20:01] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:20:01] Rendering with layout
+[2025-05-03 10:20:02] Database connection established successfully
+[2025-05-03 10:20:02] Session status: 2
+[2025-05-03 10:20:02] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:20:02] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260401
+)
+
+[2025-05-03 10:20:02] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 10:20:02] User role: admin
+[2025-05-03 10:20:02] Rendering view: home/reports
+[2025-05-03 10:20:02] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 10:20:02] View path: ../app/views/home/reports.php
+[2025-05-03 10:20:02] Loading view content
+[2025-05-03 10:20:02] View content length: 1465
+[2025-05-03 10:20:02] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:20:02] Rendering with layout
+[2025-05-03 10:20:04] Database connection established successfully
+[2025-05-03 10:20:04] Session status: 2
+[2025-05-03 10:20:04] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:20:04] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260402
+)
+
+[2025-05-03 10:20:04] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:20:04] User role: admin
+[2025-05-03 10:20:04] BaseModel initialized with database connection
+[2025-05-03 10:20:04] BaseModel initialized with database connection
+[2025-05-03 10:20:04] Rendering view: commissions/index
+[2025-05-03 10:20:04] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:20:04] View path: ../app/views/commissions/index.php
+[2025-05-03 10:20:04] Loading view content
+[2025-05-03 10:20:04] View content length: 5619
+[2025-05-03 10:20:04] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:20:04] Rendering with layout
+[2025-05-03 10:20:05] Database connection established successfully
+[2025-05-03 10:20:05] Session status: 2
+[2025-05-03 10:20:05] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:20:05] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260404
+)
+
+[2025-05-03 10:20:05] Authenticated user accessing /Salvio2/public/profit-sharing
+[2025-05-03 10:20:05] User role: admin
+[2025-05-03 10:20:05] BaseModel initialized with database connection
+[2025-05-03 10:20:05] BaseModel initialized with database connection
+[2025-05-03 10:20:05] Rendering view: profit_sharing/index
+[2025-05-03 10:20:05] View data: Array
+(
+    [title] => Profit Sharing
+    [description] => Manage profit sharing and distributions
+    [profits] => Array
+        (
+        )
+
+)
+
+[2025-05-03 10:20:05] View path: ../app/views/profit_sharing/index.php
+[2025-05-03 10:20:05] Loading view content
+[2025-05-03 10:20:05] View content length: 5968
+[2025-05-03 10:20:05] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:20:05] Rendering with layout
+[2025-05-03 10:20:06] Database connection established successfully
+[2025-05-03 10:20:06] Session status: 2
+[2025-05-03 10:20:06] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:20:06] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260405
+)
+
+[2025-05-03 10:20:06] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:20:06] User role: admin
+[2025-05-03 10:20:06] BaseModel initialized with database connection
+[2025-05-03 10:20:06] BaseModel initialized with database connection
+[2025-05-03 10:20:06] Rendering view: commissions/index
+[2025-05-03 10:20:06] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:20:06] View path: ../app/views/commissions/index.php
+[2025-05-03 10:20:06] Loading view content
+[2025-05-03 10:20:06] View content length: 5619
+[2025-05-03 10:20:06] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:20:06] Rendering with layout
+[2025-05-03 10:20:07] Database connection established successfully
+[2025-05-03 10:20:07] Session status: 2
+[2025-05-03 10:20:07] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:20:07] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260406
+)
+
+[2025-05-03 10:20:07] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:20:07] User role: admin
+[2025-05-03 10:20:07] BaseModel initialized with database connection
+[2025-05-03 10:20:07] BaseModel initialized with database connection
+[2025-05-03 10:30:47] Database connection established successfully
+[2025-05-03 10:30:47] Session status: 2
+[2025-05-03 10:30:47] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:30:47] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746260407
+)
+
+[2025-05-03 10:30:47] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:30:47] User role: admin
+[2025-05-03 10:30:47] BaseModel initialized with database connection
+[2025-05-03 10:30:47] BaseModel initialized with database connection
+[2025-05-03 10:30:47] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:30:47] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:30:49] Database connection established successfully
+[2025-05-03 10:30:49] Session status: 2
+[2025-05-03 10:30:49] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:30:49] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261047
+)
+
+[2025-05-03 10:30:49] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:30:49] User role: admin
+[2025-05-03 10:30:49] BaseModel initialized with database connection
+[2025-05-03 10:30:49] BaseModel initialized with database connection
+[2025-05-03 10:30:49] Rendering view: commissions/index
+[2025-05-03 10:30:49] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:30:49] View path: ../app/views/commissions/index.php
+[2025-05-03 10:30:49] Loading view content
+[2025-05-03 10:30:49] View content length: 5619
+[2025-05-03 10:30:49] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:30:49] Rendering with layout
+[2025-05-03 10:30:51] Database connection established successfully
+[2025-05-03 10:30:51] Session status: 2
+[2025-05-03 10:30:51] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:30:51] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261049
+)
+
+[2025-05-03 10:30:51] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:30:51] User role: admin
+[2025-05-03 10:30:51] BaseModel initialized with database connection
+[2025-05-03 10:30:51] BaseModel initialized with database connection
+[2025-05-03 10:30:51] Rendering view: commissions/index
+[2025-05-03 10:30:51] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:30:51] View path: ../app/views/commissions/index.php
+[2025-05-03 10:30:51] Loading view content
+[2025-05-03 10:30:51] View content length: 5619
+[2025-05-03 10:30:51] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:30:51] Rendering with layout
+[2025-05-03 10:30:54] Database connection established successfully
+[2025-05-03 10:30:54] Session status: 2
+[2025-05-03 10:30:54] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:30:54] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261051
+)
+
+[2025-05-03 10:30:54] Authenticated user accessing /Salvio2/public/
+[2025-05-03 10:30:54] User role: admin
+[2025-05-03 10:30:54] Database connection established successfully
+[2025-05-03 10:30:54] Session status: 2
+[2025-05-03 10:30:54] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:30:54] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261054
+)
+
+[2025-05-03 10:30:54] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 10:30:54] User role: admin
+[2025-05-03 10:30:54] Rendering view: home/reports
+[2025-05-03 10:30:54] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 10:30:54] View path: ../app/views/home/reports.php
+[2025-05-03 10:30:54] Loading view content
+[2025-05-03 10:30:54] View content length: 1465
+[2025-05-03 10:30:54] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:30:54] Rendering with layout
+[2025-05-03 10:30:55] Database connection established successfully
+[2025-05-03 10:30:55] Session status: 2
+[2025-05-03 10:30:55] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:30:55] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261054
+)
+
+[2025-05-03 10:30:55] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:30:55] User role: admin
+[2025-05-03 10:30:55] BaseModel initialized with database connection
+[2025-05-03 10:30:55] BaseModel initialized with database connection
+[2025-05-03 10:30:55] Rendering view: commissions/index
+[2025-05-03 10:30:55] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:30:55] View path: ../app/views/commissions/index.php
+[2025-05-03 10:30:55] Loading view content
+[2025-05-03 10:30:55] View content length: 5619
+[2025-05-03 10:30:55] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:30:55] Rendering with layout
+[2025-05-03 10:30:56] Database connection established successfully
+[2025-05-03 10:30:56] Session status: 2
+[2025-05-03 10:30:56] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:30:56] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261055
+)
+
+[2025-05-03 10:30:56] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:30:56] User role: admin
+[2025-05-03 10:30:56] BaseModel initialized with database connection
+[2025-05-03 10:30:56] BaseModel initialized with database connection
+[2025-05-03 10:30:56] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:30:56] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:31:28] Database connection established successfully
+[2025-05-03 10:31:28] Session status: 2
+[2025-05-03 10:31:28] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:31:28] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261056
+)
+
+[2025-05-03 10:31:28] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:31:28] User role: admin
+[2025-05-03 10:31:28] BaseModel initialized with database connection
+[2025-05-03 10:31:28] BaseModel initialized with database connection
+[2025-05-03 10:31:28] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:31:28] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:32:27] Database connection established successfully
+[2025-05-03 10:32:27] Session status: 2
+[2025-05-03 10:32:27] Session ID: 9ba0guhb5fir2snhmqpdub8kin
+[2025-05-03 10:32:27] Session data: Array
+(
+)
+
+[2025-05-03 10:32:27] Unauthorized access attempt to /Salvio2/public/commissions/rates
+[2025-05-03 10:32:27] User session data: no user data
+[2025-05-03 10:32:27] Database connection established successfully
+[2025-05-03 10:32:27] Session status: 2
+[2025-05-03 10:32:27] Session ID: 9ba0guhb5fir2snhmqpdub8kin
+[2025-05-03 10:32:27] Session data: Array
+(
+)
+
+[2025-05-03 10:32:27] BaseModel initialized with database connection
+[2025-05-03 10:32:27] Rendering view: auth/login
+[2025-05-03 10:32:27] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 10:32:27] View path: ../app/views/auth/login.php
+[2025-05-03 10:32:27] Loading view content
+[2025-05-03 10:32:27] View content length: 1089
+[2025-05-03 10:32:27] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:32:27] Rendering with layout
+[2025-05-03 10:33:17] Database connection established successfully
+[2025-05-03 10:33:17] Session status: 2
+[2025-05-03 10:33:17] Session ID: o3efmsf4chubje6jimhdkcc94a
+[2025-05-03 10:33:17] Session data: Array
+(
+)
+
+[2025-05-03 10:33:17] Unauthorized access attempt to /Salvio2/public/commissions/rates
+[2025-05-03 10:33:17] User session data: no user data
+[2025-05-03 10:33:17] Database connection established successfully
+[2025-05-03 10:33:17] Session status: 2
+[2025-05-03 10:33:17] Session ID: o3efmsf4chubje6jimhdkcc94a
+[2025-05-03 10:33:17] Session data: Array
+(
+)
+
+[2025-05-03 10:33:17] BaseModel initialized with database connection
+[2025-05-03 10:33:17] Rendering view: auth/login
+[2025-05-03 10:33:17] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 10:33:17] View path: ../app/views/auth/login.php
+[2025-05-03 10:33:17] Loading view content
+[2025-05-03 10:33:17] View content length: 1089
+[2025-05-03 10:33:17] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:33:17] Rendering with layout
+[2025-05-03 10:34:42] Database connection established successfully
+[2025-05-03 10:34:42] Session status: 2
+[2025-05-03 10:34:42] Session ID: o3efmsf4chubje6jimhdkcc94a
+[2025-05-03 10:34:42] Session data: Array
+(
+)
+
+[2025-05-03 10:34:42] BaseModel initialized with database connection
+[2025-05-03 10:34:42] Attempting authentication for user: admin
+[2025-05-03 10:34:42] Looking up user: admin
+[2025-05-03 10:34:42] User found with role: admin
+[2025-05-03 10:34:42] Authentication failed: password mismatch for username 'admin'
+[2025-05-03 10:34:42] Failed login attempt for username 'admin'.
+[2025-05-03 10:34:42] Database connection established successfully
+[2025-05-03 10:34:42] Session status: 2
+[2025-05-03 10:34:42] Session ID: o3efmsf4chubje6jimhdkcc94a
+[2025-05-03 10:34:42] Session data: Array
+(
+    [flash] => Array
+        (
+            [type] => danger
+            [message] => Invalid username or password
+        )
+
+)
+
+[2025-05-03 10:34:42] BaseModel initialized with database connection
+[2025-05-03 10:34:42] Rendering view: auth/login
+[2025-05-03 10:34:42] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 10:34:42] View path: ../app/views/auth/login.php
+[2025-05-03 10:34:42] Loading view content
+[2025-05-03 10:34:42] View content length: 1089
+[2025-05-03 10:34:42] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:34:42] Rendering with layout
+[2025-05-03 10:36:32] Database connection established successfully
+[2025-05-03 10:36:32] Session status: 2
+[2025-05-03 10:36:32] Session ID: jo3lvt1efo33rh2id99iuv4fgo
+[2025-05-03 10:36:32] Session data: Array
+(
+)
+
+[2025-05-03 10:36:32] Unauthorized access attempt to /Salvio2/public/commissions/rates
+[2025-05-03 10:36:32] User session data: no user data
+[2025-05-03 10:36:32] Database connection established successfully
+[2025-05-03 10:36:32] Session status: 2
+[2025-05-03 10:36:32] Session ID: jo3lvt1efo33rh2id99iuv4fgo
+[2025-05-03 10:36:32] Session data: Array
+(
+)
+
+[2025-05-03 10:36:32] BaseModel initialized with database connection
+[2025-05-03 10:36:32] Rendering view: auth/login
+[2025-05-03 10:36:32] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 10:36:32] View path: ../app/views/auth/login.php
+[2025-05-03 10:36:32] Loading view content
+[2025-05-03 10:36:32] View content length: 1089
+[2025-05-03 10:36:32] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:36:32] Rendering with layout
+[2025-05-03 10:37:30] Database connection established successfully
+[2025-05-03 10:37:30] Session status: 2
+[2025-05-03 10:37:30] Session ID: jo3lvt1efo33rh2id99iuv4fgo
+[2025-05-03 10:37:30] Session data: Array
+(
+)
+
+[2025-05-03 10:37:30] BaseModel initialized with database connection
+[2025-05-03 10:37:30] Attempting authentication for user: admin
+[2025-05-03 10:37:30] Looking up user: admin
+[2025-05-03 10:37:30] User found with role: admin
+[2025-05-03 10:37:30] Password verified for user 'admin' with role 'admin'
+[2025-05-03 10:37:30] User 'admin' logged in successfully.
+[2025-05-03 10:37:30] Database connection established successfully
+[2025-05-03 10:37:30] Session status: 2
+[2025-05-03 10:37:30] Session ID: rprj3fp013mpcklpbhbm0f04rs
+[2025-05-03 10:37:30] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261450
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 10:37:30] Authenticated user accessing /Salvio2/public/
+[2025-05-03 10:37:30] User role: admin
+[2025-05-03 10:37:30] Database connection established successfully
+[2025-05-03 10:37:30] Session status: 2
+[2025-05-03 10:37:30] Session ID: rprj3fp013mpcklpbhbm0f04rs
+[2025-05-03 10:37:30] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261450
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 10:37:30] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 10:37:30] User role: admin
+[2025-05-03 10:37:30] Rendering view: home/reports
+[2025-05-03 10:37:30] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 10:37:30] View path: ../app/views/home/reports.php
+[2025-05-03 10:37:30] Loading view content
+[2025-05-03 10:37:30] View content length: 1465
+[2025-05-03 10:37:30] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:37:30] Rendering with layout
+[2025-05-03 10:38:19] Database connection established successfully
+[2025-05-03 10:38:19] Session status: 2
+[2025-05-03 10:38:19] Session ID: rprj3fp013mpcklpbhbm0f04rs
+[2025-05-03 10:38:19] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261450
+)
+
+[2025-05-03 10:38:19] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:38:19] User role: admin
+[2025-05-03 10:38:19] BaseModel initialized with database connection
+[2025-05-03 10:38:19] BaseModel initialized with database connection
+[2025-05-03 10:38:19] Rendering view: commissions/index
+[2025-05-03 10:38:19] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:38:19] View path: ../app/views/commissions/index.php
+[2025-05-03 10:38:19] Loading view content
+[2025-05-03 10:38:19] View content length: 5619
+[2025-05-03 10:38:19] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:38:19] Rendering with layout
+[2025-05-03 10:38:39] Database connection established successfully
+[2025-05-03 10:38:39] Session status: 2
+[2025-05-03 10:38:39] Session ID: rprj3fp013mpcklpbhbm0f04rs
+[2025-05-03 10:38:39] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261499
+)
+
+[2025-05-03 10:38:39] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:38:39] User role: admin
+[2025-05-03 10:38:39] BaseModel initialized with database connection
+[2025-05-03 10:38:39] BaseModel initialized with database connection
+[2025-05-03 10:38:39] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:38:39] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:40:19] Database connection established successfully
+[2025-05-03 10:40:19] Session status: 2
+[2025-05-03 10:40:19] Session ID: gvgv15beaodjotep354m2m0rr0
+[2025-05-03 10:40:19] Session data: Array
+(
+)
+
+[2025-05-03 10:40:19] Unauthorized access attempt to /Salvio2/public/commissions/rates
+[2025-05-03 10:40:19] User session data: no user data
+[2025-05-03 10:40:19] Database connection established successfully
+[2025-05-03 10:40:19] Session status: 2
+[2025-05-03 10:40:19] Session ID: gvgv15beaodjotep354m2m0rr0
+[2025-05-03 10:40:19] Session data: Array
+(
+)
+
+[2025-05-03 10:40:19] BaseModel initialized with database connection
+[2025-05-03 10:40:19] Rendering view: auth/login
+[2025-05-03 10:40:19] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 10:40:19] View path: ../app/views/auth/login.php
+[2025-05-03 10:40:19] Loading view content
+[2025-05-03 10:40:19] View content length: 1089
+[2025-05-03 10:40:19] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:40:19] Rendering with layout
+[2025-05-03 10:41:17] Database connection established successfully
+[2025-05-03 10:41:17] Session status: 2
+[2025-05-03 10:41:17] Session ID: gvgv15beaodjotep354m2m0rr0
+[2025-05-03 10:41:17] Session data: Array
+(
+)
+
+[2025-05-03 10:41:17] BaseModel initialized with database connection
+[2025-05-03 10:41:17] Attempting authentication for user: admin
+[2025-05-03 10:41:17] Looking up user: admin
+[2025-05-03 10:41:17] User found with role: admin
+[2025-05-03 10:41:17] Password verified for user 'admin' with role 'admin'
+[2025-05-03 10:41:17] User 'admin' logged in successfully.
+[2025-05-03 10:41:17] Database connection established successfully
+[2025-05-03 10:41:17] Session status: 2
+[2025-05-03 10:41:17] Session ID: hf8ttcfkdh7e4ph9oarnlaj873
+[2025-05-03 10:41:17] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261677
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 10:41:17] Authenticated user accessing /Salvio2/public/
+[2025-05-03 10:41:17] User role: admin
+[2025-05-03 10:41:17] Database connection established successfully
+[2025-05-03 10:41:17] Session status: 2
+[2025-05-03 10:41:17] Session ID: hf8ttcfkdh7e4ph9oarnlaj873
+[2025-05-03 10:41:17] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261677
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 10:41:17] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 10:41:17] User role: admin
+[2025-05-03 10:41:17] Rendering view: home/reports
+[2025-05-03 10:41:17] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 10:41:17] View path: ../app/views/home/reports.php
+[2025-05-03 10:41:17] Loading view content
+[2025-05-03 10:41:17] View content length: 1465
+[2025-05-03 10:41:17] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:41:17] Rendering with layout
+[2025-05-03 10:41:50] Database connection established successfully
+[2025-05-03 10:41:50] Session status: 2
+[2025-05-03 10:41:50] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:41:50] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261088
+)
+
+[2025-05-03 10:41:50] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:41:50] User role: admin
+[2025-05-03 10:41:50] BaseModel initialized with database connection
+[2025-05-03 10:41:50] BaseModel initialized with database connection
+[2025-05-03 10:41:50] Rendering view: commissions/index
+[2025-05-03 10:41:50] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:41:50] View path: ../app/views/commissions/index.php
+[2025-05-03 10:41:50] Loading view content
+[2025-05-03 10:41:50] View content length: 5619
+[2025-05-03 10:41:50] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:41:50] Rendering with layout
+[2025-05-03 10:41:52] Database connection established successfully
+[2025-05-03 10:41:52] Session status: 2
+[2025-05-03 10:41:52] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:41:52] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261710
+)
+
+[2025-05-03 10:41:52] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:41:52] User role: admin
+[2025-05-03 10:41:52] BaseModel initialized with database connection
+[2025-05-03 10:41:52] BaseModel initialized with database connection
+[2025-05-03 10:41:52] Rendering view: commissions/index
+[2025-05-03 10:41:52] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:41:52] View path: ../app/views/commissions/index.php
+[2025-05-03 10:41:52] Loading view content
+[2025-05-03 10:41:52] View content length: 5619
+[2025-05-03 10:41:52] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:41:52] Rendering with layout
+[2025-05-03 10:41:53] Database connection established successfully
+[2025-05-03 10:41:53] Session status: 2
+[2025-05-03 10:41:53] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:41:53] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261712
+)
+
+[2025-05-03 10:41:53] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:41:53] User role: admin
+[2025-05-03 10:41:53] BaseModel initialized with database connection
+[2025-05-03 10:41:53] BaseModel initialized with database connection
+[2025-05-03 10:41:53] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:41:53] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:41:56] Database connection established successfully
+[2025-05-03 10:41:56] Session status: 2
+[2025-05-03 10:41:56] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:41:56] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261713
+)
+
+[2025-05-03 10:41:56] Authenticated user accessing /Salvio2/public/
+[2025-05-03 10:41:56] User role: admin
+[2025-05-03 10:41:56] Database connection established successfully
+[2025-05-03 10:41:56] Session status: 2
+[2025-05-03 10:41:56] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:41:56] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261716
+)
+
+[2025-05-03 10:41:56] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 10:41:56] User role: admin
+[2025-05-03 10:41:56] Rendering view: home/reports
+[2025-05-03 10:41:56] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 10:41:56] View path: ../app/views/home/reports.php
+[2025-05-03 10:41:56] Loading view content
+[2025-05-03 10:41:56] View content length: 1465
+[2025-05-03 10:41:56] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:41:56] Rendering with layout
+[2025-05-03 10:41:57] Database connection established successfully
+[2025-05-03 10:41:57] Session status: 2
+[2025-05-03 10:41:57] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:41:57] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261716
+)
+
+[2025-05-03 10:41:57] BaseModel initialized with database connection
+[2025-05-03 10:41:57] User 'admin' logged out.
+[2025-05-03 10:41:57] Database connection established successfully
+[2025-05-03 10:41:57] Session status: 2
+[2025-05-03 10:41:57] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:41:57] Session data: Array
+(
+)
+
+[2025-05-03 10:41:57] BaseModel initialized with database connection
+[2025-05-03 10:41:57] Rendering view: auth/login
+[2025-05-03 10:41:57] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 10:41:57] View path: ../app/views/auth/login.php
+[2025-05-03 10:41:57] Loading view content
+[2025-05-03 10:41:57] View content length: 1089
+[2025-05-03 10:41:57] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:41:57] Rendering with layout
+[2025-05-03 10:41:58] Database connection established successfully
+[2025-05-03 10:41:58] Session status: 2
+[2025-05-03 10:41:58] Session ID: durhhc90ae7tgm09m6sqo2sjro
+[2025-05-03 10:41:58] Session data: Array
+(
+)
+
+[2025-05-03 10:41:58] BaseModel initialized with database connection
+[2025-05-03 10:41:58] Attempting authentication for user: admin
+[2025-05-03 10:41:58] Looking up user: admin
+[2025-05-03 10:41:58] User found with role: admin
+[2025-05-03 10:41:58] Password verified for user 'admin' with role 'admin'
+[2025-05-03 10:41:58] User 'admin' logged in successfully.
+[2025-05-03 10:41:58] Database connection established successfully
+[2025-05-03 10:41:58] Session status: 2
+[2025-05-03 10:41:58] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:41:58] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261718
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 10:41:58] Authenticated user accessing /Salvio2/public/
+[2025-05-03 10:41:58] User role: admin
+[2025-05-03 10:41:58] Database connection established successfully
+[2025-05-03 10:41:58] Session status: 2
+[2025-05-03 10:41:58] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:41:58] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261718
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 10:41:58] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 10:41:58] User role: admin
+[2025-05-03 10:41:58] Rendering view: home/reports
+[2025-05-03 10:41:58] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 10:41:58] View path: ../app/views/home/reports.php
+[2025-05-03 10:41:58] Loading view content
+[2025-05-03 10:41:58] View content length: 1465
+[2025-05-03 10:41:58] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:41:58] Rendering with layout
+[2025-05-03 10:42:00] Database connection established successfully
+[2025-05-03 10:42:00] Session status: 2
+[2025-05-03 10:42:00] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:42:00] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261718
+)
+
+[2025-05-03 10:42:00] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:42:00] User role: admin
+[2025-05-03 10:42:00] BaseModel initialized with database connection
+[2025-05-03 10:42:00] BaseModel initialized with database connection
+[2025-05-03 10:42:00] Rendering view: commissions/index
+[2025-05-03 10:42:00] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:42:00] View path: ../app/views/commissions/index.php
+[2025-05-03 10:42:00] Loading view content
+[2025-05-03 10:42:00] View content length: 5619
+[2025-05-03 10:42:00] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:42:00] Rendering with layout
+[2025-05-03 10:42:01] Database connection established successfully
+[2025-05-03 10:42:01] Session status: 2
+[2025-05-03 10:42:01] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:42:01] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261720
+)
+
+[2025-05-03 10:42:01] Authenticated user accessing /Salvio2/public/profit-sharing
+[2025-05-03 10:42:01] User role: admin
+[2025-05-03 10:42:01] BaseModel initialized with database connection
+[2025-05-03 10:42:01] BaseModel initialized with database connection
+[2025-05-03 10:42:01] Rendering view: profit_sharing/index
+[2025-05-03 10:42:01] View data: Array
+(
+    [title] => Profit Sharing
+    [description] => Manage profit sharing and distributions
+    [profits] => Array
+        (
+        )
+
+)
+
+[2025-05-03 10:42:01] View path: ../app/views/profit_sharing/index.php
+[2025-05-03 10:42:01] Loading view content
+[2025-05-03 10:42:01] View content length: 5968
+[2025-05-03 10:42:01] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:42:01] Rendering with layout
+[2025-05-03 10:42:03] Database connection established successfully
+[2025-05-03 10:42:03] Session status: 2
+[2025-05-03 10:42:03] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:42:03] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261721
+)
+
+[2025-05-03 10:42:03] Authenticated user accessing /Salvio2/public/profit-sharing/calculate
+[2025-05-03 10:42:03] User role: admin
+[2025-05-03 10:42:03] BaseModel initialized with database connection
+[2025-05-03 10:42:03] BaseModel initialized with database connection
+[2025-05-03 10:42:03] Database connection established successfully
+[2025-05-03 10:42:03] Session status: 2
+[2025-05-03 10:42:03] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:42:03] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261723
+    [error] => SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.cost_price' in 'field list'
+)
+
+[2025-05-03 10:42:03] Authenticated user accessing /Salvio2/public/profit-sharing
+[2025-05-03 10:42:03] User role: admin
+[2025-05-03 10:42:03] BaseModel initialized with database connection
+[2025-05-03 10:42:03] BaseModel initialized with database connection
+[2025-05-03 10:42:03] Rendering view: profit_sharing/index
+[2025-05-03 10:42:03] View data: Array
+(
+    [title] => Profit Sharing
+    [description] => Manage profit sharing and distributions
+    [profits] => Array
+        (
+        )
+
+)
+
+[2025-05-03 10:42:03] View path: ../app/views/profit_sharing/index.php
+[2025-05-03 10:42:03] Loading view content
+[2025-05-03 10:42:03] View content length: 5968
+[2025-05-03 10:42:03] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:42:03] Rendering with layout
+[2025-05-03 10:42:04] Database connection established successfully
+[2025-05-03 10:42:04] Session status: 2
+[2025-05-03 10:42:04] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:42:04] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261723
+    [error] => SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.cost_price' in 'field list'
+)
+
+[2025-05-03 10:42:04] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:42:04] User role: admin
+[2025-05-03 10:42:04] BaseModel initialized with database connection
+[2025-05-03 10:42:04] BaseModel initialized with database connection
+[2025-05-03 10:42:04] Rendering view: commissions/index
+[2025-05-03 10:42:04] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:42:04] View path: ../app/views/commissions/index.php
+[2025-05-03 10:42:04] Loading view content
+[2025-05-03 10:42:04] View content length: 5619
+[2025-05-03 10:42:04] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:42:04] Rendering with layout
+[2025-05-03 10:42:05] Database connection established successfully
+[2025-05-03 10:42:05] Session status: 2
+[2025-05-03 10:42:05] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:42:05] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261724
+    [error] => SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.cost_price' in 'field list'
+)
+
+[2025-05-03 10:42:05] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:42:05] User role: admin
+[2025-05-03 10:42:05] BaseModel initialized with database connection
+[2025-05-03 10:42:05] BaseModel initialized with database connection
+[2025-05-03 10:42:05] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:42:05] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:43:17] Database connection established successfully
+[2025-05-03 10:43:17] Session status: 2
+[2025-05-03 10:43:17] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:43:17] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261725
+    [error] => SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.cost_price' in 'field list'
+)
+
+[2025-05-03 10:43:17] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:43:17] User role: admin
+[2025-05-03 10:43:17] BaseModel initialized with database connection
+[2025-05-03 10:43:17] BaseModel initialized with database connection
+[2025-05-03 10:43:17] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:43:17] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:44:59] Database connection established successfully
+[2025-05-03 10:44:59] Session status: 2
+[2025-05-03 10:44:59] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:44:59] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261797
+    [error] => SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.cost_price' in 'field list'
+)
+
+[2025-05-03 10:44:59] Authenticated user accessing /Salvio2/public/orders
+[2025-05-03 10:44:59] User role: admin
+[2025-05-03 10:44:59] BaseModel initialized with database connection
+[2025-05-03 10:44:59] BaseModel initialized with database connection
+[2025-05-03 10:44:59] BaseModel initialized with database connection
+[2025-05-03 10:44:59] Rendering view: orders/index
+[2025-05-03 10:44:59] View data: Array
+(
+    [title] => Orders
+    [description] => Manage orders and track their status
+    [orders] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [customer_id] => 1
+                    [order_number] => ORD-2024-001
+                    [total_amount] => 150000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => completed
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => Pharmacy Plus
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [customer_id] => 2
+                    [order_number] => ORD-2024-002
+                    [total_amount] => 240000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => in_progress
+                    [payment_type] => installment
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => City Clinic
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [customer_id] => 3
+                    [order_number] => ORD-2024-003
+                    [total_amount] => 375000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => new
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => General Hospital
+                )
+
+        )
+
+)
+
+[2025-05-03 10:44:59] View path: ../app/views/orders/index.php
+[2025-05-03 10:44:59] Loading view content
+[2025-05-03 10:44:59] View content length: 6357
+[2025-05-03 10:44:59] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:44:59] Rendering with layout
+[2025-05-03 10:45:01] Database connection established successfully
+[2025-05-03 10:45:01] Session status: 2
+[2025-05-03 10:45:01] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:45:01] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261899
+    [error] => SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.cost_price' in 'field list'
+)
+
+[2025-05-03 10:45:01] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:45:01] User role: admin
+[2025-05-03 10:45:01] BaseModel initialized with database connection
+[2025-05-03 10:45:01] BaseModel initialized with database connection
+[2025-05-03 10:45:01] Rendering view: commissions/index
+[2025-05-03 10:45:01] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:45:01] View path: ../app/views/commissions/index.php
+[2025-05-03 10:45:01] Loading view content
+[2025-05-03 10:45:01] View content length: 5619
+[2025-05-03 10:45:01] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:45:01] Rendering with layout
+[2025-05-03 10:45:02] Database connection established successfully
+[2025-05-03 10:45:02] Session status: 2
+[2025-05-03 10:45:02] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:45:02] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261901
+    [error] => SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.cost_price' in 'field list'
+)
+
+[2025-05-03 10:45:02] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:45:02] User role: admin
+[2025-05-03 10:45:02] BaseModel initialized with database connection
+[2025-05-03 10:45:02] BaseModel initialized with database connection
+[2025-05-03 10:45:02] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:45:02] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:45:08] Database connection established successfully
+[2025-05-03 10:45:08] Session status: 2
+[2025-05-03 10:45:08] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:45:08] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261902
+    [error] => SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.cost_price' in 'field list'
+)
+
+[2025-05-03 10:45:08] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:45:08] User role: admin
+[2025-05-03 10:45:08] BaseModel initialized with database connection
+[2025-05-03 10:45:08] BaseModel initialized with database connection
+[2025-05-03 10:45:08] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:45:08] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:45:37] Database connection established successfully
+[2025-05-03 10:45:37] Session status: 2
+[2025-05-03 10:45:37] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:45:37] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261908
+    [error] => SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.cost_price' in 'field list'
+)
+
+[2025-05-03 10:45:37] BaseModel initialized with database connection
+[2025-05-03 10:45:37] User 'admin' logged out.
+[2025-05-03 10:45:37] Database connection established successfully
+[2025-05-03 10:45:37] Session status: 2
+[2025-05-03 10:45:37] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:45:37] Session data: Array
+(
+)
+
+[2025-05-03 10:45:37] BaseModel initialized with database connection
+[2025-05-03 10:45:37] Rendering view: auth/login
+[2025-05-03 10:45:37] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 10:45:37] View path: ../app/views/auth/login.php
+[2025-05-03 10:45:37] Loading view content
+[2025-05-03 10:45:37] View content length: 1089
+[2025-05-03 10:45:37] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:45:37] Rendering with layout
+[2025-05-03 10:45:43] Database connection established successfully
+[2025-05-03 10:45:43] Session status: 2
+[2025-05-03 10:45:43] Session ID: emgcrr83arafl28vurk47k9ku9
+[2025-05-03 10:45:43] Session data: Array
+(
+)
+
+[2025-05-03 10:45:43] BaseModel initialized with database connection
+[2025-05-03 10:45:43] Attempting authentication for user: admin
+[2025-05-03 10:45:43] Looking up user: admin
+[2025-05-03 10:45:43] User found with role: admin
+[2025-05-03 10:45:43] Password verified for user 'admin' with role 'admin'
+[2025-05-03 10:45:43] User 'admin' logged in successfully.
+[2025-05-03 10:45:43] Database connection established successfully
+[2025-05-03 10:45:43] Session status: 2
+[2025-05-03 10:45:43] Session ID: u7eu8308tgf718f3l3tlnsu3ne
+[2025-05-03 10:45:43] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261943
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 10:45:43] Authenticated user accessing /Salvio2/public/
+[2025-05-03 10:45:43] User role: admin
+[2025-05-03 10:45:43] Database connection established successfully
+[2025-05-03 10:45:43] Session status: 2
+[2025-05-03 10:45:43] Session ID: u7eu8308tgf718f3l3tlnsu3ne
+[2025-05-03 10:45:43] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261943
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 10:45:43] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 10:45:43] User role: admin
+[2025-05-03 10:45:43] Rendering view: home/reports
+[2025-05-03 10:45:43] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 10:45:43] View path: ../app/views/home/reports.php
+[2025-05-03 10:45:43] Loading view content
+[2025-05-03 10:45:43] View content length: 1465
+[2025-05-03 10:45:43] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:45:43] Rendering with layout
+[2025-05-03 10:45:45] Database connection established successfully
+[2025-05-03 10:45:45] Session status: 2
+[2025-05-03 10:45:45] Session ID: u7eu8308tgf718f3l3tlnsu3ne
+[2025-05-03 10:45:45] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261943
+)
+
+[2025-05-03 10:45:45] Authenticated user accessing /Salvio2/public/commissions
+[2025-05-03 10:45:45] User role: admin
+[2025-05-03 10:45:45] BaseModel initialized with database connection
+[2025-05-03 10:45:45] BaseModel initialized with database connection
+[2025-05-03 10:45:45] Rendering view: commissions/index
+[2025-05-03 10:45:45] View data: Array
+(
+    [title] => Commissions
+    [description] => View and manage commission records
+    [summary] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [user_id] => 1
+                    [username] => admin
+                    [total_orders] => 3
+                    [total_commission] => 29700
+                    [status] => paid
+                )
+
+        )
+
+    [filters] => Array
+        (
+            [start_date] => 2025-05-01
+            [end_date] => 2025-05-31
+            [status] => 
+        )
+
+    [metrics] => Array
+        (
+            [total_commissions] => 3
+            [total_amount] => 29700.00
+            [avg_amount] => 9900.000000
+            [paid_count] => 1
+            [paid_amount] => 3750.00
+        )
+
+)
+
+[2025-05-03 10:45:45] View path: ../app/views/commissions/index.php
+[2025-05-03 10:45:45] Loading view content
+[2025-05-03 10:45:45] View content length: 5619
+[2025-05-03 10:45:45] Layout path: ../app/views/layouts/main.php
+[2025-05-03 10:45:45] Rendering with layout
+[2025-05-03 10:45:46] Database connection established successfully
+[2025-05-03 10:45:46] Session status: 2
+[2025-05-03 10:45:46] Session ID: u7eu8308tgf718f3l3tlnsu3ne
+[2025-05-03 10:45:46] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746261945
+)
+
+[2025-05-03 10:45:46] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 10:45:46] User role: admin
+[2025-05-03 10:45:46] BaseModel initialized with database connection
+[2025-05-03 10:45:46] BaseModel initialized with database connection
+[2025-05-03 10:45:46] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 10:45:46] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'

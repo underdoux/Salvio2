@@ -16,6 +16,10 @@ class BaseController {
             session_start();
         }
 
+        Logger::log("Session status: " . session_status());
+        Logger::log("Session ID: " . session_id());
+        Logger::log("Session data: " . print_r($_SESSION, true));
+
         // Temporarily disable auth check for test_session.php to avoid redirect loop
         $currentScript = basename($_SERVER['SCRIPT_NAME']);
         if ($currentScript === 'test_session.php') {
@@ -23,10 +27,16 @@ class BaseController {
         }
 
         // Check authentication if required
-        if ($this->requiresAuth && !$this->isAuthenticated()) {
-            $requestUri = $_SERVER['REQUEST_URI'] ?? 'unknown';
-            Logger::log("Unauthorized access attempt to {$requestUri}");
-            $this->redirect('/Salvio2/public/auth');
+        if ($this->requiresAuth) {
+            if (!$this->isAuthenticated()) {
+                $requestUri = $_SERVER['REQUEST_URI'] ?? 'unknown';
+                Logger::log("Unauthorized access attempt to {$requestUri}");
+                Logger::log("User session data: " . print_r($_SESSION['user'] ?? 'no user data', true));
+                $this->redirect('/Salvio2/public/auth');
+            } else {
+                Logger::log("Authenticated user accessing {$_SERVER['REQUEST_URI']}");
+                Logger::log("User role: " . ($_SESSION['user']['role'] ?? 'no role'));
+            }
         }
     }
 
@@ -53,14 +63,63 @@ class BaseController {
     }
 
     protected function render($view, $data = []) {
-        extract($data);
-        if ($view === 'layouts/main') {
-            require_once "../app/views/layouts/main.php";
-        } else {
+        try {
+            Logger::log("Rendering view: {$view}");
+            Logger::log("View data: " . print_r($data, true));
+            
+            // Clean any existing output buffers
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            
+            extract($data);
+            
+            if ($view === 'layouts/main') {
+                Logger::log("Rendering main layout directly");
+                require __DIR__ . "/../../app/views/layouts/main.php";
+                return;
+            }
+            
+            // Start buffering for view content
             ob_start();
-            require_once "../app/views/{$view}.php";
+            
+            $viewPath = __DIR__ . "/../../app/views/{$view}.php";
+            Logger::log("View path: {$viewPath}");
+            
+            if (!file_exists($viewPath)) {
+                throw new Exception("View file not found: {$viewPath}");
+            }
+            
+            Logger::log("Loading view content");
+            require $viewPath;
+            
+            // Get view content and clean buffer
             $content = ob_get_clean();
-            require_once "../app/views/layouts/main.php";
+            Logger::log("View content length: " . strlen($content));
+            
+            // Start new buffer for final output
+            ob_start();
+            
+            $layoutPath = __DIR__ . "/../../app/views/layouts/main.php";
+            Logger::log("Layout path: {$layoutPath}");
+            
+            if (!file_exists($layoutPath)) {
+                throw new Exception("Layout file not found: {$layoutPath}");
+            }
+            
+            Logger::log("Rendering with layout");
+            require $layoutPath;
+            
+            // Flush final output
+            ob_end_flush();
+            
+        } catch (Exception $e) {
+            // Clean any remaining buffers
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            Logger::log("Error rendering view: " . $e->getMessage());
+            echo "Error rendering view: " . $e->getMessage();
         }
     }
 

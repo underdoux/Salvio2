@@ -50,9 +50,9 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Month</th>
+                            <th>Period</th>
                             <th class="text-end">Total Sales</th>
-                            <th class="text-end">Total Costs</th>
+                            <th class="text-end">Total Product Cost</th>
                             <th class="text-end">Total Commissions</th>
                             <th class="text-end">Total Expenses</th>
                             <th class="text-end">Net Profit</th>
@@ -69,9 +69,9 @@
                         <?php else: ?>
                         <?php foreach ($profits as $profit): ?>
                         <tr>
-                            <td><?= date('F Y', strtotime($profit['month'])) ?></td>
+                            <td><?= date('F Y', strtotime($profit['period'])) ?></td>
                             <td class="text-end">₱<?= number_format($profit['total_sales'], 2) ?></td>
-                            <td class="text-end">₱<?= number_format($profit['total_costs'], 2) ?></td>
+                            <td class="text-end">₱<?= number_format($profit['total_product_cost'], 2) ?></td>
                             <td class="text-end">₱<?= number_format($profit['total_commissions'], 2) ?></td>
                             <td class="text-end">₱<?= number_format($profit['total_expenses'], 2) ?></td>
                             <td class="text-end">₱<?= number_format($profit['net_profit'], 2) ?></td>
@@ -126,8 +126,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="month" class="form-label">Month</label>
-                        <input type="month" class="form-control" id="month" name="month" 
+                        <label for="month" class="form-label">Period</label>
+                        <input type="month" class="form-control" id="month" name="period" 
                                value="<?= date('Y-m') ?>" required>
                     </div>
                 </div>

@@ -1,5 +1,3 @@
-<?php require_once '../app/views/layouts/main.php'; ?>
-
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8 offset-md-2">

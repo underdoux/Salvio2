@@ -17,7 +17,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/Salvio2/public/commissions">
+                    <a class="nav-link" href="/Salvio2/public/commissions/rates">
                         <i class="bi bi-percent"></i> Commissions
                     </a>
                 </li>

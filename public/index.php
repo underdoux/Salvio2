@@ -1,4 +1,7 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Set session cookie parameters
 ini_set('session.gc_maxlifetime', 3600); // 1 hour
 ini_set('session.cookie_lifetime', 3600); // 1 hour
@@ -18,17 +21,25 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Load configuration
+// Load configuration and helpers
 $config = require_once __DIR__ . '/../config/database.php';
-
+require_once __DIR__ . '/../app/helpers/Logger.php';
 
 // Database connection
 try {
     $dsn = "mysql:host={$config['host']};dbname={$config['dbname']};charset={$config['charset']}";
     $db = new PDO($dsn, $config['username'], $config['password'], $config['options']);
+    
+    // Test connection
+    $db->query("SELECT 1");
+    Logger::log("Database connection established successfully");
 } catch (PDOException $e) {
+    Logger::log("Database connection failed: " . $e->getMessage());
     die('Connection failed: ' . $e->getMessage());
 }
+
+// Make database connection available globally
+$GLOBALS['db'] = $db;
 
 // Autoload classes
 spl_autoload_register(function ($class) {

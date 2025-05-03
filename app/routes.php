@@ -22,7 +22,9 @@ $routes = [
     // Commission routes
     'commissions' => ['CommissionsController', 'index'],
     'commissions/rates' => ['CommissionsController', 'rates'],
-    'commissions/update-rate' => ['CommissionsController', 'updateRate'],
+    'commissions/save-rate' => ['CommissionsController', 'saveRate'],
+    'commissions/get-rate/{id}' => ['CommissionsController', 'getRate'],
+    'commissions/delete-rate/{id}' => ['CommissionsController', 'deleteRate'],
     'commissions/details/{id}' => ['CommissionsController', 'details'],
     'commissions/payment/{id}' => ['CommissionsController', 'recordPayment'],
     'commissions/void-payment/{id}' => ['CommissionsController', 'voidPayment'],
