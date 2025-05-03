@@ -71,50 +71,69 @@ $routes = [
     '' => ['HomeController', 'index']
 ];
 
-// Get the current URI
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = trim($uri, '/');
+try {
+    // Get the current URI
+    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $uri = trim($uri, '/');
 
-echo "DEBUG URI: " . $uri . "\n"; // Debug output
-
-// Remove the base path (/Salvio2/public)
-$basePath = '/Salvio2/public';
-if (strpos('/' . $uri, $basePath) === 0) {
-    $uri = substr('/' . $uri, strlen($basePath));
-}
-$uri = trim($uri, '/');
-
-// Find matching route
-$matchedRoute = null;
-$params = [];
-
-foreach ($routes as $pattern => $handler) {
-    // Convert route pattern to regex
-    $regexPattern = str_replace('/', '\/', $pattern);
-    $regexPattern = preg_replace('/\{(\w+)\}/', '(?P<$1>[^\/]+)', $regexPattern);
-    $regexPattern = "/^{$regexPattern}$/";
-    
-    if (preg_match($regexPattern, $uri, $matches)) {
-        $matchedRoute = $handler;
-        // Extract named parameters
-        foreach ($matches as $key => $value) {
-            if (!is_numeric($key)) {
-                $params[$key] = $value;
-            }
-        }
-        break;
+    // Remove the base path (/Salvio2/public)
+    $basePath = '/Salvio2/public';
+    if (strpos('/' . $uri, $basePath) === 0) {
+        $uri = substr('/' . $uri, strlen($basePath));
     }
-}
+    $uri = trim($uri, '/');
 
-if ($matchedRoute) {
-    [$controllerName, $actionName] = $matchedRoute;
+    Logger::log("Processing URI: " . $uri);
+
+    // Find matching route
+    $matchedRoute = null;
+    $params = [];
+
+    foreach ($routes as $pattern => $handler) {
+        // Convert route pattern to regex
+        $regexPattern = str_replace('/', '\/', $pattern);
+        $regexPattern = preg_replace('/\{(\w+)\}/', '(?P<$1>[^\/]+)', $regexPattern);
+        $regexPattern = "/^{$regexPattern}$/";
+        
+        if (preg_match($regexPattern, $uri, $matches)) {
+            $matchedRoute = $handler;
+            // Extract named parameters
+            foreach ($matches as $key => $value) {
+                if (!is_numeric($key)) {
+                    $params[$key] = $value;
+                }
+            }
+            break;
+        }
+    }
+
+    if ($matchedRoute) {
+        [$controllerName, $actionName] = $matchedRoute;
+        
+        // Create controller instance
+        $controller = new $controllerName();
+        
+        // Call the action with parameters
+        call_user_func_array([$controller, $actionName], $params);
+    } else {
+        Logger::log("No route found for URI: " . $uri);
+        http_response_code(404);
+        
+        // Render 404 page using BaseController
+        $controller = new BaseController();
+        $controller->render('errors/404', [
+            'title' => '404 Not Found',
+            'description' => 'The page you are looking for could not be found.'
+        ]);
+    }
+} catch (Exception $e) {
+    Logger::log("Routing error: " . $e->getMessage());
+    http_response_code(500);
     
-    // Create controller instance
-    $controller = new $controllerName();
-    
-    // Call the action with parameters
-    call_user_func_array([$controller, $actionName], $params);
-} else {
-    http_response_code(404);
-    die('Route not found');
+    // Render error page using BaseController
+    $controller = new BaseController();
+    $controller->render('errors/404', [
+        'title' => 'Error',
+        'description' => 'An error occurred while processing your request.'
+    ]);
 }

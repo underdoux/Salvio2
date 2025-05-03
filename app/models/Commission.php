@@ -13,22 +13,36 @@ class Commission extends BaseModel {
 
     public function getCommissionRates() {
         try {
-            $sql = "SELECT cr.*, 
+            $sql = "SELECT 
+                    cr.id,
+                    cr.rate,
+                    CASE 
+                        WHEN cr.product_id IS NOT NULL THEN 'product'
+                        WHEN cr.category_id IS NOT NULL THEN 'category'
+                        ELSE 'global'
+                    END as rate_type,
+                    cr.product_id,
+                    cr.category_id,
+                    cr.status,
                     CASE 
                         WHEN cr.product_id IS NOT NULL THEN p.name
                         WHEN cr.category_id IS NOT NULL THEN c.name
                         ELSE 'Global'
-                    END as target_name,
-                    CASE 
-                        WHEN cr.product_id IS NOT NULL THEN 'Product'
-                        WHEN cr.category_id IS NOT NULL THEN 'Category'
-                        ELSE 'Global'
-                    END as rate_type
+                    END as target_name
                     FROM commission_rates cr
                     LEFT JOIN products p ON cr.product_id = p.id
                     LEFT JOIN categories c ON cr.category_id = c.id
-                    WHERE cr.status = 'active'
-                    ORDER BY cr.rate_type, cr.target_name";
+                    ORDER BY 
+                        CASE 
+                            WHEN cr.product_id IS NOT NULL THEN 3
+                            WHEN cr.category_id IS NOT NULL THEN 2
+                            ELSE 1
+                        END,
+                        CASE 
+                            WHEN cr.product_id IS NOT NULL THEN p.name
+                            WHEN cr.category_id IS NOT NULL THEN c.name
+                            ELSE 'Global'
+                        END";
             
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
@@ -108,6 +122,90 @@ class Commission extends BaseModel {
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function saveCommissionRate($data) {
+        try {
+            $this->db->beginTransaction();
+
+            // Prepare fields based on rate type
+            $productId = null;
+            $categoryId = null;
+            
+            if ($data['rate_type'] === 'category' && isset($data['category_id'])) {
+                $categoryId = $data['category_id'];
+            } elseif ($data['rate_type'] === 'product' && isset($data['product_id'])) {
+                $productId = $data['product_id'];
+            }
+
+            // Insert rate record
+            $sql = "INSERT INTO commission_rates (rate, product_id, category_id, status) VALUES (?, ?, ?, 'active')";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$data['rate'], $productId, $categoryId]);
+            $rateId = $this->db->lastInsertId();
+
+            $this->db->commit();
+            return $rateId;
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    public function getCommissionRate($id) {
+        try {
+            $sql = "SELECT cr.*, 
+                    CASE 
+                        WHEN cr.product_id IS NOT NULL THEN 'product'
+                        WHEN cr.category_id IS NOT NULL THEN 'category'
+                        ELSE 'global'
+                    END as rate_type,
+                    CASE 
+                        WHEN cr.product_id IS NOT NULL THEN p.name
+                        WHEN cr.category_id IS NOT NULL THEN c.name
+                        ELSE 'Global'
+                    END as target_name
+                    FROM commission_rates cr
+                    LEFT JOIN products p ON cr.product_id = p.id
+                    LEFT JOIN categories c ON cr.category_id = c.id
+                    WHERE cr.id = ?";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            Logger::log("Error fetching commission rate: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    public function deleteCommissionRate($id) {
+        try {
+            $this->db->beginTransaction();
+
+            // Check if rate exists
+            $sql = "SELECT * FROM commission_rates WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$id]);
+            $rate = $stmt->fetch();
+
+            if (!$rate) {
+                throw new Exception("Commission rate not found");
+            }
+
+            // Delete rate
+            $sql = "DELETE FROM commission_rates WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$id]);
+
+            $this->db->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 
     public function updateCommissionStatus($commissionId, $status) {
@@ -239,6 +337,38 @@ class Commission extends BaseModel {
 
             $this->db->commit();
             return $paymentId;
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    public function voidPayment($paymentId, $reason) {
+        try {
+            $this->db->beginTransaction();
+
+            // Get payment details
+            $sql = "SELECT * FROM commission_payments WHERE id = ?";
+            $payment = $this->db->query($sql, [$paymentId])->fetch();
+
+            if (!$payment) {
+                throw new Exception("Payment not found");
+            }
+
+            // Delete payment record
+            $sql = "DELETE FROM commission_payments WHERE id = ?";
+            $this->db->query($sql, [$paymentId]);
+
+            // Update commission status back to approved
+            $sql = "UPDATE sales_commissions SET status = 'approved' WHERE id = ?";
+            $this->db->query($sql, [$payment['commission_id']]);
+
+            // Log the void
+            Logger::log("Commission payment #{$paymentId} voided. Reason: {$reason}");
+
+            $this->db->commit();
+            return true;
 
         } catch (Exception $e) {
             $this->db->rollBack();
@@ -392,170 +522,5 @@ class Commission extends BaseModel {
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function voidPayment($paymentId, $reason) {
-        try {
-            $this->db->beginTransaction();
-
-            // Get payment details
-            $sql = "SELECT * FROM commission_payments WHERE id = ?";
-            $payment = $this->db->query($sql, [$paymentId])->fetch();
-
-            if (!$payment) {
-                throw new Exception("Payment not found");
-            }
-
-            // Delete payment record
-            $sql = "DELETE FROM commission_payments WHERE id = ?";
-            $this->db->query($sql, [$paymentId]);
-
-            // Update commission status back to approved
-            $sql = "UPDATE sales_commissions SET status = 'approved' WHERE id = ?";
-            $this->db->query($sql, [$payment['commission_id']]);
-
-            // Log the void
-            Logger::log("Commission payment #{$paymentId} voided. Reason: {$reason}");
-
-            $this->db->commit();
-            return true;
-
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            throw $e;
-        }
-    }
-
-    public function saveCommissionRate($data) {
-        try {
-            $this->db->beginTransaction();
-
-            // Prepare fields based on rate type
-            $fields = ['rate'];
-            $values = [$data['rate']];
-            
-            if ($data['rate_type'] === 'category' && isset($data['category_id'])) {
-                $fields[] = 'category_id';
-                $values[] = $data['category_id'];
-            } elseif ($data['rate_type'] === 'product' && isset($data['product_id'])) {
-                $fields[] = 'product_id';
-                $values[] = $data['product_id'];
-            }
-
-            // Insert rate record
-            $sql = "INSERT INTO commission_rates (" . implode(', ', $fields) . ") 
-                    VALUES (" . implode(', ', array_fill(0, count($values), '?')) . ")";
-            
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute($values);
-            $rateId = $this->db->lastInsertId();
-
-            $this->db->commit();
-            return $rateId;
-
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            throw $e;
-        }
-    }
-
-    public function getCommissionRate($id) {
-        try {
-            $sql = "SELECT cr.*, 
-                    CASE 
-                        WHEN cr.product_id IS NOT NULL THEN p.name
-                        WHEN cr.category_id IS NOT NULL THEN c.name
-                        ELSE 'Global'
-                    END as target_name,
-                    CASE 
-                        WHEN cr.product_id IS NOT NULL THEN 'Product'
-                        WHEN cr.category_id IS NOT NULL THEN 'Category'
-                        ELSE 'Global'
-                    END as rate_type
-                    FROM commission_rates cr
-                    LEFT JOIN products p ON cr.product_id = p.id
-                    LEFT JOIN categories c ON cr.category_id = c.id
-                    WHERE cr.id = ?";
-            
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            Logger::log("Error fetching commission rate: " . $e->getMessage(), 'ERROR');
-            throw $e;
-        }
-    }
-
-    public function deleteCommissionRate($id) {
-        try {
-            $this->db->beginTransaction();
-
-            // Check if rate exists
-            $sql = "SELECT * FROM commission_rates WHERE id = ?";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$id]);
-            $rate = $stmt->fetch();
-
-            if (!$rate) {
-                throw new Exception("Commission rate not found");
-            }
-
-            // Delete rate
-            $sql = "DELETE FROM commission_rates WHERE id = ?";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$id]);
-
-            $this->db->commit();
-            return true;
-
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            throw $e;
-        }
-    }
-
-    public function calculateOrderCommission($orderId) {
-        try {
-            $result = parent::calculateOrderCommission($orderId);
-
-            // Get commission details
-            $sql = "SELECT c.*, u.email, CONCAT(u.first_name, ' ', u.last_name) as recipient_name 
-                    FROM sales_commissions c
-                    JOIN users u ON c.user_id = u.id
-                    WHERE c.id = ?";
-            $commission = $this->db->query($sql, [$result['commission_id']])->fetch();
-
-            // Create notification for new commission
-            $notificationData = [
-                'user_id' => $commission['user_id'],
-                'type' => 'new_commission',
-                'title' => 'New Commission Generated',
-                'message' => "A new commission of $" . number_format($commission['amount'], 2) . 
-                           " has been generated for Order #{$orderId}",
-                'reference_type' => 'commission',
-                'reference_id' => $result['commission_id']
-            ];
-            
-            $this->notification->createNotification($notificationData);
-
-            // Send email notification
-            $emailSubject = "New Commission Generated";
-            $emailMessage = "Dear {$commission['recipient_name']},\n\n" .
-                          "A new commission of $" . number_format($commission['amount'], 2) . 
-                          " has been generated for Order #{$orderId}.\n\n" .
-                          "Please log in to your account to view the details.\n\n" .
-                          "Best regards,\nSalvio POS Team";
-
-            $this->notification->sendEmailNotification(
-                $commission['user_id'],
-                $emailSubject,
-                $emailMessage
-            );
-
-            return $result;
-
-        } catch (Exception $e) {
-            throw $e;
-        }
     }
 }

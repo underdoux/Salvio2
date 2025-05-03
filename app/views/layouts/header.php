@@ -38,7 +38,7 @@
                         <span class="nav-link">Welcome, <?php echo htmlspecialchars($_SESSION['user']['username']); ?></span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/Salvio2/public/logout">
+                        <a class="nav-link" href="/Salvio2/public/auth/logout">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
                     </li>
