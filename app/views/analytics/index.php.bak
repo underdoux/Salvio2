@@ -1,0 +1,910 @@
+<div class="container mt-4">
+    <h1><?php echo $title; ?></h1>
+    <p class="lead"><?php echo $description; ?></p>
+
+    <!-- Chart Controls -->
+    <div class="row mb-4">
+        <!-- Comparison Controls -->
+<div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Comparative Analysis</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="analysisType" class="form-label">Analysis Type</label>
+                            <select class="form-select" id="analysisType">
+                                <option value="trend">Trend Analysis</option>
+                                <option value="variance">Variance Analysis</option>
+                                <option value="correlation">Correlation Analysis</option>
+                                <option value="forecast">Forecast Analysis</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="aggregationType" class="form-label">Aggregation</label>
+                            <select class="form-select" id="aggregationType">
+                                <option value="sum">Sum</option>
+                                <option value="average">Average</option>
+                                <option value="median">Median</option>
+                                <option value="growth">Growth Rate</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="comparisonType" class="form-label">Comparison Type</label>
+                            <select class="form-select" id="comparisonType">
+                                <option value="period">Time Period</option>
+                                <option value="category">Category</option>
+                                <option value="product">Product</option>
+                                <option value="benchmark">Benchmark</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="primaryPeriod" class="form-label">Primary Period</label>
+                            <select class="form-select" id="primaryPeriod">
+                                <option value="current">Current Period</option>
+                                <option value="previous">Previous Period</option>
+                                <option value="lastYear">Last Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="comparisonPeriod" class="form-label">Comparison Period</label>
+                            <select class="form-select" id="comparisonPeriod">
+                                <option value="previousPeriod">Previous Period</option>
+                                <option value="lastYear">Last Year</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="metricType" class="form-label">Metric</label>
+                            <select class="form-select" id="metricType">
+                                <option value="revenue">Revenue</option>
+                                <option value="units">Units Sold</option>
+                                <option value="profit">Profit</option>
+                                <option value="growth">Growth Rate</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <button class="btn btn-primary" onclick="updateComparison()">Update Comparison</button>
+                            <button class="btn btn-outline-secondary" onclick="resetComparison()">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Visualization Options</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="colorScheme" class="form-label">Color Scheme</label>
+                            <select class="form-select" id="colorScheme">
+                                <option value="default">Default</option>
+                                <option value="warm">Warm</option>
+                                <option value="cool">Cool</option>
+                                <option value="monochrome">Monochrome</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dateRange" class="form-label">Date Range</label>
+                            <select class="form-select" id="dateRange">
+                                <option value="7">Last 7 days</option>
+                                <option value="30">Last 30 days</option>
+                                <option value="90">Last 90 days</option>
+                                <option value="180" selected>Last 6 months</option>
+                                <option value="365">Last year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Export Options</h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary" onclick="exportCharts('png')">Export as PNG</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="exportCharts('jpg')">Export as JPG</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="exportCharts('pdf')">Export as PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Best Selling Products Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title">Best Selling Products</h5>
+                        <select class="form-select form-select-sm" style="width: auto;" onchange="updateChartType('bestSellingChart', this.value)">
+                            <option value="bar">Bar Chart</option>
+                            <option value="horizontalBar">Horizontal Bar</option>
+                            <option value="line">Line Chart</option>
+                        </select>
+                    </div>
+                    <div class="chart-container" style="position: relative; height:300px;">
+                        <canvas id="bestSellingChart"></canvas>
+                    </div>
+                    <div class="mt-3 chart-data-table" style="max-height: 200px; overflow-y: auto;">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Units Sold</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bestSellingTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Response Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title">Market Response by Customer Type</h5>
+                        <select class="form-select form-select-sm" style="width: auto;" onchange="updateChartType('marketResponseChart', this.value)">
+                            <option value="pie">Pie Chart</option>
+                            <option value="doughnut">Doughnut Chart</option>
+                            <option value="polarArea">Polar Area</option>
+                        </select>
+                    </div>
+                    <div class="chart-container" style="position: relative; height:300px;">
+                        <canvas id="marketResponseChart"></canvas>
+                    </div>
+                    <div class="mt-3 chart-data-table" style="max-height: 200px; overflow-y: auto;">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Customer Type</th>
+                                    <th>Revenue</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marketResponseTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Trends Chart -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title">Sales Trends</h5>
+                        <select class="form-select form-select-sm" style="width: auto;" onchange="updateChartType('salesTrendsChart', this.value)">
+                            <option value="line">Line Chart</option>
+                            <option value="bar">Bar Chart</option>
+                            <option value="area">Area Chart</option>
+                        </select>
+                    </div>
+                    <div class="chart-container" style="position: relative; height:400px;">
+                        <canvas id="salesTrendsChart"></canvas>
+                    </div>
+                    <div class="mt-3 chart-data-table" style="max-height: 200px; overflow-y: auto;">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Revenue</th>
+                                    <th>Growth</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesTrendsTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Comparative Analysis Chart -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title">Comparative Analysis</h5>
+                    <select class="form-select form-select-sm" style="width: auto;" onchange="updateChartType('comparativeChart', this.value)">
+                        <option value="bar">Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                        <option value="radar">Radar Chart</option>
+                    </select>
+                </div>
+                <div class="chart-container" style="position: relative; height:400px;">
+                    <canvas id="comparativeChart"></canvas>
+                </div>
+                <div class="mt-3">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Growth Analysis</h6>
+                                    <div id="growthMetrics"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Performance Metrics</h6>
+                                    <div id="performanceMetrics"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Trend Analysis</h6>
+                                    <div id="trendMetrics"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</div>
+
+<!-- Include Required Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+<script>
+// Color Schemes
+const colorSchemes = {
+    default: {
+        backgroundColor: [
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(75, 192, 192, 0.5)',
+            'rgba(153, 102, 255, 0.5)'
+        ],
+        borderColor: [
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)'
+        ]
+    },
+    warm: {
+        backgroundColor: [
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(255, 159, 64, 0.5)',
+            'rgba(255, 205, 86, 0.5)',
+            'rgba(255, 133, 27, 0.5)',
+            'rgba(255, 88, 88, 0.5)'
+        ],
+        borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(255, 205, 86, 1)',
+            'rgba(255, 133, 27, 1)',
+            'rgba(255, 88, 88, 1)'
+        ]
+    },
+    cool: {
+        backgroundColor: [
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(75, 192, 192, 0.5)',
+            'rgba(153, 102, 255, 0.5)',
+            'rgba(51, 187, 238, 0.5)',
+            'rgba(0, 184, 169, 0.5)'
+        ],
+        borderColor: [
+            'rgba(54, 162, 235, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(51, 187, 238, 1)',
+            'rgba(0, 184, 169, 1)'
+        ]
+    },
+    monochrome: {
+        backgroundColor: [
+            'rgba(52, 58, 64, 0.5)',
+            'rgba(73, 80, 87, 0.5)',
+            'rgba(108, 117, 125, 0.5)',
+            'rgba(173, 181, 189, 0.5)',
+            'rgba(206, 212, 218, 0.5)'
+        ],
+        borderColor: [
+            'rgba(52, 58, 64, 1)',
+            'rgba(73, 80, 87, 1)',
+            'rgba(108, 117, 125, 1)',
+            'rgba(173, 181, 189, 1)',
+            'rgba(206, 212, 218, 1)'
+        ]
+    }
+};
+
+// Chart Instances
+let charts = {};
+
+// Initialize Charts
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+    updateTables();
+});
+
+function initializeCharts() {
+    // Best Selling Products Chart
+    const bestSellingData = <?php echo json_encode($best_selling); ?>;
+    charts.bestSelling = new Chart(document.getElementById('bestSellingChart'), {
+        type: 'bar',
+        data: {
+            labels: bestSellingData.map(item => item.name),
+            datasets: [{
+                label: 'Units Sold',
+                data: bestSellingData.map(item => item.total_quantity),
+                backgroundColor: colorSchemes.default.backgroundColor,
+                borderColor: colorSchemes.default.borderColor,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                zoom: {
+                    zoom: {
+                        wheel: {
+                            enabled: true
+                        },
+                        pinch: {
+                            enabled: true
+                        },
+                        mode: 'xy'
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    onClick: function(e, legendItem, legend) {
+                        const index = legendItem.datasetIndex;
+                        const ci = legend.chart;
+                        if (ci.isDatasetVisible(index)) {
+                            ci.hide(index);
+                            legendItem.hidden = true;
+                        } else {
+                            ci.show(index);
+                            legendItem.hidden = false;
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y} units`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Market Response Chart
+    const marketResponseData = <?php echo json_encode($market_response); ?>;
+    charts.marketResponse = new Chart(document.getElementById('marketResponseChart'), {
+        type: 'pie',
+        data: {
+            labels: marketResponseData.map(item => item.customer_type),
+            datasets: [{
+                data: marketResponseData.map(item => item.total_revenue),
+                backgroundColor: colorSchemes.default.backgroundColor,
+                borderColor: colorSchemes.default.borderColor,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    onClick: function(e, legendItem, legend) {
+                        const index = legendItem.index;
+                        const ci = legend.chart;
+                        const meta = ci.getDatasetMeta(0);
+                        const curr = meta.data[index];
+                        curr.hidden = !curr.hidden;
+                        ci.update();
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: $${context.parsed.toLocaleString()} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Sales Trends Chart
+    const salesTrendsData = <?php echo json_encode($sales_trends); ?>;
+    charts.salesTrends = new Chart(document.getElementById('salesTrendsChart'), {
+        type: 'line',
+        data: {
+            labels: salesTrendsData.map(item => item.month),
+            datasets: [{
+                label: 'Revenue',
+                data: salesTrendsData.map(item => item.total_revenue),
+                borderColor: colorSchemes.default.borderColor[0],
+                backgroundColor: colorSchemes.default.backgroundColor[0],
+                fill: false,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                zoom: {
+                    zoom: {
+                        wheel: {
+                            enabled: true
+                        },
+                        pinch: {
+                            enabled: true
+                        },
+                        mode: 'x'
+                    },
+                    pan: {
+                        enabled: true,
+                        mode: 'x'
+                    }
+                },
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Revenue: $${context.parsed.y.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Category Performance Chart
+    const categoryData = <?php echo json_encode($category_performance); ?>;
+    charts.categoryPerformance = new Chart(document.getElementById('categoryPerformanceChart'), {
+        type: 'radar',
+        data: {
+            labels: categoryData.map(item => item.category),
+            datasets: [{
+                label: 'Revenue',
+                data: categoryData.map(item => item.total_revenue),
+                backgroundColor: colorSchemes.default.backgroundColor[0],
+                borderColor: colorSchemes.default.borderColor[0],
+                borderWidth: 1
+            }, {
+                label: 'Units Sold',
+                data: categoryData.map(item => item.units_sold),
+                backgroundColor: colorSchemes.default.backgroundColor[1],
+                borderColor: colorSchemes.default.borderColor[1],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.dataset.label;
+                            const value = context.parsed.r;
+                            return `${label}: ${value.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Update Chart Type
+function updateChartType(chartId, newType) {
+    const chart = charts[chartId.replace('Chart', '')];
+    const data = chart.data;
+    const options = chart.options;
+    
+    chart.destroy();
+    charts[chartId.replace('Chart', '')] = new Chart(document.getElementById(chartId), {
+        type: newType,
+        data: data,
+        options: options
+    });
+}
+
+// Update Color Scheme
+document.getElementById('colorScheme').addEventListener('change', function(e) {
+    const scheme = colorSchemes[e.target.value];
+    Object.values(charts).forEach(chart => {
+        chart.data.datasets.forEach((dataset, i) => {
+            dataset.backgroundColor = scheme.backgroundColor[i % scheme.backgroundColor.length];
+            dataset.borderColor = scheme.borderColor[i % scheme.borderColor.length];
+        });
+        chart.update();
+    });
+});
+
+// Update Date Range
+document.getElementById('dateRange').addEventListener('change', function(e) {
+    // Here you would typically make an AJAX call to get new data
+    // For demo purposes, we'll just update the sales trends chart with dummy data
+    const days = parseInt(e.target.value);
+    const labels = [];
+    const data = [];
+    for (let i = 0; i < days; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        labels.unshift(date.toLocaleDateString());
+        data.unshift(Math.random() * 1000);
+    }
+    
+    charts.salesTrends.data.labels = labels;
+    charts.salesTrends.data.datasets[0].data = data;
+    charts.salesTrends.update();
+});
+
+// Export Charts
+function exportCharts(format) {
+    Object.entries(charts).forEach(([name, chart]) => {
+        const link = document.createElement('a');
+        link.download = `${name}_chart.${format}`;
+        link.href = chart.toBase64Image(format);
+        link.click();
+    });
+}
+
+// Comparative Analysis Functions
+function updateComparison() {
+    const comparisonType = document.getElementById('comparisonType').value;
+    const primaryPeriod = document.getElementById('primaryPeriod').value;
+    const comparisonPeriod = document.getElementById('comparisonPeriod').value;
+    const metricType = document.getElementById('metricType').value;
+
+    // Here you would typically make an AJAX call to get comparison data
+    // For demo purposes, we'll create sample data
+    const comparisonData = generateComparisonData(comparisonType, primaryPeriod, comparisonPeriod, metricType);
+    updateComparativeChart(comparisonData);
+    updateMetrics(comparisonData);
+}
+
+    function generateComparisonData(type, primary, comparison, metric) {
+        const analysisType = document.getElementById('analysisType').value;
+        const aggregationType = document.getElementById('aggregationType').value;
+        
+        // Sample data generation with analysis type consideration
+        const primaryData = Array.from({length: 6}, () => Math.floor(Math.random() * 1000));
+        const comparisonData = Array.from({length: 6}, () => Math.floor(Math.random() * 1000));
+        
+        // Additional analysis metrics based on analysis type
+        const analysisMetrics = generateAnalysisMetrics(primaryData, comparisonData, analysisType, aggregationType);
+        
+    
+    return {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [
+            {
+                label: 'Primary Period',
+                data: primaryData,
+                backgroundColor: colorSchemes.default.backgroundColor[0],
+                borderColor: colorSchemes.default.borderColor[0],
+                borderWidth: 1
+            },
+            {
+                label: 'Comparison Period',
+                data: comparisonData,
+                backgroundColor: colorSchemes.default.backgroundColor[1],
+                borderColor: colorSchemes.default.borderColor[1],
+                borderWidth: 1
+            }
+        ],
+        metrics: {
+            growth: calculateGrowth(primaryData, comparisonData),
+            performance: calculatePerformance(primaryData, comparisonData),
+            trend: analyzeTrend(primaryData, comparisonData)
+        }
+    };
+}
+
+function updateComparativeChart(data) {
+    if (charts.comparative) {
+        charts.comparative.destroy();
+    }
+
+    charts.comparative = new Chart(document.getElementById('comparativeChart'), {
+        type: 'bar',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+    function updateMetrics(data) {
+        // Update Growth Metrics
+        document.getElementById('growthMetrics').innerHTML = `
+            <p>Period Growth: ${data.metrics.growth.periodGrowth}%</p>
+            <p>YoY Growth: ${data.metrics.growth.yoyGrowth}%</p>
+            <p>Average Growth: ${data.metrics.growth.avgGrowth}%</p>
+            <p>Forecast (Next Period): ${data.metrics.analysis.forecast[0].toFixed(2)}</p>
+        `;
+
+        // Update Performance Metrics
+        document.getElementById('performanceMetrics').innerHTML = `
+            <p>Performance Index: ${data.metrics.performance.index}</p>
+            <p>Variance: ${data.metrics.performance.variance}%</p>
+            <p>Achievement: ${data.metrics.performance.achievement}%</p>
+            <p>Correlation: ${data.metrics.analysis.correlation.toFixed(3)}</p>
+        `;
+
+        // Update Trend Metrics
+        document.getElementById('trendMetrics').innerHTML = `
+            <p>Trend Direction: ${data.metrics.trend.direction}</p>
+            <p>Momentum: ${data.metrics.trend.momentum}</p>
+            <p>Consistency: ${data.metrics.trend.consistency}%</p>
+            <p>CV: ${data.metrics.analysis.variance.coefficientOfVariation.toFixed(2)}%</p>
+        `;
+
+        // Add Statistical Analysis
+        const analysisType = document.getElementById('analysisType').value;
+        const aggregationType = document.getElementById('aggregationType').value;
+        
+        // Update Analysis Details
+        updateAnalysisDetails(data.metrics.analysis, analysisType, aggregationType);
+    }
+
+    function updateAnalysisDetails(analysis, type, aggregation) {
+        const detailsContainer = document.createElement('div');
+        detailsContainer.className = 'mt-3';
+        
+        let content = '';
+        
+        switch(type) {
+            case 'trend':
+                content = `
+                    <h6>Trend Analysis Details</h6>
+                    <p>Standard Deviation: ${analysis.variance.standardDev.toFixed(2)}</p>
+                    <p>Coefficient of Variation: ${analysis.variance.coefficientOfVariation.toFixed(2)}%</p>
+                    <p>Mean Absolute Deviation: ${analysis.variance.meanAbsoluteDeviation.toFixed(2)}</p>
+                `;
+                break;
+            case 'correlation':
+                content = `
+                    <h6>Correlation Analysis</h6>
+                    <p>Correlation Coefficient: ${analysis.correlation.toFixed(3)}</p>
+                    <p>Strength: ${getCorrelationStrength(analysis.correlation)}</p>
+                    <p>Direction: ${analysis.correlation > 0 ? 'Positive' : 'Negative'}</p>
+                `;
+                break;
+            case 'forecast':
+                content = `
+                    <h6>Forecast Analysis</h6>
+                    <p>Next Period: ${analysis.forecast[0].toFixed(2)}</p>
+                    <p>Second Period: ${analysis.forecast[1].toFixed(2)}</p>
+                    <p>Third Period: ${analysis.forecast[2].toFixed(2)}</p>
+                `;
+                break;
+            case 'variance':
+                content = `
+                    <h6>Variance Analysis</h6>
+                    <p>Standard Deviation: ${analysis.variance.standardDev.toFixed(2)}</p>
+                    <p>CV: ${analysis.variance.coefficientOfVariation.toFixed(2)}%</p>
+                    <p>MAD: ${analysis.variance.meanAbsoluteDeviation.toFixed(2)}</p>
+                `;
+                break;
+        }
+
+        // Add aggregation metrics
+        content += `
+            <h6>Aggregated Metrics</h6>
+            <p>${capitalizeFirst(aggregation)}: ${getAggregatedValue(analysis.aggregated, aggregation)}</p>
+        `;
+
+        detailsContainer.innerHTML = content;
+        
+        // Find and update or append to analysis details container
+        let container = document.getElementById('analysisDetails');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'analysisDetails';
+            document.getElementById('trendMetrics').parentNode.appendChild(container);
+        }
+        container.innerHTML = content;
+    }
+
+    function getCorrelationStrength(correlation) {
+        const abs = Math.abs(correlation);
+        if (abs >= 0.7) return 'Strong';
+        if (abs >= 0.3) return 'Moderate';
+        return 'Weak';
+    }
+
+    function capitalizeFirst(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    function getAggregatedValue(aggregated, type) {
+        switch(type) {
+            case 'sum': return aggregated.sum.toFixed(2);
+            case 'average': return aggregated.average.toFixed(2);
+            case 'median': return aggregated.median.toFixed(2);
+            case 'growth': return (aggregated.growthRate * 100).toFixed(2) + '%';
+            default: return aggregated.sum.toFixed(2);
+        }
+    }
+
+function calculateGrowth(primary, comparison) {
+    const periodGrowth = ((primary[primary.length-1] - primary[0]) / primary[0] * 100).toFixed(1);
+    const yoyGrowth = ((primary[primary.length-1] - comparison[comparison.length-1]) / comparison[comparison.length-1] * 100).toFixed(1);
+    const avgGrowth = (primary.reduce((a,b) => a + b, 0) / primary.length - 
+                      comparison.reduce((a,b) => a + b, 0) / comparison.length).toFixed(1);
+    
+    return {
+        periodGrowth,
+        yoyGrowth,
+        avgGrowth
+    };
+}
+
+function calculatePerformance(primary, comparison) {
+    const index = ((primary.reduce((a,b) => a + b, 0) / comparison.reduce((a,b) => a + b, 0)) * 100).toFixed(1);
+    const variance = ((primary[primary.length-1] - comparison[comparison.length-1]) / comparison[comparison.length-1] * 100).toFixed(1);
+    const achievement = ((primary.reduce((a,b) => a + b, 0) / (comparison.reduce((a,b) => a + b, 0) * 1.1)) * 100).toFixed(1);
+    
+    return {
+        index,
+        variance,
+        achievement
+    };
+}
+
+function analyzeTrend(primary, comparison) {
+    const direction = primary[primary.length-1] > primary[0] ? 'Upward' : 'Downward';
+    const momentum = primary[primary.length-1] > comparison[comparison.length-1] ? 'Strong' : 'Weak';
+    const consistency = (primary.filter((val, idx) => val >= comparison[idx]).length / primary.length * 100).toFixed(1);
+    
+    return {
+        direction,
+        momentum,
+        consistency
+    };
+}
+
+function resetComparison() {
+    document.getElementById('comparisonType').value = 'period';
+    document.getElementById('primaryPeriod').value = 'current';
+    document.getElementById('comparisonPeriod').value = 'previousPeriod';
+    document.getElementById('metricType').value = 'revenue';
+    updateComparison();
+}
+
+// Update Tables
+function updateTables() {
+    // Best Selling Products Table
+    const bestSellingData = <?php echo json_encode($best_selling); ?>;
+    const bestSellingTable = document.getElementById('bestSellingTable');
+    bestSellingTable.innerHTML = bestSellingData.map(item => `
+        <tr>
+            <td>${item.name}</td>
+            <td>${item.total_quantity}</td>
+            <td>$${item.total_revenue.toLocaleString()}</td>
+        </tr>
+    `).join('');
+
+    // Market Response Table
+    const marketResponseData = <?php echo json_encode($market_response); ?>;
+    const marketResponseTable = document.getElementById('marketResponseTable');
+    const totalRevenue = marketResponseData.reduce((sum, item) => sum + item.total_revenue, 0);
+    marketResponseTable.innerHTML = marketResponseData.map(item => `
+        <tr>
+            <td>${item.customer_type}</td>
+            <td>$${item.total_revenue.toLocaleString()}</td>
+            <td>${((item.total_revenue / totalRevenue) * 100).toFixed(1)}%</td>
+        </tr>
+    `).join('');
+
+    // Sales Trends Table
+    const salesTrendsData = <?php echo json_encode($sales_trends); ?>;
+    const salesTrendsTable = document.getElementById('salesTrendsTable');
+    salesTrendsTable.innerHTML = salesTrendsData.map((item, index) => {
+        const growth = index > 0 
+            ? ((item.total_revenue - salesTrendsData[index-1].total_revenue) / salesTrendsData[index-1].total_revenue * 100).toFixed(1)
+            : 'N/A';
+        return `
+            <tr>
+                <td>${item.month}</td>
+                <td>$${item.total_revenue.toLocaleString()}</td>
+                <td>${growth === 'N/A' ? growth : growth + '%'}</td>
+            </tr>
+        `;
+    }).join('');
+
+    // Category Performance Table
+    const categoryData = <?php echo json_encode($category_performance); ?>;
+    const categoryPerformanceTable = document.getElementById('categoryPerformanceTable');
+    categoryPerformanceTable.innerHTML = categoryData.map(item => `
+        <tr>
+            <td>${item.category}</td>
+            <td>$${item.total_revenue.toLocaleString()}</td>
+            <td>${item.units_sold}</td>
+            <td>$${(item.total_revenue / item.units_sold).toFixed(2)}</td>
+        </tr>
+    `).join('');
+}
+</script>
