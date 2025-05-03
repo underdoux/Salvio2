@@ -23,7 +23,7 @@ class Commission extends BaseModel {
                     END as rate_type,
                     cr.product_id,
                     cr.category_id,
-                    cr.status,
+                    'active' as status,
                     CASE 
                         WHEN cr.product_id IS NOT NULL THEN p.name
                         WHEN cr.category_id IS NOT NULL THEN c.name

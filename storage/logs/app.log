@@ -4941,3 +4941,467 @@
 [2025-05-03 11:15:29] View content length: 1465
 [2025-05-03 11:15:29] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
 [2025-05-03 11:15:29] Rendering with layout
+[2025-05-03 11:42:34] Database connection established successfully
+[2025-05-03 11:42:34] Processing URI: auth/logout
+[2025-05-03 11:42:34] Session status: 2
+[2025-05-03 11:42:34] Session ID: u7eu8308tgf718f3l3tlnsu3ne
+[2025-05-03 11:42:34] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746263729
+)
+
+[2025-05-03 11:42:34] BaseModel initialized with database connection
+[2025-05-03 11:42:34] User 'admin' logged out.
+[2025-05-03 11:42:34] Database connection established successfully
+[2025-05-03 11:42:34] Processing URI: auth
+[2025-05-03 11:42:34] Session status: 2
+[2025-05-03 11:42:34] Session ID: u7eu8308tgf718f3l3tlnsu3ne
+[2025-05-03 11:42:34] Session data: Array
+(
+)
+
+[2025-05-03 11:42:34] BaseModel initialized with database connection
+[2025-05-03 11:42:34] Rendering view: auth/login
+[2025-05-03 11:42:34] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 11:42:34] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/auth/login.php
+[2025-05-03 11:42:34] Loading view content
+[2025-05-03 11:42:34] View content length: 1089
+[2025-05-03 11:42:34] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:42:34] Rendering with layout
+[2025-05-03 11:42:34] Processing URI: auth
+[2025-05-03 11:42:34] Session status: 2
+[2025-05-03 11:42:34] Session ID: u7eu8308tgf718f3l3tlnsu3ne
+[2025-05-03 11:42:34] Session data: Array
+(
+)
+
+[2025-05-03 11:42:34] BaseModel initialized with database connection
+[2025-05-03 11:42:34] Rendering view: auth/login
+[2025-05-03 11:42:34] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 11:42:34] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/auth/login.php
+[2025-05-03 11:42:34] Loading view content
+[2025-05-03 11:42:34] View content length: 1089
+[2025-05-03 11:42:34] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:42:34] Rendering with layout
+[2025-05-03 11:42:36] Database connection established successfully
+[2025-05-03 11:42:36] Processing URI: auth
+[2025-05-03 11:42:36] Session status: 2
+[2025-05-03 11:42:36] Session ID: u7eu8308tgf718f3l3tlnsu3ne
+[2025-05-03 11:42:36] Session data: Array
+(
+)
+
+[2025-05-03 11:42:36] BaseModel initialized with database connection
+[2025-05-03 11:42:36] Attempting authentication for user: admin
+[2025-05-03 11:42:36] Looking up user: admin
+[2025-05-03 11:42:36] User found with role: admin
+[2025-05-03 11:42:36] Password verified for user 'admin' with role 'admin'
+[2025-05-03 11:42:36] User 'admin' logged in successfully.
+[2025-05-03 11:42:36] Database connection established successfully
+[2025-05-03 11:42:36] Processing URI: 
+[2025-05-03 11:42:36] Session status: 2
+[2025-05-03 11:42:36] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 11:42:36] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746265356
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 11:42:36] Authenticated user accessing /Salvio2/public/
+[2025-05-03 11:42:36] User role: admin
+[2025-05-03 11:42:36] Database connection established successfully
+[2025-05-03 11:42:36] Processing URI: reports
+[2025-05-03 11:42:36] Session status: 2
+[2025-05-03 11:42:36] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 11:42:36] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746265356
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 11:42:36] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 11:42:36] User role: admin
+[2025-05-03 11:42:36] Rendering view: home/reports
+[2025-05-03 11:42:36] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 11:42:36] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/home/reports.php
+[2025-05-03 11:42:36] Loading view content
+[2025-05-03 11:42:36] View content length: 1465
+[2025-05-03 11:42:36] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:42:36] Rendering with layout
+[2025-05-03 11:42:36] Processing URI: reports
+[2025-05-03 11:42:36] Session status: 2
+[2025-05-03 11:42:36] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 11:42:36] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746265356
+)
+
+[2025-05-03 11:42:36] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 11:42:36] User role: admin
+[2025-05-03 11:42:36] Rendering view: home/reports
+[2025-05-03 11:42:36] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 11:42:36] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/home/reports.php
+[2025-05-03 11:42:36] Loading view content
+[2025-05-03 11:42:36] View content length: 1465
+[2025-05-03 11:42:36] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:42:36] Rendering with layout
+[2025-05-03 11:45:07] Database connection established successfully
+[2025-05-03 11:45:07] Processing URI: auth
+[2025-05-03 11:45:07] Session status: 2
+[2025-05-03 11:45:07] Session ID: rnlq2jnohe04665fhgdhnpop0l
+[2025-05-03 11:45:07] Session data: Array
+(
+)
+
+[2025-05-03 11:45:07] BaseModel initialized with database connection
+[2025-05-03 11:45:07] Rendering view: auth/login
+[2025-05-03 11:45:07] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 11:45:07] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/auth/login.php
+[2025-05-03 11:45:07] Loading view content
+[2025-05-03 11:45:07] View content length: 1089
+[2025-05-03 11:45:07] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:45:07] Rendering with layout
+[2025-05-03 11:45:07] Processing URI: auth
+[2025-05-03 11:45:07] Session status: 2
+[2025-05-03 11:45:07] Session ID: rnlq2jnohe04665fhgdhnpop0l
+[2025-05-03 11:45:07] Session data: Array
+(
+)
+
+[2025-05-03 11:45:07] BaseModel initialized with database connection
+[2025-05-03 11:45:07] Rendering view: auth/login
+[2025-05-03 11:45:07] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 11:45:07] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/auth/login.php
+[2025-05-03 11:45:07] Loading view content
+[2025-05-03 11:45:07] View content length: 1089
+[2025-05-03 11:45:07] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:45:07] Rendering with layout
+[2025-05-03 11:46:57] Database connection established successfully
+[2025-05-03 11:46:57] Processing URI: auth
+[2025-05-03 11:46:57] Session status: 2
+[2025-05-03 11:46:57] Session ID: rnlq2jnohe04665fhgdhnpop0l
+[2025-05-03 11:46:57] Session data: Array
+(
+)
+
+[2025-05-03 11:46:57] BaseModel initialized with database connection
+[2025-05-03 11:46:57] Attempting authentication for user: admin
+[2025-05-03 11:46:57] Looking up user: admin
+[2025-05-03 11:46:57] User found with role: admin
+[2025-05-03 11:46:57] Password verified for user 'admin' with role 'admin'
+[2025-05-03 11:46:57] User 'admin' logged in successfully.
+[2025-05-03 11:46:57] Database connection established successfully
+[2025-05-03 11:46:57] Processing URI: 
+[2025-05-03 11:46:57] Session status: 2
+[2025-05-03 11:46:57] Session ID: lq7k2ofpdu8sjt73fjm4vrath1
+[2025-05-03 11:46:57] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746265617
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 11:46:57] Authenticated user accessing /Salvio2/public/
+[2025-05-03 11:46:57] User role: admin
+[2025-05-03 11:46:57] Database connection established successfully
+[2025-05-03 11:46:57] Processing URI: reports
+[2025-05-03 11:46:57] Session status: 2
+[2025-05-03 11:46:57] Session ID: lq7k2ofpdu8sjt73fjm4vrath1
+[2025-05-03 11:46:57] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746265617
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 11:46:57] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 11:46:57] User role: admin
+[2025-05-03 11:46:57] Rendering view: home/reports
+[2025-05-03 11:46:57] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 11:46:57] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/home/reports.php
+[2025-05-03 11:46:57] Loading view content
+[2025-05-03 11:46:57] View content length: 1465
+[2025-05-03 11:46:57] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:46:57] Rendering with layout
+[2025-05-03 11:46:57] Processing URI: reports
+[2025-05-03 11:46:57] Session status: 2
+[2025-05-03 11:46:57] Session ID: lq7k2ofpdu8sjt73fjm4vrath1
+[2025-05-03 11:46:57] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746265617
+)
+
+[2025-05-03 11:46:57] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 11:46:57] User role: admin
+[2025-05-03 11:46:57] Rendering view: home/reports
+[2025-05-03 11:46:57] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 11:46:57] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/home/reports.php
+[2025-05-03 11:46:57] Loading view content
+[2025-05-03 11:46:57] View content length: 1465
+[2025-05-03 11:46:57] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:46:57] Rendering with layout
+[2025-05-03 11:48:14] Database connection established successfully
+[2025-05-03 11:48:14] Processing URI: commissions/rates
+[2025-05-03 11:48:14] Session status: 2
+[2025-05-03 11:48:14] Session ID: piblvjqbm211d4terdia2vpqmo
+[2025-05-03 11:48:14] Session data: Array
+(
+)
+
+[2025-05-03 11:48:14] Unauthorized access attempt to /Salvio2/public/commissions/rates
+[2025-05-03 11:48:14] User session data: no user data
+[2025-05-03 11:48:14] Database connection established successfully
+[2025-05-03 11:48:14] Processing URI: auth
+[2025-05-03 11:48:14] Session status: 2
+[2025-05-03 11:48:14] Session ID: piblvjqbm211d4terdia2vpqmo
+[2025-05-03 11:48:14] Session data: Array
+(
+)
+
+[2025-05-03 11:48:14] BaseModel initialized with database connection
+[2025-05-03 11:48:14] Rendering view: auth/login
+[2025-05-03 11:48:14] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 11:48:14] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/auth/login.php
+[2025-05-03 11:48:14] Loading view content
+[2025-05-03 11:48:14] View content length: 1089
+[2025-05-03 11:48:14] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:48:14] Rendering with layout
+[2025-05-03 11:48:14] Processing URI: auth
+[2025-05-03 11:48:14] Session status: 2
+[2025-05-03 11:48:14] Session ID: piblvjqbm211d4terdia2vpqmo
+[2025-05-03 11:48:14] Session data: Array
+(
+)
+
+[2025-05-03 11:48:14] BaseModel initialized with database connection
+[2025-05-03 11:48:14] Rendering view: auth/login
+[2025-05-03 11:48:14] View data: Array
+(
+    [title] => Login - Salvio POS
+)
+
+[2025-05-03 11:48:14] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/auth/login.php
+[2025-05-03 11:48:14] Loading view content
+[2025-05-03 11:48:14] View content length: 1089
+[2025-05-03 11:48:14] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:48:14] Rendering with layout
+[2025-05-03 11:50:18] Database connection established successfully
+[2025-05-03 11:50:18] Processing URI: auth
+[2025-05-03 11:50:18] Session status: 2
+[2025-05-03 11:50:18] Session ID: piblvjqbm211d4terdia2vpqmo
+[2025-05-03 11:50:18] Session data: Array
+(
+)
+
+[2025-05-03 11:50:18] BaseModel initialized with database connection
+[2025-05-03 11:50:18] Attempting authentication for user: admin
+[2025-05-03 11:50:18] Looking up user: admin
+[2025-05-03 11:50:18] User found with role: admin
+[2025-05-03 11:50:18] Password verified for user 'admin' with role 'admin'
+[2025-05-03 11:50:18] User 'admin' logged in successfully.
+[2025-05-03 11:50:18] Database connection established successfully
+[2025-05-03 11:50:18] Processing URI: 
+[2025-05-03 11:50:18] Session status: 2
+[2025-05-03 11:50:18] Session ID: fapljnb79lf1amcq8t68tunq1r
+[2025-05-03 11:50:18] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746265818
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 11:50:18] Authenticated user accessing /Salvio2/public/
+[2025-05-03 11:50:18] User role: admin
+[2025-05-03 11:50:18] Database connection established successfully
+[2025-05-03 11:50:18] Processing URI: reports
+[2025-05-03 11:50:18] Session status: 2
+[2025-05-03 11:50:18] Session ID: fapljnb79lf1amcq8t68tunq1r
+[2025-05-03 11:50:18] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746265818
+    [flash] => Array
+        (
+            [type] => success
+            [message] => Welcome back, admin!
+        )
+
+)
+
+[2025-05-03 11:50:18] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 11:50:18] User role: admin
+[2025-05-03 11:50:18] Rendering view: home/reports
+[2025-05-03 11:50:18] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 11:50:18] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/home/reports.php
+[2025-05-03 11:50:18] Loading view content
+[2025-05-03 11:50:18] View content length: 1465
+[2025-05-03 11:50:18] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:50:18] Rendering with layout
+[2025-05-03 11:50:18] Processing URI: reports
+[2025-05-03 11:50:18] Session status: 2
+[2025-05-03 11:50:18] Session ID: fapljnb79lf1amcq8t68tunq1r
+[2025-05-03 11:50:18] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746265818
+)
+
+[2025-05-03 11:50:18] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 11:50:18] User role: admin
+[2025-05-03 11:50:18] Rendering view: home/reports
+[2025-05-03 11:50:18] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 11:50:18] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/home/reports.php
+[2025-05-03 11:50:18] Loading view content
+[2025-05-03 11:50:18] View content length: 1465
+[2025-05-03 11:50:18] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 11:50:18] Rendering with layout
