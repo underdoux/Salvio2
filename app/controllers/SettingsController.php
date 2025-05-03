@@ -1,252 +1,186 @@
 <?php
 
 class SettingsController extends BaseController {
-    private $settings;
-    private $rateLimiter;
-    private $twoFactorAuth;
+    private $settingsManager;
+    private $validator;
+    private $auditLogger;
 
     public function __construct() {
         parent::__construct();
-        $this->settings = new Settings();
-        $this->rateLimiter = new RateLimiter();
-        $this->twoFactorAuth = new TwoFactorAuth();
+        $this->settingsManager = SettingsManager::getInstance();
+        $this->validator = Validator::getInstance();
+        $this->auditLogger = AuditLogger::getInstance();
     }
 
-    public function update($key) {
-        $this->checkPermission('settings.edit');
-        
-        try {
-            // Check rate limit
-            $limit = $this->rateLimiter->checkLimit($key, $_SESSION['user_id']);
-            if (!$limit['allowed']) {
-                $resetTime = $this->rateLimiter->getResetTime($this->getSettingType($key), $_SESSION['user_id']);
-                $minutes = ceil($resetTime / 60);
-                
-                return $this->jsonResponse([
-                    'success' => false,
-                    'message' => "Rate limit exceeded. Please try again in {$minutes} minutes.",
-                    'rate_limit' => [
-                        'remaining' => $limit['remaining'],
-                        'reset' => $limit['reset']
-                    ]
-                ], 429);
-            }
-
-            // Validate CSRF token
-            if (!$this->validateCsrfToken()) {
-                throw new Exception('Invalid security token');
-            }
-
-            $data = $this->getRequestData();
-            if (!isset($data['value'])) {
-                throw new Exception('No value provided');
-            }
-
-            // Check if setting requires 2FA
-            if ($this->twoFactorAuth->requiresTwoFactor($key)) {
-                // If no verification code provided, generate and send one
-                if (!isset($data['verification_code'])) {
-                    $result = $this->twoFactorAuth->generateCode($_SESSION['user_id'], $key);
-                    return $this->jsonResponse([
-                        'requires_2fa' => true,
-                        'message' => 'Please check your email for verification code',
-                        'email_hint' => $result['email_hint'],
-                        'expires_in' => $result['expires_in']
-                    ]);
-                }
-
-                // Verify the provided code
-                try {
-                    $this->twoFactorAuth->verifyCode(
-                        $_SESSION['user_id'],
-                        $key,
-                        $data['verification_code']
-                    );
-                } catch (Exception $e) {
-                    $remaining = $this->twoFactorAuth->getRemainingAttempts($_SESSION['user_id'], $key);
-                    return $this->jsonResponse([
-                        'success' => false,
-                        'requires_2fa' => true,
-                        'message' => $e->getMessage(),
-                        'remaining_attempts' => $remaining
-                    ], 400);
-                }
-            }
-
-            // Get current setting
-            $current = $this->settings->get($key);
-            if (!$current) {
-                throw new Exception('Setting not found');
-            }
-
-            // Update the setting
-            $success = $this->settings->set(
-                $key,
-                $data['value'],
-                $data['type'] ?? $current['type'],
-                $data['description'] ?? $current['description']
-            );
-
-            if ($success) {
-                // Clear 2FA verification if it was used
-                if ($this->twoFactorAuth->requiresTwoFactor($key)) {
-                    $this->twoFactorAuth->clearVerification($_SESSION['user_id'], $key);
-                }
-
-                // Log the change
-                Logger::log("Setting '{$key}' updated by user {$_SESSION['user_id']}", 'INFO', [
-                    'old_value' => $current['value'],
-                    'new_value' => $data['value'],
-                    'remaining_attempts' => $limit['remaining'],
-                    'required_2fa' => $this->twoFactorAuth->requiresTwoFactor($key)
-                ]);
-
-                return $this->jsonResponse([
-                    'success' => true,
-                    'message' => 'Setting updated successfully',
-                    'rate_limit' => [
-                        'remaining' => $limit['remaining'],
-                        'reset' => $limit['reset']
-                    ]
-                ]);
-            }
-
-            throw new Exception('Failed to update setting');
-
-        } catch (Exception $e) {
-            Logger::log("Error updating setting '{$key}': " . $e->getMessage(), 'ERROR');
-            
-            return $this->jsonResponse([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
-    }
-
-    public function resendVerificationCode($key) {
-        $this->checkPermission('settings.edit');
-        
-        try {
-            if (!$this->twoFactorAuth->requiresTwoFactor($key)) {
-                throw new Exception('Two-factor authentication not required for this setting');
-            }
-
-            // Clear any existing verification
-            $this->twoFactorAuth->clearVerification($_SESSION['user_id'], $key);
-
-            // Generate and send new code
-            $result = $this->twoFactorAuth->generateCode($_SESSION['user_id'], $key);
-
-            return $this->jsonResponse([
-                'success' => true,
-                'message' => 'Verification code sent',
-                'email_hint' => $result['email_hint'],
-                'expires_in' => $result['expires_in']
-            ]);
-
-        } catch (Exception $e) {
-            return $this->jsonResponse([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
-    }
-
+    /**
+     * Display settings index
+     */
     public function index() {
-        $this->checkPermission('settings.view');
-        
-        // Get rate limit status for display
-        $limitStatus = $this->rateLimiter->getLimitStatus($_SESSION['user_id']);
-        
-        $settings = $this->settings->getAll();
-        $groupedSettings = $this->groupSettings($settings);
-        
-        // Add 2FA requirement info to settings
-        foreach ($groupedSettings as $type => &$typeSettings) {
-            foreach ($typeSettings as &$setting) {
-                $setting['requires_2fa'] = $this->twoFactorAuth->requiresTwoFactor($setting['key']);
-            }
-        }
-        
-        return $this->render('settings/index', [
-            'settings' => $groupedSettings,
-            'limitStatus' => $limitStatus
+        $this->render('settings/index', [
+            'settings' => $this->getAllSettings()
         ]);
     }
 
-    public function history($key) {
-        $this->checkPermission('settings.view');
+    /**
+     * Display bulk settings management
+     */
+    public function bulk() {
+        $settings = $this->getAllSettings();
         
-        try {
-            $history = $this->settings->getHistory($key);
-            return $this->jsonResponse(['success' => true, 'history' => $history]);
-        } catch (Exception $e) {
-            return $this->jsonResponse([
-                'success' => false,
-                'message' => 'Failed to fetch setting history'
-            ], 400);
+        // Add dependencies information
+        foreach ($settings as $key => &$setting) {
+            $setting['dependencies'] = $this->settingsManager->getDependencies($key);
         }
+
+        $this->render('settings/bulk', [
+            'settings' => $settings
+        ]);
     }
 
-    public function resetLimits() {
-        $this->checkPermission('settings.manage');
-        
+    /**
+     * Handle bulk settings update
+     */
+    public function bulkUpdate() {
         try {
-            $userId = $this->getRequestData()['user_id'] ?? null;
-            if (!$userId) {
-                throw new Exception('No user ID provided');
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            if (!$data) {
+                throw new Exception('Invalid request data');
             }
 
-            $this->rateLimiter->resetLimits($userId);
-            Logger::log("Rate limits reset for user {$userId} by admin {$_SESSION['user_id']}", 'INFO');
-
-            return $this->jsonResponse([
-                'success' => true,
-                'message' => 'Rate limits reset successfully'
+            $this->settingsManager->bulkUpdate($data, $_SESSION['user_id']);
+            
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'error' => $e->getMessage()
             ]);
-        } catch (Exception $e) {
-            return $this->jsonResponse([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
         }
     }
 
-    private function groupSettings($settings) {
-        $grouped = [];
-        foreach ($settings as $setting) {
-            $type = $this->getSettingType($setting['key']);
-            if (!isset($grouped[$type])) {
-                $grouped[$type] = [];
+    /**
+     * Export settings
+     */
+    public function export() {
+        try {
+            $format = $_GET['format'] ?? 'json';
+            
+            if (!in_array($format, ['json', 'csv'])) {
+                throw new Exception('Invalid export format');
             }
-            $grouped[$type][] = $setting;
+
+            $data = $this->settingsManager->exportSettings($format);
+            
+            // Set appropriate headers
+            $contentType = $format === 'json' ? 'application/json' : 'text/csv';
+            header("Content-Type: {$contentType}");
+            header('Content-Disposition: attachment; filename="settings.' . $format . '"');
+            
+            echo $data;
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
         }
-        return $grouped;
     }
 
-    private function getSettingType($key) {
-        $parts = explode('.', $key);
-        return $parts[0];
-    }
+    /**
+     * Import settings
+     */
+    public function import() {
+        try {
+            if (!isset($_FILES['file'])) {
+                throw new Exception('No file uploaded');
+            }
 
-    private function validateCsrfToken() {
-        $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
-        return $token && $token === $_SESSION['csrf_token'];
-    }
+            $file = $_FILES['file'];
+            $format = $_POST['format'] ?? 'json';
+            
+            if (!in_array($format, ['json', 'csv'])) {
+                throw new Exception('Invalid import format');
+            }
 
-    private function getRequestData() {
-        $json = file_get_contents('php://input');
-        return json_decode($json, true) ?: $_POST;
-    }
-
-    private function checkPermission($permission) {
-        if (!isset($_SESSION['user_id'])) {
-            throw new Exception('Unauthorized', 401);
+            $data = file_get_contents($file['tmp_name']);
+            $this->settingsManager->importSettings($data, $format, $_SESSION['user_id']);
+            
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
         }
+    }
+
+    /**
+     * Edit setting
+     */
+    public function edit($key) {
+        $setting = $this->getSetting($key);
         
-        // Add your permission checking logic here
-        if ($permission === 'settings.manage' && !$_SESSION['is_admin']) {
-            throw new Exception('Forbidden', 403);
+        if (!$setting) {
+            $this->redirect('/settings');
+            return;
         }
+
+        // Add dependencies information
+        $setting['dependencies'] = $this->settingsManager->getDependencies($key);
+
+        $this->render('settings/edit', [
+            'setting' => $setting
+        ]);
+    }
+
+    /**
+     * Update setting
+     */
+    public function update($key) {
+        try {
+            $value = $_POST['value'] ?? null;
+            
+            if ($value === null) {
+                throw new Exception('No value provided');
+            }
+
+            // Validate dependencies
+            $errors = $this->settingsManager->validateDependencies($key, $value);
+            if (!empty($errors)) {
+                throw new Exception(implode(", ", $errors));
+            }
+
+            // Validate value
+            if (!$this->validator->validate($key, $value)) {
+                throw new Exception('Invalid value');
+            }
+
+            $this->settingsManager->bulkUpdate([$key => $value], $_SESSION['user_id']);
+            
+            $this->redirect('/settings');
+        } catch (Exception $e) {
+            $this->setError($e->getMessage());
+            $this->redirect("/settings/edit/{$key}");
+        }
+    }
+
+    /**
+     * Get all settings
+     */
+    private function getAllSettings() {
+        $query = "SELECT * FROM settings ORDER BY `key`";
+        return Database::getInstance()->query($query);
+    }
+
+    /**
+     * Get single setting
+     */
+    private function getSetting($key) {
+        $query = "SELECT * FROM settings WHERE `key` = ?";
+        $result = Database::getInstance()->query($query, [$key]);
+        return $result[0] ?? null;
     }
 }

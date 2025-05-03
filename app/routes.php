@@ -1,4 +1,12 @@
 <?php
+require_once __DIR__ . '/helpers/ErrorHandler.php';
+
+// Initialize error handler
+$errorHandler = ErrorHandler::getInstance();
+
+// Set error handlers
+set_error_handler([$errorHandler, 'handleError']);
+set_exception_handler([$errorHandler, 'handleException']);
 
 // Define routes
 $routes = [
@@ -68,20 +76,24 @@ foreach ($routes as $route => $handler) {
         // Remove the full match from the matches array
         array_shift($matches);
         
-        // Include and instantiate the controller
-        require_once __DIR__ . "/controllers/{$controllerName}.php";
-        $controller = new $controllerName();
-        
-        // Call the method with any parameters
-        call_user_func_array([$controller, $methodName], $matches);
-        
-        $routeFound = true;
-        break;
+        try {
+            // Include and instantiate the controller
+            require_once __DIR__ . "/controllers/{$controllerName}.php";
+            $controller = new $controllerName();
+            
+            // Call the method with any parameters
+            call_user_func_array([$controller, $methodName], $matches);
+            
+            $routeFound = true;
+            break;
+        } catch (Exception $e) {
+            // Let the exception handler deal with it
+            throw $e;
+        }
     }
 }
 
 // If no route was found, show 404 error
 if (!$routeFound) {
-    http_response_code(404);
-    require __DIR__ . '/views/errors/404.php';
+    $errorHandler->handle404($uri, array_keys($routes));
 }
