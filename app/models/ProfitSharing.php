@@ -1,275 +1,355 @@
 <?php
 
-require_once __DIR__ . '/Notification.php';
-require_once __DIR__ . '/../helpers/Mailer.php';
-
 class ProfitSharing extends BaseModel {
-    private $notification;
-    private $mailer;
+    private $table = 'monthly_profits';
 
     public function __construct() {
         parent::__construct();
-        $this->notification = new Notification();
-        $this->mailer = new Mailer();
     }
 
-    public function getMonthlyProfits($filters = []) {
-        $sql = "SELECT 
-                    mp.*,
-                    (mp.total_sales - mp.total_product_cost) as gross_profit,
-                    ((mp.total_sales - mp.total_product_cost) / mp.total_sales * 100) as gross_margin,
-                    (mp.net_profit / mp.total_sales * 100) as net_margin,
-                    COUNT(pd.id) as total_distributions,
-                    SUM(pd.amount) as total_distributed,
-                    CASE 
-                        WHEN mp.status = 'draft' THEN 'warning'
-                        WHEN mp.status = 'final' THEN 'success'
-                        ELSE 'secondary'
-                    END as status_class
-                FROM monthly_profits mp
-                LEFT JOIN profit_distributions pd ON mp.id = pd.profit_id";
-
-        $conditions = ["1=1"];
-        $params = [];
-
-        if (isset($filters['status'])) {
-            $conditions[] = "mp.status = ?";
-            $params[] = $filters['status'];
-        }
-
-        if (isset($filters['year'])) {
-            $conditions[] = "YEAR(mp.period) = ?";
-            $params[] = $filters['year'];
-        }
-
-        $sql .= " WHERE " . implode(" AND ", $conditions);
-        $sql .= " GROUP BY mp.id ORDER BY mp.period DESC";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function calculateMonthlyProfit($month) {
+    /**
+     * Calculate monthly profit
+     */
+    public function calculateMonthlyProfit($year, $month) {
         try {
             $this->db->beginTransaction();
 
-            // Check if profit record already exists
-            $sql = "SELECT id FROM monthly_profits WHERE period = ?";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$month]);
-            $existing = $stmt->fetch();
-            if ($existing) {
-                throw new Exception("Profit record already exists for this month");
+            // Check if calculation already exists
+            $existing = $this->getMonthlyProfit($year, $month);
+            if ($existing && $existing['status'] === 'finalized') {
+                throw new Exception("Profit calculation for {$year}-{$month} is already finalized");
             }
 
-            // Get total sales
-            $sql = "SELECT COALESCE(SUM(total_amount), 0) as total_sales 
-                    FROM orders 
-                    WHERE DATE_FORMAT(created_at, '%Y-%m') = ? 
-                    AND status = 'completed'";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$month]);
-            $totalSales = $stmt->fetch()['total_sales'];
-
-            // Get total product costs (from order items)
-            $sql = "SELECT COALESCE(SUM(oi.quantity * p.cost_price), 0) as total_product_cost
-                    FROM orders o
-                    JOIN order_items oi ON o.id = oi.order_id
-                    JOIN products p ON oi.product_id = p.id
-                    WHERE DATE_FORMAT(o.created_at, '%Y-%m') = ?
-                    AND o.status = 'completed'";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$month]);
-            $totalProductCost = $stmt->fetch()['total_product_cost'];
-
-            // Get total commissions
-            $sql = "SELECT COALESCE(SUM(amount), 0) as total_commissions
-                    FROM sales_commissions
-                    WHERE DATE_FORMAT(created_at, '%Y-%m') = ?";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$month]);
-            $totalCommissions = $stmt->fetch()['total_commissions'];
-
-            // Get total expenses
-            $sql = "SELECT COALESCE(SUM(amount), 0) as total_expenses
-                    FROM expenses
-                    WHERE DATE_FORMAT(date, '%Y-%m') = ?";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$month]);
-            $totalExpenses = $stmt->fetch()['total_expenses'];
-
+            // Calculate total sales
+            $totalSales = $this->calculateTotalSales($year, $month);
+            
+            // Calculate total costs
+            $totalCosts = $this->calculateTotalCosts($year, $month);
+            
+            // Calculate total expenses
+            $totalExpenses = $this->calculateTotalExpenses($year, $month);
+            
+            // Calculate total commissions
+            $totalCommissions = $this->calculateTotalCommissions($year, $month);
+            
             // Calculate net profit
-            $netProfit = $totalSales - $totalProductCost - $totalCommissions - $totalExpenses;
+            $netProfit = $totalSales - $totalCosts - $totalExpenses - $totalCommissions;
 
-            // Insert profit record
-            $sql = "INSERT INTO monthly_profits (
-                        period,
-                        total_sales,
-                        total_product_cost,
-                        total_commissions,
-                        total_expenses,
-                        net_profit,
-                        status,
-                        created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, 'draft', NOW())";
+            // Save or update calculation
+            if ($existing) {
+                $sql = "UPDATE {$this->table} SET 
+                        total_sales = ?, total_costs = ?, total_expenses = ?,
+                        total_commissions = ?, net_profit = ?
+                        WHERE id = ?";
+                
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([
+                    $totalSales,
+                    $totalCosts,
+                    $totalExpenses,
+                    $totalCommissions,
+                    $netProfit,
+                    $existing['id']
+                ]);
 
-            $this->db->query($sql, [
-                $month,
-                $totalSales,
-                $totalProductCost,
-                $totalCommissions,
-                $totalExpenses,
-                $netProfit
-            ]);
+                $profitId = $existing['id'];
+            } else {
+                $sql = "INSERT INTO {$this->table} 
+                        (year, month, total_sales, total_costs, total_expenses,
+                         total_commissions, net_profit)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)";
+                
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([
+                    $year,
+                    $month,
+                    $totalSales,
+                    $totalCosts,
+                    $totalExpenses,
+                    $totalCommissions,
+                    $netProfit
+                ]);
 
-            $profitId = $this->db->lastInsertId();
+                $profitId = $this->db->lastInsertId();
+            }
 
-            // Calculate investor distributions
-            $this->calculateInvestorDistributions($profitId, $netProfit);
+            // Log calculation details
+            $this->logCalculation($profitId, "Calculated profit for {$year}-{$month}:
+                Total Sales: {$totalSales}
+                Total Costs: {$totalCosts}
+                Total Expenses: {$totalExpenses}
+                Total Commissions: {$totalCommissions}
+                Net Profit: {$netProfit}");
 
             $this->db->commit();
             return $profitId;
-
         } catch (Exception $e) {
             $this->db->rollBack();
+            Logger::log("Error calculating monthly profit: " . $e->getMessage(), 'ERROR');
             throw $e;
         }
     }
 
-    private function calculateInvestorDistributions($profitId, $netProfit) {
-        // Get active investors
-        $sql = "SELECT id, percentage FROM investors WHERE status = 'active'";
-        $investors = $this->db->query($sql)->fetchAll();
-
-        foreach ($investors as $investor) {
-            $amount = ($netProfit * $investor['percentage']) / 100;
-
-            $sql = "INSERT INTO profit_distributions (
-                        profit_id,
-                        investor_id,
-                        percentage,
-                        amount,
-                        status,
-                        created_at
-                    ) VALUES (?, ?, ?, ?, 'pending', NOW())";
-
-            $this->db->query($sql, [
-                $profitId,
-                $investor['id'],
-                $investor['percentage'],
-                $amount
-            ]);
-        }
-    }
-
-    public function finalizeProfitRecord($profitId) {
+    /**
+     * Finalize monthly profit
+     */
+    public function finalizeMonthlyProfit($id) {
         try {
             $this->db->beginTransaction();
 
-            // Get profit record
-            $sql = "SELECT * FROM monthly_profits WHERE id = ?";
-            $profit = $this->db->query($sql, [$profitId])->fetch();
-
+            $profit = $this->getMonthlyProfitById($id);
             if (!$profit) {
-                throw new Exception("Profit record not found");
+                throw new Exception("Profit calculation not found");
             }
 
-            if ($profit['status'] === 'final') {
-                throw new Exception("Profit record is already finalized");
+            if ($profit['status'] === 'finalized') {
+                throw new Exception("Profit calculation is already finalized");
+            }
+
+            // Calculate distributions
+            $investors = $this->getActiveInvestors();
+            $totalPercentage = 0;
+            $distributions = [];
+
+            foreach ($investors as $investor) {
+                $totalPercentage += $investor['percentage'];
+                $amount = ($profit['net_profit'] * $investor['percentage']) / 100;
+                $distributions[] = [
+                    'investor_id' => $investor['id'],
+                    'amount' => $amount
+                ];
+            }
+
+            if (abs($totalPercentage - 100) > 0.01) {
+                throw new Exception("Total investor percentages must equal 100%");
+            }
+
+            // Save distributions
+            $sql = "INSERT INTO profit_distribution 
+                    (monthly_profit_id, investor_id, distribution_amount)
+                    VALUES (?, ?, ?)";
+            
+            $stmt = $this->db->prepare($sql);
+            foreach ($distributions as $dist) {
+                $stmt->execute([$id, $dist['investor_id'], $dist['amount']]);
             }
 
             // Update profit status
-            $sql = "UPDATE monthly_profits SET status = 'final' WHERE id = ?";
-            $this->db->query($sql, [$profitId]);
+            $sql = "UPDATE {$this->table} SET status = 'finalized' WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$id]);
 
-            // Update distribution status to approved
-            $sql = "UPDATE profit_distributions SET status = 'approved' WHERE profit_id = ?";
-            $this->db->query($sql, [$profitId]);
-
-            // Get distributions for notifications
-            $sql = "SELECT pd.*, i.name, i.email 
-                    FROM profit_distributions pd
-                    JOIN investors i ON pd.investor_id = i.id
-                    WHERE pd.profit_id = ?";
-            $distributions = $this->db->query($sql, [$profitId])->fetchAll();
-
-            // Send notifications
-            foreach ($distributions as $dist) {
-                $notificationData = [
-                    'user_id' => $dist['investor_id'],
-                    'type' => 'profit_distribution',
-                    'title' => 'Profit Distribution Approved',
-                    'message' => "Your profit share of ₱" . number_format($dist['amount'], 2) . 
-                               " (" . $dist['percentage'] . "%) for " . 
-                               date('F Y', strtotime($profit['period'])) . " has been approved.",
-                    'reference_type' => 'profit_distribution',
-                    'reference_id' => $dist['id']
-                ];
-                
-                $this->notification->createNotification($notificationData);
-            }
+            $this->logCalculation($id, "Finalized profit calculation and created distributions");
 
             $this->db->commit();
             return true;
-
         } catch (Exception $e) {
             $this->db->rollBack();
+            Logger::log("Error finalizing monthly profit: " . $e->getMessage(), 'ERROR');
             throw $e;
         }
     }
 
-    public function getProfitDetails($id) {
-        $sql = "SELECT mp.*, 
-                       COUNT(pd.id) as total_distributions,
-                       SUM(pd.amount) as total_distributed,
-                       CASE 
-                           WHEN mp.status = 'draft' THEN 'warning'
-                           WHEN mp.status = 'final' THEN 'success'
-                           ELSE 'secondary'
-                       END as status_class
-                FROM monthly_profits mp
-                LEFT JOIN profit_distributions pd ON mp.id = pd.profit_id
-                WHERE mp.id = ?
-                GROUP BY mp.id";
-
-        $profit = $this->db->query($sql, [$id])->fetch();
-
-        if (!$profit) {
-            throw new Exception("Profit record not found");
-        }
-
-        return $profit;
-    }
-
-    public function getProfitDistributions($profitId) {
-        $sql = "SELECT pd.*,
-                       i.name as investor_name,
-                       i.email as investor_email
-                FROM profit_distributions pd
-                JOIN investors i ON pd.investor_id = i.id
-                WHERE pd.profit_id = ?
-                ORDER BY pd.percentage DESC";
-
-        return $this->db->query($sql, [$profitId])->fetchAll();
-    }
-
-    public function sendCalculationNotification($data) {
+    /**
+     * Process profit distribution payment
+     */
+    public function processDistributionPayment($distributionId, $paymentData) {
         try {
-            Logger::log("Sending profit calculation notification");
+            $sql = "UPDATE profit_distribution 
+                    SET status = 'paid', payment_date = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ? AND status = 'pending'";
             
-            $result = $this->mailer->sendProfitCalculationNotification($data);
-            
-            if ($result) {
-                Logger::log("Profit calculation notification sent successfully");
-            } else {
-                Logger::log("Failed to send profit calculation notification");
-            }
-            
-            return $result;
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([$paymentData['payment_date'], $distributionId]);
         } catch (Exception $e) {
-            Logger::log("Error in sendCalculationNotification: " . $e->getMessage());
-            return false;
+            Logger::log("Error processing distribution payment: " . $e->getMessage(), 'ERROR');
+            throw $e;
         }
+    }
+
+    /**
+     * Get monthly profit by ID
+     */
+    public function getMonthlyProfitById($id) {
+        try {
+            $sql = "SELECT * FROM {$this->table} WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$id]);
+            return $stmt->fetch();
+        } catch (Exception $e) {
+            Logger::log("Error fetching monthly profit: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Get monthly profit by year and month
+     */
+    public function getMonthlyProfit($year, $month) {
+        try {
+            $sql = "SELECT * FROM {$this->table} WHERE year = ? AND month = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$year, $month]);
+            return $stmt->fetch();
+        } catch (Exception $e) {
+            Logger::log("Error fetching monthly profit: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Get profit distributions
+     */
+    public function getProfitDistributions($monthlyProfitId) {
+        try {
+            $sql = "SELECT pd.*, i.name as investor_name, i.percentage
+                   FROM profit_distribution pd
+                   LEFT JOIN investors i ON pd.investor_id = i.id
+                   WHERE pd.monthly_profit_id = ?
+                   ORDER BY i.name ASC";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$monthlyProfitId]);
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            Logger::log("Error fetching profit distributions: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Get profit calculation logs
+     */
+    public function getCalculationLogs($monthlyProfitId) {
+        try {
+            $sql = "SELECT * FROM profit_calculation_logs 
+                   WHERE monthly_profit_id = ?
+                   ORDER BY created_at ASC";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$monthlyProfitId]);
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            Logger::log("Error fetching calculation logs: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Get all monthly profits with optional filtering
+     */
+    public function getAllMonthlyProfits($filters = [], $page = 1, $limit = 10) {
+        try {
+            $sql = "SELECT mp.*, 
+                   COUNT(pd.id) as distribution_count,
+                   SUM(CASE WHEN pd.status = 'paid' THEN 1 ELSE 0 END) as paid_count
+                   FROM {$this->table} mp
+                   LEFT JOIN profit_distribution pd ON mp.id = pd.monthly_profit_id
+                   WHERE 1=1";
+            
+            $params = [];
+
+            if (!empty($filters['year'])) {
+                $sql .= " AND mp.year = ?";
+                $params[] = $filters['year'];
+            }
+
+            if (!empty($filters['month'])) {
+                $sql .= " AND mp.month = ?";
+                $params[] = $filters['month'];
+            }
+
+            if (!empty($filters['status'])) {
+                $sql .= " AND mp.status = ?";
+                $params[] = $filters['status'];
+            }
+
+            $sql .= " GROUP BY mp.id ORDER BY mp.year DESC, mp.month DESC LIMIT ? OFFSET ?";
+            $params[] = $limit;
+            $params[] = ($page - 1) * $limit;
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            Logger::log("Error fetching monthly profits: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Calculate total sales for a month
+     */
+    private function calculateTotalSales($year, $month) {
+        $sql = "SELECT COALESCE(SUM(total_amount), 0) as total
+               FROM orders
+               WHERE YEAR(created_at) = ?
+               AND MONTH(created_at) = ?
+               AND status = 'completed'";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$year, $month]);
+        return $stmt->fetch()['total'];
+    }
+
+    /**
+     * Calculate total costs for a month
+     */
+    private function calculateTotalCosts($year, $month) {
+        $sql = "SELECT COALESCE(SUM(oi.quantity * oi.unit_cost), 0) as total
+               FROM order_items oi
+               LEFT JOIN orders o ON oi.order_id = o.id
+               WHERE YEAR(o.created_at) = ?
+               AND MONTH(o.created_at) = ?
+               AND o.status = 'completed'";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$year, $month]);
+        return $stmt->fetch()['total'];
+    }
+
+    /**
+     * Calculate total expenses for a month
+     */
+    private function calculateTotalExpenses($year, $month) {
+        // This would typically connect to an expenses tracking system
+        // For now, returning 0 as placeholder
+        return 0;
+    }
+
+    /**
+     * Calculate total commissions for a month
+     */
+    private function calculateTotalCommissions($year, $month) {
+        $sql = "SELECT COALESCE(SUM(commission_amount), 0) as total
+               FROM sales_commissions sc
+               WHERE YEAR(created_at) = ?
+               AND MONTH(created_at) = ?
+               AND status != 'cancelled'";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$year, $month]);
+        return $stmt->fetch()['total'];
+    }
+
+    /**
+     * Get active investors
+     */
+    private function getActiveInvestors() {
+        $sql = "SELECT * FROM investors WHERE status = 'active' ORDER BY name ASC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Log calculation details
+     */
+    private function logCalculation($profitId, $message) {
+        $sql = "INSERT INTO profit_calculation_logs (monthly_profit_id, log_message)
+                VALUES (?, ?)";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$profitId, $message]);
     }
 }

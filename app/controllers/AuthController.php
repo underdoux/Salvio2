@@ -1,70 +1,55 @@
 <?php
 
-require_once __DIR__ . '/../helpers/Logger.php';
-
 class AuthController extends BaseController {
-    private $userModel;
     protected $requiresAuth = false;
+    protected $layout = null; // Disable layout for auth pages
 
-    public function __construct() {
-        parent::__construct();
-        $this->userModel = new User();
-    }
-
-    public function index() {
-        // If already logged in, redirect to home
-        if (isset($_SESSION['user'])) {
-            $this->redirect('/Salvio2/public/');
+    public function login() {
+        // If already logged in, redirect to dashboard
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/dashboard');
         }
 
-        // Handle POST request for login
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->handleLogin();
-            return;
+        if ($this->isPost()) {
+            $username = $this->getPost('username');
+            $password = $this->getPost('password');
+
+            try {
+                $db = Database::getInstance()->getConnection();
+                $stmt = $db->prepare("SELECT * FROM users WHERE username = ?");
+                $stmt->execute([$username]);
+                $user = $stmt->fetch();
+
+                if ($user && password_verify($password, $user['password'])) {
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['role'] = $user['role'];
+
+                    $this->redirect('/dashboard');
+                } else {
+                    return $this->render('auth/login', [
+                        'error' => 'Invalid username or password',
+                        'username' => $username
+                    ]);
+                }
+            } catch (Exception $e) {
+                Logger::log("Login error: " . $e->getMessage(), 'ERROR');
+                return $this->render('auth/login', [
+                    'error' => 'An error occurred during login. Please try again.',
+                    'username' => $username
+                ]);
+            }
         }
-        
-        // Show login form for GET request
-        $this->render('auth/login', [
+
+        // GET request - show login form
+        return $this->render('auth/login', [
             'title' => 'Login - Salvio POS'
         ]);
     }
 
-    private function handleLogin() {
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
-
-        $user = $this->userModel->authenticate($username, $password);
-
-        if ($user) {
-            Logger::log("User '{$username}' logged in successfully.");
-            
-            // Regenerate session ID for security
-            session_regenerate_id(true);
-            
-            // Store user data in session
-            $_SESSION['user'] = $user;
-            $_SESSION['auth_time'] = time();
-            $_SESSION['flash'] = [
-                'type' => 'success',
-                'message' => 'Welcome back, ' . $user['username'] . '!'
-            ];
-            
-            $this->redirect('/Salvio2/public/');
-        } else {
-            Logger::log("Failed login attempt for username '{$username}'.");
-            $_SESSION['flash'] = [
-                'type' => 'danger',
-                'message' => 'Invalid username or password'
-            ];
-            $this->redirect('/Salvio2/public/auth');
-        }
-    }
-
     public function logout() {
-        if (isset($_SESSION['user'])) {
-            Logger::log("User '{$_SESSION['user']['username']}' logged out.");
-        }
+        session_start();
         session_destroy();
-        $this->redirect('/Salvio2/public/auth');
+        $this->redirect('/login');
     }
 }

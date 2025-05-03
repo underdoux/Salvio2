@@ -1,139 +1,87 @@
 <?php
 
-// Map URLs to controller actions
+// Define routes
 $routes = [
     // Auth routes
-    'login' => ['AuthController', 'index'],
-    'auth' => ['AuthController', 'index'],
-    'auth/logout' => ['AuthController', 'logout'],
+    '/login' => ['AuthController', 'login'],
+    '/logout' => ['AuthController', 'logout'],
     
-    // Product routes
-    'products' => ['ProductsController', 'index'],
-    'products/create' => ['ProductsController', 'create'],
-    'products/edit/{id}' => ['ProductsController', 'edit'],
-    'products/delete/{id}' => ['ProductsController', 'delete'],
+    // Dashboard
+    '/' => ['HomeController', 'index'],
+    '/dashboard' => ['HomeController', 'index'],
     
-    // Order routes
-    'orders' => ['OrdersController', 'index'],
-    'orders/create' => ['OrdersController', 'create'],
-    'orders/view/{id}' => ['OrdersController', 'view'],
-    'orders/update-status/{id}' => ['OrdersController', 'updateStatus'],
+    // Orders
+    '/orders' => ['OrdersController', 'index'],
+    '/orders/create' => ['OrdersController', 'create'],
+    '/orders/view/{id}' => ['OrdersController', 'view'],
     
-    // Commission routes
-    'commissions' => ['CommissionsController', 'index'],
-    'commissions/rates' => ['CommissionsController', 'rates'],
-    'commissions/save-rate' => ['CommissionsController', 'saveRate'],
-    'commissions/get-rate/{id}' => ['CommissionsController', 'getRate'],
-    'commissions/delete-rate/{id}' => ['CommissionsController', 'deleteRate'],
-    'commissions/details/{id}' => ['CommissionsController', 'details'],
-    'commissions/payment/{id}' => ['CommissionsController', 'recordPayment'],
-    'commissions/void-payment/{id}' => ['CommissionsController', 'voidPayment'],
-    'commissions/payment-history/{id}' => ['CommissionsController', 'paymentHistory'],
-    'commissions/pending-payments' => ['CommissionsController', 'pendingPayments'],
-    'commissions/payment-summary' => ['CommissionsController', 'paymentSummary'],
-    'commissions/reports' => ['CommissionsController', 'reports'],
-    'commissions/export-report' => ['CommissionsController', 'exportReport'],
-    'commissions/performance-metrics/{id?}' => ['CommissionsController', 'performanceMetrics'],
-    'commissions/product-trends' => ['CommissionsController', 'productTrends'],
-    'commissions/period-summary' => ['CommissionsController', 'periodSummary'],
+    // Products
+    '/products' => ['ProductsController', 'index'],
+    '/products/create' => ['ProductsController', 'create'],
+    '/products/edit/{id}' => ['ProductsController', 'edit'],
     
-    // Profit Sharing routes
-    'profit-sharing' => ['ProfitSharingController', 'index'],
-    'profit-sharing/calculate' => ['ProfitSharingController', 'calculate'],
-    'profit-sharing/view/{id}' => ['ProfitSharingController', 'view'],
-    'profit-sharing/finalize/{id}' => ['ProfitSharingController', 'finalize'],
-    'profit-sharing/report/{id}' => ['ProfitSharingController', 'report'],
-    'profit-sharing/trends' => ['ProfitSharingController', 'trends'],
-    'profit-sharing/trend-data' => ['ProfitSharingController', 'getTrendData'],
-    'profit-sharing/investor-trends/{id}' => ['ProfitSharingController', 'getInvestorTrends'],
-    'profit-sharing/profit-breakdown/{id}' => ['ProfitSharingController', 'getProfitBreakdown'],
-    'profit-sharing/export/profit/{month}' => ['ProfitSharingController', 'exportProfitReport'],
-    'profit-sharing/export/distributions' => ['ProfitSharingController', 'exportDistributionHistory'],
-    'profit-sharing/export/investor/{id}' => ['ProfitSharingController', 'exportInvestorReport'],
+    // Commissions
+    '/commissions' => ['CommissionsController', 'index'],
+    '/commissions/details/{id}' => ['CommissionsController', 'details'],
+    '/commissions/rates' => ['CommissionsController', 'rates'],
     
-    // Reports routes
-    'reports' => ['HomeController', 'reports'],
+    // Profit Sharing
+    '/profit-sharing' => ['ProfitSharingController', 'index'],
+    '/profit-sharing/view/{id}' => ['ProfitSharingController', 'view'],
+    '/profit-sharing/report' => ['ProfitSharingController', 'report'],
+    '/profit-sharing/calculate' => ['ProfitSharingController', 'calculate'],
+    '/profit-sharing/finalize/{id}' => ['ProfitSharingController', 'finalize'],
+    '/profit-sharing/process-payment' => ['ProfitSharingController', 'processPayment'],
     
-    // Analytics routes
-    'analytics' => ['AnalyticsController', 'index'],
-    'analytics/best-selling' => ['AnalyticsController', 'bestSelling'],
-    'analytics/least-performing' => ['AnalyticsController', 'leastPerforming'],
-    'analytics/market-response' => ['AnalyticsController', 'marketResponse'],
-    'analytics/sales-trends' => ['AnalyticsController', 'salesTrends'],
-    'analytics/product/{id}' => ['AnalyticsController', 'productMetrics'],
-    'analytics/category/{id}' => ['AnalyticsController', 'categoryMetrics'],
-    'analytics/export/best-selling' => ['AnalyticsController', 'exportBestSelling'],
-    'analytics/export/market-response' => ['AnalyticsController', 'exportMarketResponse'],
-    'analytics/export/sales-trends' => ['AnalyticsController', 'exportSalesTrends'],
-    'analytics/export/product/{id}' => ['AnalyticsController', 'exportProductMetrics'],
+    // Analytics
+    '/analytics' => ['AnalyticsController', 'index'],
+    '/analytics/trends' => ['AnalyticsController', 'trends'],
+    '/analytics/market-response' => ['AnalyticsController', 'marketResponse'],
+    '/analytics/performance' => ['AnalyticsController', 'performance'],
+    '/analytics/predictions' => ['AnalyticsController', 'predictions'],
+    '/analytics/calculate' => ['AnalyticsController', 'calculate'],
+    '/analytics/export' => ['AnalyticsController', 'export'],
 
-    // Default route
-    '' => ['HomeController', 'index']
+    // System Settings
+    '/settings' => ['SettingsController', 'index'],
+    '/settings/edit/{key}' => ['SettingsController', 'edit'],
+    '/settings/update/{key}' => ['SettingsController', 'update'],
 ];
 
-try {
-    // Get the current URI
-    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $uri = trim($uri, '/');
+// Get the current URI
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$uri = str_replace('/Salvio2/public', '', $uri);
 
-    // Remove the base path (/Salvio2/public)
-    $basePath = '/Salvio2/public';
-    if (strpos('/' . $uri, $basePath) === 0) {
-        $uri = substr('/' . $uri, strlen($basePath));
-    }
-    $uri = trim($uri, '/');
+// Route not found by default
+$routeFound = false;
 
-    Logger::log("Processing URI: " . $uri);
-
-    // Find matching route
-    $matchedRoute = null;
-    $params = [];
-
-    foreach ($routes as $pattern => $handler) {
-        // Convert route pattern to regex
-        $regexPattern = str_replace('/', '\/', $pattern);
-        $regexPattern = preg_replace('/\{(\w+)\}/', '(?P<$1>[^\/]+)', $regexPattern);
-        $regexPattern = "/^{$regexPattern}$/";
+foreach ($routes as $route => $handler) {
+    // Convert route parameters to regex pattern
+    $pattern = preg_replace('/\{[^}]+\}/', '([^/]+)', $route);
+    $pattern = str_replace('/', '\/', $pattern);
+    $pattern = '/^' . $pattern . '$/';
+    
+    if (preg_match($pattern, $uri, $matches)) {
+        $controllerName = $handler[0];
+        $methodName = $handler[1];
         
-        if (preg_match($regexPattern, $uri, $matches)) {
-            $matchedRoute = $handler;
-            // Extract named parameters
-            foreach ($matches as $key => $value) {
-                if (!is_numeric($key)) {
-                    $params[$key] = $value;
-                }
-            }
-            break;
-        }
-    }
-
-    if ($matchedRoute) {
-        [$controllerName, $actionName] = $matchedRoute;
+        // Remove the full match from the matches array
+        array_shift($matches);
         
-        // Create controller instance
+        // Include and instantiate the controller
+        require_once __DIR__ . "/controllers/{$controllerName}.php";
         $controller = new $controllerName();
         
-        // Call the action with parameters
-        call_user_func_array([$controller, $actionName], $params);
-    } else {
-        Logger::log("No route found for URI: " . $uri);
-        http_response_code(404);
+        // Call the method with any parameters
+        call_user_func_array([$controller, $methodName], $matches);
         
-        // Render 404 page using BaseController
-        $controller = new BaseController();
-        $controller->render('errors/404', [
-            'title' => '404 Not Found',
-            'description' => 'The page you are looking for could not be found.'
-        ]);
+        $routeFound = true;
+        break;
     }
-} catch (Exception $e) {
-    Logger::log("Routing error: " . $e->getMessage());
-    http_response_code(500);
-    
-    // Render error page using BaseController
-    $controller = new BaseController();
-    $controller->render('errors/404', [
-        'title' => 'Error',
-        'description' => 'An error occurred while processing your request.'
-    ]);
+}
+
+// If no route was found, show 404 error
+if (!$routeFound) {
+    http_response_code(404);
+    require __DIR__ . '/views/errors/404.php';
 }

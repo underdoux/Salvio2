@@ -1,168 +1,272 @@
 <?php
 
-require_once __DIR__ . '/BaseModel.php';
-require_once __DIR__ . '/../helpers/Logger.php';
-
 class Product extends BaseModel {
-    protected $table = 'products';
+    private $table = 'products';
+    private $fillable = [
+        'name', 'sku', 'bpom_id', 'category_id', 'description',
+        'purchase_price', 'selling_price', 'stock_type', 'current_stock',
+        'min_stock', 'is_active'
+    ];
 
-    public function getAll() {
+    public function __construct() {
+        parent::__construct();
+    }
+
+    public function getAll($filters = [], $page = 1, $limit = 10) {
         try {
-            Logger::log("Fetching all products");
             $sql = "SELECT p.*, c.name as category_name, 
-                    (SELECT quantity FROM stock WHERE product_id = p.id ORDER BY id DESC LIMIT 1) as current_stock 
-                    FROM {$this->table} p 
-                    LEFT JOIN categories c ON p.category_id = c.id 
-                    WHERE p.status = TRUE";
+                   COALESCE(b.category_name, 'Uncategorized') as bpom_category 
+                   FROM {$this->table} p 
+                   LEFT JOIN categories c ON p.category_id = c.id 
+                   LEFT JOIN bpom_references b ON p.bpom_id = b.bpom_id 
+                   WHERE 1=1";
             
+            $params = [];
+
+            if (!empty($filters['search'])) {
+                $sql .= " AND (p.name LIKE ? OR p.sku LIKE ? OR p.bpom_id LIKE ?)";
+                $searchTerm = "%{$filters['search']}%";
+                $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm]);
+            }
+
+            if (isset($filters['category_id'])) {
+                $sql .= " AND p.category_id = ?";
+                $params[] = $filters['category_id'];
+            }
+
+            if (isset($filters['stock_type'])) {
+                $sql .= " AND p.stock_type = ?";
+                $params[] = $filters['stock_type'];
+            }
+
+            if (isset($filters['is_active'])) {
+                $sql .= " AND p.is_active = ?";
+                $params[] = $filters['is_active'];
+            }
+
+            // Add pagination
+            $offset = ($page - 1) * $limit;
+            $sql .= " ORDER BY p.name ASC LIMIT ? OFFSET ?";
+            $params[] = $limit;
+            $params[] = $offset;
+
             $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            Logger::log("Successfully fetched " . count($products) . " products");
-            return $products;
+            $stmt->execute($params);
+            return $stmt->fetchAll();
         } catch (Exception $e) {
-            Logger::log("Error fetching products: " . $e->getMessage());
+            Logger::log("Error fetching products: " . $e->getMessage(), 'ERROR');
             throw $e;
         }
     }
 
     public function getById($id) {
         try {
-            Logger::log("Fetching product with ID: " . $id);
             $sql = "SELECT p.*, c.name as category_name,
-                    (SELECT quantity FROM stock WHERE product_id = p.id ORDER BY id DESC LIMIT 1) as current_stock 
-                    FROM {$this->table} p 
-                    LEFT JOIN categories c ON p.category_id = c.id 
-                    WHERE p.id = ?";
+                   b.category_name as bpom_category,
+                   b.registration_date, b.expiry_date,
+                   b.manufacturer, b.composition
+                   FROM {$this->table} p
+                   LEFT JOIN categories c ON p.category_id = c.id
+                   LEFT JOIN bpom_references b ON p.bpom_id = b.bpom_id
+                   WHERE p.id = ?";
             
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$id]);
-            $product = $stmt->fetch(PDO::FETCH_ASSOC);
-            Logger::log("Product fetch result: " . ($product ? "Found" : "Not found"));
-            return $product;
+            return $stmt->fetch();
         } catch (Exception $e) {
-            Logger::log("Error fetching product by ID: " . $e->getMessage());
+            Logger::log("Error fetching product {$id}: " . $e->getMessage(), 'ERROR');
             throw $e;
         }
     }
 
     public function create($data) {
         try {
-            Logger::log("Starting product creation process");
-            Logger::log("Product data: " . print_r($data, true));
-            
             $this->db->beginTransaction();
-            Logger::log("Transaction started");
 
-            // Insert product
-            $fields = implode(', ', array_keys($data));
-            $values = implode(', ', array_fill(0, count($data), '?'));
-            
-            $sql = "INSERT INTO {$this->table} ({$fields}) VALUES ({$values})";
-            Logger::log("Executing SQL: " . $sql);
-            
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute(array_values($data));
-            
-            $productId = $this->db->lastInsertId();
-            Logger::log("Product created with ID: " . $productId);
+            // Validate required fields
+            $this->validateProduct($data);
 
-            // Initialize stock if product is stocked
-            if ($data['stock_type'] === 'stocked') {
-                Logger::log("Initializing stock for stocked product");
-                $sql = "INSERT INTO stock (product_id, quantity) VALUES (?, 0)";
-                $stmt = $this->db->prepare($sql);
-                $stmt->execute([$productId]);
-                Logger::log("Stock initialized for product ID: " . $productId);
+            // Generate SKU if not provided
+            if (empty($data['sku'])) {
+                $data['sku'] = $this->generateSKU($data['name']);
             }
 
-            $this->db->commit();
-            Logger::log("Transaction committed successfully");
-            return $productId;
+            // Prepare SQL
+            $fields = array_intersect_key($data, array_flip($this->fillable));
+            $columns = implode(', ', array_keys($fields));
+            $values = implode(', ', array_fill(0, count($fields), '?'));
+            
+            $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$values})";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(array_values($fields));
+            $productId = $this->db->lastInsertId();
 
+            // Record initial stock if provided
+            if (isset($data['initial_stock']) && $data['initial_stock'] > 0) {
+                $this->recordStockMovement($productId, 'in', $data['initial_stock'], 'initial_stock');
+            }
+
+            // Record price history
+            $this->recordPriceHistory($productId, $data['purchase_price'], $data['selling_price'], 'Initial price');
+
+            $this->db->commit();
+            return $productId;
         } catch (Exception $e) {
-            Logger::log("Error in product creation: " . $e->getMessage());
             $this->db->rollBack();
-            Logger::log("Transaction rolled back");
+            Logger::log("Error creating product: " . $e->getMessage(), 'ERROR');
             throw $e;
         }
     }
 
     public function update($id, $data) {
         try {
-            Logger::log("Updating product ID: " . $id);
-            Logger::log("Update data: " . print_r($data, true));
-            
-            $fields = implode('=?, ', array_keys($data)) . '=?';
-            $sql = "UPDATE {$this->table} SET {$fields} WHERE id = ?";
-            
-            $values = array_values($data);
-            $values[] = $id;
-            
+            $this->db->beginTransaction();
+
+            // Get current product data
+            $currentProduct = $this->getById($id);
+            if (!$currentProduct) {
+                throw new Exception("Product not found");
+            }
+
+            // Validate required fields
+            $this->validateProduct($data, true);
+
+            // Prepare SQL
+            $fields = array_intersect_key($data, array_flip($this->fillable));
+            $updates = [];
+            foreach ($fields as $key => $value) {
+                $updates[] = "{$key} = ?";
+            }
+            $sql = "UPDATE {$this->table} SET " . implode(', ', $updates) . " WHERE id = ?";
+
             $stmt = $this->db->prepare($sql);
-            $result = $stmt->execute($values);
-            
-            Logger::log("Product update " . ($result ? "successful" : "failed"));
-            return $result;
+            $stmt->execute([...array_values($fields), $id]);
+
+            // Record price history if prices changed
+            if (isset($data['purchase_price']) && isset($data['selling_price']) &&
+                ($data['purchase_price'] != $currentProduct['purchase_price'] ||
+                 $data['selling_price'] != $currentProduct['selling_price'])) {
+                $this->recordPriceHistory(
+                    $id,
+                    $data['purchase_price'],
+                    $data['selling_price'],
+                    $data['price_change_reason'] ?? 'Price update'
+                );
+            }
+
+            $this->db->commit();
+            return true;
         } catch (Exception $e) {
-            Logger::log("Error updating product: " . $e->getMessage());
+            $this->db->rollBack();
+            Logger::log("Error updating product {$id}: " . $e->getMessage(), 'ERROR');
             throw $e;
         }
     }
 
     public function updateStock($id, $quantity, $type = 'adjustment', $reference = null) {
         try {
-            Logger::log("Starting stock update for product ID: " . $id);
-            Logger::log("Quantity: " . $quantity . ", Type: " . $type);
-            
             $this->db->beginTransaction();
 
             // Get current stock
-            $sql = "SELECT quantity FROM stock WHERE product_id = ? ORDER BY id DESC LIMIT 1";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$id]);
-            $currentStock = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            $newQuantity = isset($currentStock['quantity']) ? $currentStock['quantity'] + $quantity : $quantity;
-            Logger::log("Current stock: " . ($currentStock['quantity'] ?? 0) . ", New stock will be: " . $newQuantity);
+            $product = $this->getById($id);
+            if (!$product) {
+                throw new Exception("Product not found");
+            }
 
-            // Insert new stock record
-            $sql = "INSERT INTO stock (product_id, quantity) VALUES (?, ?)";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$id, $newQuantity]);
+            // Calculate new stock
+            $newStock = $product['current_stock'] + $quantity;
+            if ($newStock < 0) {
+                throw new Exception("Insufficient stock");
+            }
 
-            // Record stock history
-            $sql = "INSERT INTO stock_history (product_id, quantity, type, reference_type, reference_id) 
-                    VALUES (?, ?, ?, ?, ?)";
+            // Update stock
+            $sql = "UPDATE {$this->table} SET current_stock = ? WHERE id = ?";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([$id, $quantity, $type, $reference ? $reference['type'] : null, $reference ? $reference['id'] : null]);
+            $stmt->execute([$newStock, $id]);
+
+            // Record movement
+            $this->recordStockMovement($id, $quantity > 0 ? 'in' : 'out', abs($quantity), $type, $reference);
 
             $this->db->commit();
-            Logger::log("Stock update completed successfully");
             return true;
-
         } catch (Exception $e) {
-            Logger::log("Error updating stock: " . $e->getMessage());
             $this->db->rollBack();
-            Logger::log("Stock update transaction rolled back");
+            Logger::log("Error updating stock for product {$id}: " . $e->getMessage(), 'ERROR');
             throw $e;
         }
     }
 
-    public function getCategories() {
+    private function validateProduct($data, $isUpdate = false) {
+        $required = ['name', 'purchase_price', 'selling_price', 'stock_type'];
+        if (!$isUpdate) {
+            foreach ($required as $field) {
+                if (empty($data[$field])) {
+                    throw new Exception("Field {$field} is required");
+                }
+            }
+        }
+
+        if (isset($data['purchase_price']) && isset($data['selling_price'])) {
+            if ($data['purchase_price'] >= $data['selling_price']) {
+                throw new Exception("Selling price must be greater than purchase price");
+            }
+        }
+
+        return true;
+    }
+
+    private function generateSKU($name) {
+        $prefix = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $name), 0, 3));
+        $timestamp = date('ymd');
+        $random = strtoupper(substr(md5(uniqid()), 0, 4));
+        return "{$prefix}{$timestamp}{$random}";
+    }
+
+    private function recordStockMovement($productId, $type, $quantity, $referenceType, $referenceId = null) {
+        $sql = "INSERT INTO stock_movements (product_id, movement_type, quantity, reference_type, reference_id, created_by)
+                VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            $productId,
+            $type,
+            $quantity,
+            $referenceType,
+            $referenceId,
+            $_SESSION['user_id'] ?? null
+        ]);
+    }
+
+    private function recordPriceHistory($productId, $purchasePrice, $sellingPrice, $reason) {
+        $sql = "INSERT INTO product_price_history (product_id, purchase_price, selling_price, change_reason, created_by)
+                VALUES (?, ?, ?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            $productId,
+            $purchasePrice,
+            $sellingPrice,
+            $reason,
+            $_SESSION['user_id'] ?? null
+        ]);
+    }
+
+    public function syncBPOMData($bpomId) {
         try {
-            Logger::log("Attempting to fetch categories from database");
-            $sql = "SELECT * FROM categories ORDER BY name";
+            // This would typically call an external API or service
+            // For now, we'll just update the reference in our database
+            $sql = "UPDATE {$this->table} p
+                   SET p.category_id = (
+                       SELECT c.id FROM categories c
+                       INNER JOIN bpom_references b ON b.category_name = c.name
+                       WHERE b.bpom_id = ?
+                       LIMIT 1
+                   )
+                   WHERE p.bpom_id = ?";
+            
             $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            Logger::log("Successfully fetched " . count($categories) . " categories");
-            return $categories;
-        } catch (PDOException $e) {
-            Logger::log("Database error when fetching categories: " . $e->getMessage());
-            throw new Exception("Failed to load product categories");
+            return $stmt->execute([$bpomId, $bpomId]);
         } catch (Exception $e) {
-            Logger::log("Error when fetching categories: " . $e->getMessage());
+            Logger::log("Error syncing BPOM data for ID {$bpomId}: " . $e->getMessage(), 'ERROR');
             throw $e;
         }
     }

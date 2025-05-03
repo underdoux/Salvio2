@@ -1,138 +1,411 @@
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Sales Commissions</h1>
-        <a href="/Salvio2/public/commissions/rates" class="btn btn-primary">
-            <i class="fas fa-cog"></i> Manage Rates
-        </a>
+<div class="commissions-page">
+    <div class="page-header">
+        <h2>Commission Management</h2>
+        <div class="actions">
+            <a href="<?= $baseUrl ?>/commissions/rates" class="btn btn-primary">
+                <i class="fas fa-percentage"></i> Manage Rates
+            </a>
+            <a href="<?= $baseUrl ?>/commissions/report" class="btn btn-secondary">
+                <i class="fas fa-file-alt"></i> View Report
+            </a>
+        </div>
     </div>
 
     <!-- Filters -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="GET" class="row g-3">
-                <div class="col-md-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select class="form-select" id="status" name="status">
-                        <option value="">All</option>
-                        <option value="pending" <?= $filters['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                        <option value="approved" <?= $filters['status'] === 'approved' ? 'selected' : '' ?>>Approved</option>
-                        <option value="paid" <?= $filters['status'] === 'paid' ? 'selected' : '' ?>>Paid</option>
+    <div class="filters-section">
+        <form method="GET" action="<?= $baseUrl ?>/commissions" class="filters-form">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <select name="user_id" class="form-control">
+                        <option value="">All Sales Persons</option>
+                        <?php foreach ($users as $user): ?>
+                            <option value="<?= $user['id'] ?>" 
+                                    <?= ($filters['user_id'] ?? '') == $user['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($user['username']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label for="date_from" class="form-label">Date From</label>
-                    <input type="date" class="form-control" id="date_from" name="date_from" 
-                           value="<?= htmlspecialchars($filters['date_from'] ?? '') ?>">
+
+                <div class="form-group col-md-2">
+                    <select name="status" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="pending" <?= ($filters['status'] ?? '') === 'pending' ? 'selected' : '' ?>>
+                            Pending
+                        </option>
+                        <option value="approved" <?= ($filters['status'] ?? '') === 'approved' ? 'selected' : '' ?>>
+                            Approved
+                        </option>
+                        <option value="paid" <?= ($filters['status'] ?? '') === 'paid' ? 'selected' : '' ?>>
+                            Paid
+                        </option>
+                        <option value="cancelled" <?= ($filters['status'] ?? '') === 'cancelled' ? 'selected' : '' ?>>
+                            Cancelled
+                        </option>
+                    </select>
                 </div>
-                <div class="col-md-3">
-                    <label for="date_to" class="form-label">Date To</label>
-                    <input type="date" class="form-control" id="date_to" name="date_to"
-                           value="<?= htmlspecialchars($filters['date_to'] ?? '') ?>">
+
+                <div class="form-group col-md-4">
+                    <div class="input-group">
+                        <input type="date" 
+                               name="date_from" 
+                               class="form-control" 
+                               value="<?= htmlspecialchars($filters['date_from'] ?? '') ?>"
+                               placeholder="From Date">
+                        <div class="input-group-prepend input-group-append">
+                            <span class="input-group-text">to</span>
+                        </div>
+                        <input type="date" 
+                               name="date_to" 
+                               class="form-control" 
+                               value="<?= htmlspecialchars($filters['date_to'] ?? '') ?>"
+                               placeholder="To Date">
+                    </div>
                 </div>
-                <div class="col-md-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary me-2">Filter</button>
-                    <a href="/Salvio2/public/commissions" class="btn btn-secondary">Reset</a>
+
+                <div class="form-group col-md-3">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                    <a href="<?= $baseUrl ?>/commissions" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 
-    <!-- Commission Summary Table -->
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+    <?php if (isset($error)): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+
+    <!-- Commissions Table -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Sales Person</th>
+                    <th>Product</th>
+                    <th>Original Price</th>
+                    <th>Commission Rate</th>
+                    <th>Commission Amount</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($commissions)): ?>
+                    <tr>
+                        <td colspan="9" class="text-center">No commissions found</td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach ($commissions as $commission): ?>
                         <tr>
-                            <th>Sales Person</th>
-                            <th class="text-center">Total Orders</th>
-                            <th class="text-end">Total Commission</th>
-                            <th>Status</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($summary)): ?>
-                        <tr>
-                            <td colspan="5" class="text-center">No commission records found</td>
-                        </tr>
-                        <?php else: ?>
-                        <?php foreach ($summary as $row): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($row['username']) ?></td>
-                            <td class="text-center"><?= $row['total_orders'] ?></td>
-                            <td class="text-end">₱<?= number_format($row['total_commission'], 2) ?></td>
                             <td>
-                                <span class="badge bg-<?= $this->getStatusBadgeClass($row['status']) ?>">
-                                    <?= ucfirst($row['status']) ?>
-                                </span>
-                            </td>
-                            <td class="text-end">
-                                <a href="/Salvio2/public/commissions/details/<?= $row['user_id'] ?>" 
-                                   class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i> Details
+                                <a href="<?= $baseUrl ?>/orders/view/<?= $commission['order_id'] ?>">
+                                    <?= htmlspecialchars($commission['order_number']) ?>
                                 </a>
-                                <?php if ($row['status'] !== 'paid'): ?>
-                                <button type="button" class="btn btn-sm btn-primary" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#updateStatusModal"
-                                        data-commission-id="<?= $row['id'] ?>"
-                                        data-current-status="<?= $row['status'] ?>">
-                                    <i class="fas fa-edit"></i> Update Status
-                                </button>
+                            </td>
+                            <td><?= htmlspecialchars($commission['sales_person']) ?></td>
+                            <td>
+                                <?= htmlspecialchars($commission['product_name']) ?>
+                                <small class="text-muted d-block">
+                                    Qty: <?= $commission['quantity'] ?>
+                                </small>
+                            </td>
+                            <td>
+                                <?= CurrencyFormatter::getInstance()->format($commission['original_price']) ?>
+                            </td>
+                            <td>
+                                <?= $commission['rate_percent'] ?>%
+                                <small class="text-muted d-block">
+                                    <?= ucfirst($commission['rate_type']) ?>
+                                </small>
+                            </td>
+                            <td>
+                                <?= CurrencyFormatter::getInstance()->format($commission['commission_amount']) ?>
+                                <?php if ($commission['paid_amount'] > 0): ?>
+                                    <small class="text-success d-block">
+                                        Paid: <?= CurrencyFormatter::getInstance()->format($commission['paid_amount']) ?>
+                                    </small>
                                 <?php endif; ?>
                             </td>
+                            <td>
+                                <span class="badge <?= $this->getCommissionStatusBadgeClass($commission['status']) ?>">
+                                    <?= ucfirst($commission['status']) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <?= date('Y-m-d', strtotime($commission['created_at'])) ?>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="<?= $baseUrl ?>/commissions/view/<?= $commission['id'] ?>" 
+                                       class="btn btn-sm btn-info" 
+                                       title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <?php if ($commission['status'] === 'pending'): ?>
+                                        <button type="button"
+                                                class="btn btn-sm btn-success"
+                                                title="Approve Commission"
+                                                onclick="updateCommissionStatus(<?= $commission['id'] ?>, 'approved')">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                    <?php if ($commission['status'] === 'approved'): ?>
+                                        <button type="button"
+                                                class="btn btn-sm btn-primary"
+                                                title="Process Payment"
+                                                onclick="showPaymentModal(<?= $commission['id'] ?>, <?= $commission['commission_amount'] - $commission['paid_amount'] ?>)">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
                         </tr>
-                        <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
+
+    <!-- Pagination -->
+    <?php if (!empty($commissions)): ?>
+        <div class="pagination-section">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <?php
+                    $totalPages = ceil(count($commissions) / 10);
+                    for ($i = 1; $i <= $totalPages; $i++):
+                    ?>
+                        <li class="page-item <?= $currentPage == $i ? 'active' : '' ?>">
+                            <a class="page-link" href="<?= $baseUrl ?>/commissions?page=<?= $i ?><?= !empty($filters['user_id']) ? '&user_id=' . $filters['user_id'] : '' ?><?= !empty($filters['status']) ? '&status=' . $filters['status'] : '' ?><?= !empty($filters['date_from']) ? '&date_from=' . $filters['date_from'] : '' ?><?= !empty($filters['date_to']) ? '&date_to=' . $filters['date_to'] : '' ?>">
+                                <?= $i ?>
+                            </a>
+                        </li>
+                    <?php endfor; ?>
+                </ul>
+            </nav>
+        </div>
+    <?php endif; ?>
 </div>
 
-<!-- Update Status Modal -->
-<div class="modal fade" id="updateStatusModal" tabindex="-1">
-    <div class="modal-dialog">
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="/Salvio2/public/commissions/updateStatus" method="POST">
-                <div class="modal-header">
-                    <h5 class="modal-title">Update Commission Status</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+            <div class="modal-header">
+                <h5 class="modal-title">Process Commission Payment</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="paymentForm" method="POST" action="<?= $baseUrl ?>/commissions/processPayment">
                 <div class="modal-body">
-                    <input type="hidden" name="commission_id" id="commissionId">
-                    <div class="mb-3">
-                        <label for="status" class="form-label">New Status</label>
-                        <select class="form-select" id="modalStatus" name="status" required>
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="paid">Paid</option>
+                    <input type="hidden" id="commissionIds" name="commissions">
+                    <input type="hidden" id="userId" name="user_id">
+
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Rp</span>
+                            </div>
+                            <input type="number" 
+                                   id="amount" 
+                                   name="amount" 
+                                   class="form-control" 
+                                   required 
+                                   step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment_date">Payment Date</label>
+                        <input type="date" 
+                               id="payment_date" 
+                               name="payment_date" 
+                               class="form-control" 
+                               required 
+                               value="<?= date('Y-m-d') ?>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment_method">Payment Method</label>
+                        <select id="payment_method" name="payment_method" class="form-control" required>
+                            <option value="cash">Cash</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="check">Check</option>
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reference_number">Reference Number</label>
+                        <input type="text" 
+                               id="reference_number" 
+                               name="reference_number" 
+                               class="form-control">
+                        <small class="form-text text-muted">
+                            Required for bank transfer and check payments
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" 
+                                name="notes" 
+                                class="form-control" 
+                                rows="2"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Update Status</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Process Payment</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle status update modal
-    const updateStatusModal = document.getElementById('updateStatusModal');
-    if (updateStatusModal) {
-        updateStatusModal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            const commissionId = button.getAttribute('data-commission-id');
-            const currentStatus = button.getAttribute('data-current-status');
-            
-            updateStatusModal.querySelector('#commissionId').value = commissionId;
-            updateStatusModal.querySelector('#modalStatus').value = currentStatus;
-        });
+<style>
+.commissions-page {
+    padding: 20px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filters-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.filters-form .form-row {
+    margin-bottom: 10px;
+}
+
+.filters-form .form-row:last-child {
+    margin-bottom: 0;
+}
+
+.table {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+}
+
+.badge-success {
+    background-color: #28a745;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+}
+
+.btn-group {
+    display: flex;
+    gap: 5px;
+}
+
+.pagination-section {
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .filters-form .form-row {
+        margin-right: 0;
+        margin-left: 0;
     }
+
+    .filters-form .form-group {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .table-responsive {
+        margin: 0 -20px;
+    }
+}
+</style>
+
+<script>
+function updateCommissionStatus(id, status) {
+    if (!confirm('Are you sure you want to update this commission\'s status?')) {
+        return;
+    }
+
+    fetch(`<?= $baseUrl ?>/commissions/updateStatus/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `status=${status}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || 'An error occurred');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+    });
+}
+
+function showPaymentModal(commissionId, amount) {
+    document.getElementById('commissionIds').value = JSON.stringify([{
+        id: commissionId,
+        amount: amount
+    }]);
+    document.getElementById('amount').value = amount;
+    document.getElementById('amount').max = amount;
+    $('#paymentModal').modal('show');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethodSelect = document.getElementById('payment_method');
+    const referenceNumberInput = document.getElementById('reference_number');
+
+    paymentMethodSelect.addEventListener('change', function() {
+        const isReferenceRequired = this.value !== 'cash';
+        referenceNumberInput.required = isReferenceRequired;
+    });
+
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        const paymentMethod = paymentMethodSelect.value;
+        const referenceNumber = referenceNumberInput.value.trim();
+
+        if (paymentMethod !== 'cash' && !referenceNumber) {
+            e.preventDefault();
+            alert('Reference number is required for bank transfer and check payments');
+            referenceNumberInput.focus();
+        }
+    });
 });
+</script>

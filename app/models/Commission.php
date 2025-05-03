@@ -1,526 +1,448 @@
 <?php
 
-require_once __DIR__ . '/Notification.php';
-
 class Commission extends BaseModel {
-    private $notification;
-    protected $table = 'sales_commissions';
+    private $table = 'sales_commissions';
 
     public function __construct() {
         parent::__construct();
-        $this->notification = new Notification();
     }
 
-    public function getCommissionRates() {
+    /**
+     * Get all commissions with optional filtering
+     */
+    public function getAll($filters = [], $page = 1, $limit = 10) {
         try {
-            $sql = "SELECT 
-                    cr.id,
-                    cr.rate,
-                    CASE 
-                        WHEN cr.product_id IS NOT NULL THEN 'product'
-                        WHEN cr.category_id IS NOT NULL THEN 'category'
-                        ELSE 'global'
-                    END as rate_type,
-                    cr.product_id,
-                    cr.category_id,
-                    'active' as status,
-                    CASE 
-                        WHEN cr.product_id IS NOT NULL THEN p.name
-                        WHEN cr.category_id IS NOT NULL THEN c.name
-                        ELSE 'Global'
-                    END as target_name
-                    FROM commission_rates cr
-                    LEFT JOIN products p ON cr.product_id = p.id
-                    LEFT JOIN categories c ON cr.category_id = c.id
-                    ORDER BY 
-                        CASE 
-                            WHEN cr.product_id IS NOT NULL THEN 3
-                            WHEN cr.category_id IS NOT NULL THEN 2
-                            ELSE 1
-                        END,
-                        CASE 
-                            WHEN cr.product_id IS NOT NULL THEN p.name
-                            WHEN cr.category_id IS NOT NULL THEN c.name
-                            ELSE 'Global'
-                        END";
+            $sql = "SELECT sc.*, u.username as sales_person,
+                   o.order_number, oi.quantity, p.name as product_name,
+                   cr.rate_percent, cr.type as rate_type,
+                   COALESCE(SUM(cpi.amount), 0) as paid_amount
+                   FROM {$this->table} sc
+                   LEFT JOIN users u ON sc.user_id = u.id
+                   LEFT JOIN orders o ON sc.order_id = o.id
+                   LEFT JOIN order_items oi ON sc.order_item_id = oi.id
+                   LEFT JOIN products p ON oi.product_id = p.id
+                   LEFT JOIN commission_rates cr ON sc.commission_rate_id = cr.id
+                   LEFT JOIN commission_payment_items cpi ON sc.id = cpi.commission_id
+                   WHERE 1=1";
+            
+            $params = [];
+
+            if (!empty($filters['user_id'])) {
+                $sql .= " AND sc.user_id = ?";
+                $params[] = $filters['user_id'];
+            }
+
+            if (!empty($filters['status'])) {
+                $sql .= " AND sc.status = ?";
+                $params[] = $filters['status'];
+            }
+
+            if (!empty($filters['date_from'])) {
+                $sql .= " AND DATE(sc.created_at) >= ?";
+                $params[] = $filters['date_from'];
+            }
+
+            if (!empty($filters['date_to'])) {
+                $sql .= " AND DATE(sc.created_at) <= ?";
+                $params[] = $filters['date_to'];
+            }
+
+            $sql .= " GROUP BY sc.id ORDER BY sc.created_at DESC LIMIT ? OFFSET ?";
+            $params[] = $limit;
+            $params[] = ($page - 1) * $limit;
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            Logger::log("Error fetching commissions: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Get commission details by ID
+     */
+    public function getById($id) {
+        try {
+            $sql = "SELECT sc.*, u.username as sales_person,
+                   o.order_number, oi.quantity, p.name as product_name,
+                   cr.rate_percent, cr.type as rate_type,
+                   COALESCE(SUM(cpi.amount), 0) as paid_amount
+                   FROM {$this->table} sc
+                   LEFT JOIN users u ON sc.user_id = u.id
+                   LEFT JOIN orders o ON sc.order_id = o.id
+                   LEFT JOIN order_items oi ON sc.order_item_id = oi.id
+                   LEFT JOIN products p ON oi.product_id = p.id
+                   LEFT JOIN commission_rates cr ON sc.commission_rate_id = cr.id
+                   LEFT JOIN commission_payment_items cpi ON sc.id = cpi.commission_id
+                   WHERE sc.id = ?
+                   GROUP BY sc.id";
             
             $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->execute([$id]);
+            $commission = $stmt->fetch();
+
+            if ($commission) {
+                $commission['adjustments'] = $this->getCommissionAdjustments($id);
+                $commission['payments'] = $this->getCommissionPayments($id);
+            }
+
+            return $commission;
+        } catch (Exception $e) {
+            Logger::log("Error fetching commission {$id}: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Calculate and create commission for an order item
+     */
+    public function createForOrderItem($orderId, $orderItemId, $userId) {
+        try {
+            $this->db->beginTransaction();
+
+            // Get order item details
+            $sql = "SELECT oi.*, p.category_id, p.id as product_id
+                   FROM order_items oi
+                   LEFT JOIN products p ON oi.product_id = p.id
+                   WHERE oi.id = ?";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$orderItemId]);
+            $item = $stmt->fetch();
+
+            if (!$item) {
+                throw new Exception("Order item not found");
+            }
+
+            // Get applicable commission rate
+            $rate = $this->getApplicableRate($item['product_id'], $item['category_id']);
+            if (!$rate) {
+                throw new Exception("No applicable commission rate found");
+            }
+
+            // Calculate commission amount
+            $commissionAmount = $this->calculateCommissionAmount($item['unit_price'], $rate['rate_percent'], $rate['min_amount'], $rate['max_amount']);
+
+            // Insert commission record
+            $sql = "INSERT INTO {$this->table} (order_id, order_item_id, user_id, 
+                    commission_rate_id, original_price, commission_amount, status)
+                    VALUES (?, ?, ?, ?, ?, ?, 'pending')";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                $orderId,
+                $orderItemId,
+                $userId,
+                $rate['id'],
+                $item['unit_price'],
+                $commissionAmount
+            ]);
+
+            $this->db->commit();
+            return $this->db->lastInsertId();
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            Logger::log("Error creating commission: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Update commission status
+     */
+    public function updateStatus($id, $status, $notes = null) {
+        try {
+            $sql = "UPDATE {$this->table} SET status = ?, notes = ? WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([$status, $notes, $id]);
+        } catch (Exception $e) {
+            Logger::log("Error updating commission status: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Add commission adjustment
+     */
+    public function addAdjustment($commissionId, $type, $amount, $reason, $userId) {
+        try {
+            $this->db->beginTransaction();
+
+            $sql = "INSERT INTO commission_adjustments (commission_id, adjustment_type, 
+                    amount, reason, created_by)
+                    VALUES (?, ?, ?, ?, ?)";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$commissionId, $type, $amount, $reason, $userId]);
+
+            // Update commission amount
+            $adjustment = $type === 'increase' ? $amount : -$amount;
+            $sql = "UPDATE {$this->table} 
+                    SET commission_amount = commission_amount + ?
+                    WHERE id = ?";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$adjustment, $commissionId]);
+
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            Logger::log("Error adding commission adjustment: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Process commission payment
+     */
+    public function processPayment($userId, $commissions, $paymentData) {
+        try {
+            $this->db->beginTransaction();
+
+            // Create payment record
+            $sql = "INSERT INTO commission_payments (user_id, amount, payment_date,
+                    payment_method, reference_number, notes, created_by)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                $userId,
+                $paymentData['amount'],
+                $paymentData['payment_date'],
+                $paymentData['payment_method'],
+                $paymentData['reference_number'] ?? null,
+                $paymentData['notes'] ?? null,
+                $_SESSION['user_id']
+            ]);
+
+            $paymentId = $this->db->lastInsertId();
+
+            // Create payment items
+            $sql = "INSERT INTO commission_payment_items (payment_id, commission_id, amount)
+                    VALUES (?, ?, ?)";
+            
+            $stmt = $this->db->prepare($sql);
+            foreach ($commissions as $commission) {
+                $stmt->execute([$paymentId, $commission['id'], $commission['amount']]);
+
+                // Update commission status if fully paid
+                $this->updateCommissionPaymentStatus($commission['id']);
+            }
+
+            $this->db->commit();
+            return $paymentId;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            Logger::log("Error processing commission payment: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Get commission rates
+     */
+    public function getRates($type = null, $referenceId = null) {
+        try {
+            $sql = "SELECT * FROM commission_rates WHERE 1=1";
+            $params = [];
+
+            if ($type) {
+                $sql .= " AND type = ?";
+                $params[] = $type;
+            }
+
+            if ($referenceId) {
+                $sql .= " AND reference_id = ?";
+                $params[] = $referenceId;
+            }
+
+            $sql .= " ORDER BY effective_from DESC";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll();
         } catch (Exception $e) {
             Logger::log("Error fetching commission rates: " . $e->getMessage(), 'ERROR');
             throw $e;
         }
     }
 
-    public function getCategories() {
+    /**
+     * Create or update commission rate
+     */
+    public function saveRate($data) {
         try {
-            $sql = "SELECT * FROM categories WHERE status = 'active' ORDER BY name";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            Logger::log("Error fetching categories: " . $e->getMessage(), 'ERROR');
-            throw $e;
-        }
-    }
-
-    public function getProducts() {
-        try {
-            $sql = "SELECT p.*, c.name as category_name 
-                    FROM products p 
-                    LEFT JOIN categories c ON p.category_id = c.id 
-                    WHERE p.status = 'active' 
-                    ORDER BY p.name";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            Logger::log("Error fetching products: " . $e->getMessage(), 'ERROR');
-            throw $e;
-        }
-    }
-
-    public function getAll($filters = []) {
-        $sql = "SELECT c.*, 
-                       u.username as user_name,
-                       o.id as order_id,
-                       o.total_amount as order_amount,
-                       COALESCE(cp.amount, 0) as paid_amount,
-                       cp.payment_date,
-                       cp.payment_method
-                FROM sales_commissions c
-                JOIN users u ON c.user_id = u.id
-                JOIN orders o ON c.order_id = o.id
-                LEFT JOIN commission_payments cp ON c.id = cp.commission_id
-                WHERE 1=1";
-        
-        $params = [];
-
-        if (isset($filters['status'])) {
-            $sql .= " AND c.status = ?";
-            $params[] = $filters['status'];
-        }
-
-        if (isset($filters['user_id'])) {
-            $sql .= " AND c.user_id = ?";
-            $params[] = $filters['user_id'];
-        }
-
-        if (isset($filters['start_date'])) {
-            $sql .= " AND c.created_at >= ?";
-            $params[] = $filters['start_date'];
-        }
-
-        if (isset($filters['end_date'])) {
-            $sql .= " AND c.created_at <= ?";
-            $params[] = $filters['end_date'];
-        }
-
-        $sql .= " ORDER BY c.created_at DESC";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function saveCommissionRate($data) {
-        try {
-            $this->db->beginTransaction();
-
-            // Prepare fields based on rate type
-            $productId = null;
-            $categoryId = null;
-            
-            if ($data['rate_type'] === 'category' && isset($data['category_id'])) {
-                $categoryId = $data['category_id'];
-            } elseif ($data['rate_type'] === 'product' && isset($data['product_id'])) {
-                $productId = $data['product_id'];
+            if (!empty($data['id'])) {
+                $sql = "UPDATE commission_rates SET 
+                        type = ?, reference_id = ?, rate_percent = ?,
+                        min_amount = ?, max_amount = ?, effective_from = ?,
+                        effective_to = ?, created_by = ?
+                        WHERE id = ?";
+                
+                $params = [
+                    $data['type'],
+                    $data['reference_id'],
+                    $data['rate_percent'],
+                    $data['min_amount'] ?? 0,
+                    $data['max_amount'] ?? null,
+                    $data['effective_from'],
+                    $data['effective_to'] ?? null,
+                    $_SESSION['user_id'],
+                    $data['id']
+                ];
+            } else {
+                $sql = "INSERT INTO commission_rates (type, reference_id, rate_percent,
+                        min_amount, max_amount, effective_from, effective_to, created_by)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                
+                $params = [
+                    $data['type'],
+                    $data['reference_id'],
+                    $data['rate_percent'],
+                    $data['min_amount'] ?? 0,
+                    $data['max_amount'] ?? null,
+                    $data['effective_from'],
+                    $data['effective_to'] ?? null,
+                    $_SESSION['user_id']
+                ];
             }
 
-            // Insert rate record
-            $sql = "INSERT INTO commission_rates (rate, product_id, category_id, status) VALUES (?, ?, ?, 'active')";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([$data['rate'], $productId, $categoryId]);
-            $rateId = $this->db->lastInsertId();
+            $stmt->execute($params);
 
-            $this->db->commit();
-            return $rateId;
-
+            return !empty($data['id']) ? $data['id'] : $this->db->lastInsertId();
         } catch (Exception $e) {
-            $this->db->rollBack();
+            Logger::log("Error saving commission rate: " . $e->getMessage(), 'ERROR');
             throw $e;
         }
     }
 
-    public function getCommissionRate($id) {
-        try {
-            $sql = "SELECT cr.*, 
-                    CASE 
-                        WHEN cr.product_id IS NOT NULL THEN 'product'
-                        WHEN cr.category_id IS NOT NULL THEN 'category'
-                        ELSE 'global'
-                    END as rate_type,
-                    CASE 
-                        WHEN cr.product_id IS NOT NULL THEN p.name
-                        WHEN cr.category_id IS NOT NULL THEN c.name
-                        ELSE 'Global'
-                    END as target_name
-                    FROM commission_rates cr
-                    LEFT JOIN products p ON cr.product_id = p.id
-                    LEFT JOIN categories c ON cr.category_id = c.id
-                    WHERE cr.id = ?";
-            
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            Logger::log("Error fetching commission rate: " . $e->getMessage(), 'ERROR');
-            throw $e;
-        }
-    }
-
-    public function deleteCommissionRate($id) {
-        try {
-            $this->db->beginTransaction();
-
-            // Check if rate exists
-            $sql = "SELECT * FROM commission_rates WHERE id = ?";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$id]);
-            $rate = $stmt->fetch();
-
-            if (!$rate) {
-                throw new Exception("Commission rate not found");
-            }
-
-            // Delete rate
-            $sql = "DELETE FROM commission_rates WHERE id = ?";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$id]);
-
-            $this->db->commit();
-            return true;
-
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            throw $e;
-        }
-    }
-
-    public function updateCommissionStatus($commissionId, $status) {
-        try {
-            $this->db->beginTransaction();
-
-            // Get commission details before update
-            $sql = "SELECT c.*, u.email, CONCAT(u.first_name, ' ', u.last_name) as recipient_name 
-                    FROM sales_commissions c
-                    JOIN users u ON c.user_id = u.id
-                    WHERE c.id = ?";
-            $commission = $this->db->query($sql, [$commissionId])->fetch();
-
-            if (!$commission) {
-                throw new Exception("Commission not found");
-            }
-
-            // Update status
-            $sql = "UPDATE sales_commissions SET status = ? WHERE id = ?";
-            $this->db->query($sql, [$status, $commissionId]);
-
-            // Create notification
-            $notificationData = [
-                'user_id' => $commission['user_id'],
-                'type' => 'commission_status',
-                'title' => 'Commission Status Updated',
-                'message' => "Your commission of $" . number_format($commission['amount'], 2) . 
-                           " has been marked as " . strtoupper($status),
-                'reference_type' => 'commission',
-                'reference_id' => $commissionId
-            ];
-            
-            $this->notification->createNotification($notificationData);
-
-            // Send email notification
-            $emailSubject = "Commission Status Update";
-            $emailMessage = "Dear {$commission['recipient_name']},\n\n" .
-                          "Your commission of $" . number_format($commission['amount'], 2) . 
-                          " has been marked as " . strtoupper($status) . ".\n\n" .
-                          "Please log in to your account for more details.\n\n" .
-                          "Best regards,\nSalvio POS Team";
-
-            $this->notification->sendEmailNotification(
-                $commission['user_id'],
-                $emailSubject,
-                $emailMessage
-            );
-
-            $this->db->commit();
-            return true;
-
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            throw $e;
-        }
-    }
-
-    public function recordPayment($commissionId, $data) {
-        try {
-            $this->db->beginTransaction();
-
-            // Get commission details
-            $sql = "SELECT c.*, u.email, CONCAT(u.first_name, ' ', u.last_name) as recipient_name 
-                    FROM sales_commissions c
-                    JOIN users u ON c.user_id = u.id
-                    WHERE c.id = ?";
-            $commission = $this->db->query($sql, [$commissionId])->fetch();
-
-            if (!$commission) {
-                throw new Exception("Commission not found");
-            }
-
-            // Insert payment record
-            $sql = "INSERT INTO commission_payments (
-                        commission_id,
-                        amount,
-                        payment_date,
-                        payment_method,
-                        reference_number,
-                        notes,
-                        created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, NOW())";
-
-            $params = [
-                $commissionId,
-                $data['amount'],
-                $data['payment_date'],
-                $data['payment_method'],
-                $data['reference_number'],
-                $data['notes'] ?? null
-            ];
-
-            $this->db->query($sql, $params);
-            $paymentId = $this->db->lastInsertId();
-
-            // Update commission status
-            $this->updateCommissionStatus($commissionId, 'paid');
-
-            // Create notification
-            $notificationData = [
-                'user_id' => $commission['user_id'],
-                'type' => 'commission_payment',
-                'title' => 'Commission Payment Recorded',
-                'message' => "A payment of $" . number_format($data['amount'], 2) . 
-                           " has been recorded for your commission",
-                'reference_type' => 'commission_payment',
-                'reference_id' => $paymentId
-            ];
-            
-            $this->notification->createNotification($notificationData);
-
-            // Send email notification
-            $emailSubject = "Commission Payment Recorded";
-            $emailMessage = "Dear {$commission['recipient_name']},\n\n" .
-                          "A payment of $" . number_format($data['amount'], 2) . 
-                          " has been recorded for your commission.\n\n" .
-                          "Payment Details:\n" .
-                          "- Method: {$data['payment_method']}\n" .
-                          "- Reference: {$data['reference_number']}\n" .
-                          "- Date: {$data['payment_date']}\n\n" .
-                          "Please log in to your account for more details.\n\n" .
-                          "Best regards,\nSalvio POS Team";
-
-            $this->notification->sendEmailNotification(
-                $commission['user_id'],
-                $emailSubject,
-                $emailMessage
-            );
-
-            $this->db->commit();
-            return $paymentId;
-
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            throw $e;
-        }
-    }
-
-    public function voidPayment($paymentId, $reason) {
-        try {
-            $this->db->beginTransaction();
-
-            // Get payment details
-            $sql = "SELECT * FROM commission_payments WHERE id = ?";
-            $payment = $this->db->query($sql, [$paymentId])->fetch();
-
-            if (!$payment) {
-                throw new Exception("Payment not found");
-            }
-
-            // Delete payment record
-            $sql = "DELETE FROM commission_payments WHERE id = ?";
-            $this->db->query($sql, [$paymentId]);
-
-            // Update commission status back to approved
-            $sql = "UPDATE sales_commissions SET status = 'approved' WHERE id = ?";
-            $this->db->query($sql, [$payment['commission_id']]);
-
-            // Log the void
-            Logger::log("Commission payment #{$paymentId} voided. Reason: {$reason}");
-
-            $this->db->commit();
-            return true;
-
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            throw $e;
-        }
-    }
-
-    public function getCommissionSummaryByPeriod($period, $year) {
-        $sql = "SELECT 
-                    DATE_FORMAT(created_at, '%Y-%m') as period,
-                    COUNT(*) as total_count,
-                    SUM(amount) as total_amount,
-                    MIN(amount) as min_amount,
-                    MAX(amount) as max_amount,
-                    AVG(amount) as avg_amount
-                FROM sales_commissions
-                WHERE YEAR(created_at) = ?
-                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-                ORDER BY period DESC";
+    /**
+     * Get commission adjustments
+     */
+    private function getCommissionAdjustments($commissionId) {
+        $sql = "SELECT ca.*, u.username as created_by_name
+               FROM commission_adjustments ca
+               LEFT JOIN users u ON ca.created_by = u.id
+               WHERE ca.commission_id = ?
+               ORDER BY ca.created_at ASC";
         
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([$year]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->execute([$commissionId]);
+        return $stmt->fetchAll();
     }
 
-    public function getCommissionPerformanceMetrics($userId = null, $days = 30) {
-        $sql = "SELECT 
-                    COUNT(*) as total_commissions,
-                    SUM(amount) as total_amount,
-                    AVG(amount) as avg_amount,
-                    COUNT(CASE WHEN status = 'paid' THEN 1 END) as paid_count,
-                    SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) as paid_amount
-                FROM sales_commissions
-                WHERE created_at >= DATE_SUB(CURRENT_DATE, INTERVAL ? DAY)";
+    /**
+     * Get commission payments
+     */
+    private function getCommissionPayments($commissionId) {
+        $sql = "SELECT cp.*, cpi.amount as payment_amount,
+               u.username as created_by_name
+               FROM commission_payment_items cpi
+               LEFT JOIN commission_payments cp ON cpi.payment_id = cp.id
+               LEFT JOIN users u ON cp.created_by = u.id
+               WHERE cpi.commission_id = ?
+               ORDER BY cp.payment_date ASC";
         
-        $params = [$days];
-        
-        if ($userId) {
-            $sql .= " AND user_id = ?";
-            $params[] = $userId;
-        }
-
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute([$commissionId]);
+        return $stmt->fetchAll();
     }
 
-    public function getCommissionReport($filters) {
-        $sql = "SELECT c.*, 
-                       u.username as user_name,
-                       o.order_number,
-                       o.total_amount as order_amount,
-                       COALESCE(cp.amount, 0) as paid_amount,
-                       cp.payment_date,
-                       cp.payment_method
-                FROM sales_commissions c
-                JOIN users u ON c.user_id = u.id
-                JOIN orders o ON c.order_id = o.id
-                LEFT JOIN commission_payments cp ON c.id = cp.commission_id
-                WHERE 1=1";
+    /**
+     * Get applicable commission rate
+     */
+    private function getApplicableRate($productId, $categoryId) {
+        // Try product-specific rate first
+        $sql = "SELECT * FROM commission_rates
+               WHERE type = 'product'
+               AND reference_id = ?
+               AND effective_from <= CURRENT_DATE
+               AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
+               ORDER BY effective_from DESC
+               LIMIT 1";
         
-        $params = [];
-
-        if (isset($filters['status'])) {
-            $sql .= " AND c.status = ?";
-            $params[] = $filters['status'];
-        }
-
-        if (isset($filters['user_id'])) {
-            $sql .= " AND c.user_id = ?";
-            $params[] = $filters['user_id'];
-        }
-
-        if (isset($filters['start_date'])) {
-            $sql .= " AND c.created_at >= ?";
-            $params[] = $filters['start_date'];
-        }
-
-        if (isset($filters['end_date'])) {
-            $sql .= " AND c.created_at <= ?";
-            $params[] = $filters['end_date'];
-        }
-
-        $sql .= " ORDER BY c.created_at DESC";
-
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->execute([$productId]);
+        $rate = $stmt->fetch();
+
+        if ($rate) {
+            return $rate;
+        }
+
+        // Try category rate
+        $sql = "SELECT * FROM commission_rates
+               WHERE type = 'category'
+               AND reference_id = ?
+               AND effective_from <= CURRENT_DATE
+               AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
+               ORDER BY effective_from DESC
+               LIMIT 1";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$categoryId]);
+        $rate = $stmt->fetch();
+
+        if ($rate) {
+            return $rate;
+        }
+
+        // Fall back to global rate
+        $sql = "SELECT * FROM commission_rates
+               WHERE type = 'global'
+               AND reference_id IS NULL
+               AND effective_from <= CURRENT_DATE
+               AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
+               ORDER BY effective_from DESC
+               LIMIT 1";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
     }
 
-    public function getCommissionTrendsByProduct($startDate, $endDate) {
-        $sql = "SELECT 
-                    p.name as product_name,
-                    COUNT(*) as commission_count,
-                    SUM(c.amount) as total_commission,
-                    AVG(c.amount) as avg_commission
-                FROM sales_commissions c
-                JOIN orders o ON c.order_id = o.id
-                JOIN order_items oi ON o.id = oi.order_id
-                JOIN products p ON oi.product_id = p.id
-                WHERE c.created_at BETWEEN ? AND ?
-                GROUP BY p.id, p.name
-                ORDER BY total_commission DESC";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$startDate, $endDate]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    /**
+     * Calculate commission amount
+     */
+    private function calculateCommissionAmount($price, $ratePercent, $minAmount, $maxAmount) {
+        $amount = $price * ($ratePercent / 100);
+
+        if ($minAmount && $amount < $minAmount) {
+            $amount = $minAmount;
+        }
+
+        if ($maxAmount && $amount > $maxAmount) {
+            $amount = $maxAmount;
+        }
+
+        return $amount;
     }
 
-    public function exportCommissionReport($filters) {
-        $sql = "SELECT 
-                    c.id as commission_id,
-                    u.username as user_name,
-                    o.order_number,
-                    c.amount as commission_amount,
-                    c.status,
-                    COALESCE(cp.amount, 0) as paid_amount,
-                    cp.payment_date,
-                    cp.payment_method,
-                    c.created_at
-                FROM sales_commissions c
-                JOIN users u ON c.user_id = u.id
-                JOIN orders o ON c.order_id = o.id
-                LEFT JOIN commission_payments cp ON c.id = cp.commission_id
-                WHERE 1=1";
+    /**
+     * Update commission payment status
+     */
+    private function updateCommissionPaymentStatus($commissionId) {
+        $sql = "SELECT sc.commission_amount,
+               COALESCE(SUM(cpi.amount), 0) as total_paid
+               FROM {$this->table} sc
+               LEFT JOIN commission_payment_items cpi ON sc.id = cpi.commission_id
+               WHERE sc.id = ?
+               GROUP BY sc.id, sc.commission_amount";
         
-        $params = [];
-
-        if (isset($filters['status'])) {
-            $sql .= " AND c.status = ?";
-            $params[] = $filters['status'];
-        }
-
-        if (isset($filters['user_id'])) {
-            $sql .= " AND c.user_id = ?";
-            $params[] = $filters['user_id'];
-        }
-
-        if (isset($filters['start_date'])) {
-            $sql .= " AND c.created_at >= ?";
-            $params[] = $filters['start_date'];
-        }
-
-        if (isset($filters['end_date'])) {
-            $sql .= " AND c.created_at <= ?";
-            $params[] = $filters['end_date'];
-        }
-
-        $sql .= " ORDER BY c.created_at DESC";
-
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->execute([$commissionId]);
+        $result = $stmt->fetch();
+
+        $status = 'pending';
+        if ($result['total_paid'] >= $result['commission_amount']) {
+            $status = 'paid';
+        } elseif ($result['total_paid'] > 0) {
+            $status = 'partial';
+        }
+
+        $this->updateStatus($commissionId, $status);
     }
 }

@@ -5405,3 +5405,872 @@
 [2025-05-03 11:50:18] View content length: 1465
 [2025-05-03 11:50:18] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
 [2025-05-03 11:50:18] Rendering with layout
+[2025-05-03 12:08:29] Database connection established successfully
+[2025-05-03 12:08:29] Processing URI: 
+[2025-05-03 12:08:29] Session status: 2
+[2025-05-03 12:08:29] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:29] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746265356
+)
+
+[2025-05-03 12:08:29] Authenticated user accessing /Salvio2/public/
+[2025-05-03 12:08:29] User role: admin
+[2025-05-03 12:08:29] Database connection established successfully
+[2025-05-03 12:08:29] Processing URI: reports
+[2025-05-03 12:08:29] Session status: 2
+[2025-05-03 12:08:29] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:29] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266909
+)
+
+[2025-05-03 12:08:29] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 12:08:29] User role: admin
+[2025-05-03 12:08:29] Rendering view: home/reports
+[2025-05-03 12:08:29] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 12:08:29] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/home/reports.php
+[2025-05-03 12:08:29] Loading view content
+[2025-05-03 12:08:29] View content length: 1465
+[2025-05-03 12:08:29] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:29] Rendering with layout
+[2025-05-03 12:08:29] Processing URI: reports
+[2025-05-03 12:08:29] Session status: 2
+[2025-05-03 12:08:29] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:29] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266909
+)
+
+[2025-05-03 12:08:29] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 12:08:29] User role: admin
+[2025-05-03 12:08:29] Rendering view: home/reports
+[2025-05-03 12:08:29] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 12:08:29] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/home/reports.php
+[2025-05-03 12:08:29] Loading view content
+[2025-05-03 12:08:29] View content length: 1465
+[2025-05-03 12:08:29] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:29] Rendering with layout
+[2025-05-03 12:08:31] Database connection established successfully
+[2025-05-03 12:08:31] Processing URI: orders
+[2025-05-03 12:08:31] Session status: 2
+[2025-05-03 12:08:31] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:31] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266909
+)
+
+[2025-05-03 12:08:31] Authenticated user accessing /Salvio2/public/orders
+[2025-05-03 12:08:31] User role: admin
+[2025-05-03 12:08:31] BaseModel initialized with database connection
+[2025-05-03 12:08:31] BaseModel initialized with database connection
+[2025-05-03 12:08:31] BaseModel initialized with database connection
+[2025-05-03 12:08:31] Rendering view: orders/index
+[2025-05-03 12:08:31] View data: Array
+(
+    [title] => Orders
+    [description] => Manage orders and track their status
+    [orders] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [customer_id] => 1
+                    [order_number] => ORD-2024-001
+                    [total_amount] => 150000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => completed
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => Pharmacy Plus
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [customer_id] => 2
+                    [order_number] => ORD-2024-002
+                    [total_amount] => 240000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => in_progress
+                    [payment_type] => installment
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => City Clinic
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [customer_id] => 3
+                    [order_number] => ORD-2024-003
+                    [total_amount] => 375000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => new
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => General Hospital
+                )
+
+        )
+
+)
+
+[2025-05-03 12:08:31] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/orders/index.php
+[2025-05-03 12:08:31] Loading view content
+[2025-05-03 12:08:31] View content length: 6357
+[2025-05-03 12:08:31] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:31] Rendering with layout
+[2025-05-03 12:08:31] Processing URI: orders
+[2025-05-03 12:08:31] Session status: 2
+[2025-05-03 12:08:31] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:31] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266911
+)
+
+[2025-05-03 12:08:31] Authenticated user accessing /Salvio2/public/orders
+[2025-05-03 12:08:31] User role: admin
+[2025-05-03 12:08:31] BaseModel initialized with database connection
+[2025-05-03 12:08:31] BaseModel initialized with database connection
+[2025-05-03 12:08:31] BaseModel initialized with database connection
+[2025-05-03 12:08:31] Rendering view: orders/index
+[2025-05-03 12:08:31] View data: Array
+(
+    [title] => Orders
+    [description] => Manage orders and track their status
+    [orders] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [customer_id] => 1
+                    [order_number] => ORD-2024-001
+                    [total_amount] => 150000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => completed
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => Pharmacy Plus
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [customer_id] => 2
+                    [order_number] => ORD-2024-002
+                    [total_amount] => 240000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => in_progress
+                    [payment_type] => installment
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => City Clinic
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [customer_id] => 3
+                    [order_number] => ORD-2024-003
+                    [total_amount] => 375000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => new
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => General Hospital
+                )
+
+        )
+
+)
+
+[2025-05-03 12:08:31] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/orders/index.php
+[2025-05-03 12:08:31] Loading view content
+[2025-05-03 12:08:31] View content length: 6357
+[2025-05-03 12:08:31] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:31] Rendering with layout
+[2025-05-03 12:08:39] Database connection established successfully
+[2025-05-03 12:08:39] Processing URI: commissions/rates
+[2025-05-03 12:08:39] Session status: 2
+[2025-05-03 12:08:39] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:39] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266911
+)
+
+[2025-05-03 12:08:39] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 12:08:39] User role: admin
+[2025-05-03 12:08:39] BaseModel initialized with database connection
+[2025-05-03 12:08:39] BaseModel initialized with database connection
+[2025-05-03 12:08:39] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 12:08:39] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 12:08:42] Database connection established successfully
+[2025-05-03 12:08:42] Processing URI: profit-sharing
+[2025-05-03 12:08:42] Session status: 2
+[2025-05-03 12:08:42] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:42] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266919
+)
+
+[2025-05-03 12:08:42] Authenticated user accessing /Salvio2/public/profit-sharing
+[2025-05-03 12:08:42] User role: admin
+[2025-05-03 12:08:42] BaseModel initialized with database connection
+[2025-05-03 12:08:42] BaseModel initialized with database connection
+[2025-05-03 12:08:42] Rendering view: profit_sharing/index
+[2025-05-03 12:08:42] View data: Array
+(
+    [title] => Profit Sharing
+    [description] => Manage profit sharing and distributions
+    [profits] => Array
+        (
+        )
+
+)
+
+[2025-05-03 12:08:42] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/profit_sharing/index.php
+[2025-05-03 12:08:42] Loading view content
+[2025-05-03 12:08:42] View content length: 5968
+[2025-05-03 12:08:42] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:42] Rendering with layout
+[2025-05-03 12:08:42] Processing URI: profit-sharing
+[2025-05-03 12:08:42] Session status: 2
+[2025-05-03 12:08:42] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:42] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266922
+)
+
+[2025-05-03 12:08:42] Authenticated user accessing /Salvio2/public/profit-sharing
+[2025-05-03 12:08:42] User role: admin
+[2025-05-03 12:08:42] BaseModel initialized with database connection
+[2025-05-03 12:08:42] BaseModel initialized with database connection
+[2025-05-03 12:08:42] Rendering view: profit_sharing/index
+[2025-05-03 12:08:42] View data: Array
+(
+    [title] => Profit Sharing
+    [description] => Manage profit sharing and distributions
+    [profits] => Array
+        (
+        )
+
+)
+
+[2025-05-03 12:08:42] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/profit_sharing/index.php
+[2025-05-03 12:08:42] Loading view content
+[2025-05-03 12:08:42] View content length: 5968
+[2025-05-03 12:08:42] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:42] Rendering with layout
+[2025-05-03 12:08:44] Database connection established successfully
+[2025-05-03 12:08:44] Processing URI: commissions/rates
+[2025-05-03 12:08:44] Session status: 2
+[2025-05-03 12:08:44] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:44] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266922
+)
+
+[2025-05-03 12:08:44] Authenticated user accessing /Salvio2/public/commissions/rates
+[2025-05-03 12:08:44] User role: admin
+[2025-05-03 12:08:44] BaseModel initialized with database connection
+[2025-05-03 12:08:44] BaseModel initialized with database connection
+[2025-05-03 12:08:44] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 12:08:44] Error loading commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cr.product_id' in 'field list'
+[2025-05-03 12:08:46] Database connection established successfully
+[2025-05-03 12:08:46] Processing URI: reports
+[2025-05-03 12:08:46] Session status: 2
+[2025-05-03 12:08:46] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:46] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266924
+)
+
+[2025-05-03 12:08:46] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 12:08:46] User role: admin
+[2025-05-03 12:08:46] Rendering view: home/reports
+[2025-05-03 12:08:46] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 12:08:46] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/home/reports.php
+[2025-05-03 12:08:46] Loading view content
+[2025-05-03 12:08:46] View content length: 1465
+[2025-05-03 12:08:46] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:46] Rendering with layout
+[2025-05-03 12:08:46] Processing URI: reports
+[2025-05-03 12:08:46] Session status: 2
+[2025-05-03 12:08:46] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:46] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266926
+)
+
+[2025-05-03 12:08:46] Authenticated user accessing /Salvio2/public/reports
+[2025-05-03 12:08:46] User role: admin
+[2025-05-03 12:08:46] Rendering view: home/reports
+[2025-05-03 12:08:46] View data: Array
+(
+    [title] => Reports Dashboard
+    [description] => View sales and inventory reports
+)
+
+[2025-05-03 12:08:46] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/home/reports.php
+[2025-05-03 12:08:46] Loading view content
+[2025-05-03 12:08:46] View content length: 1465
+[2025-05-03 12:08:46] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:46] Rendering with layout
+[2025-05-03 12:08:52] Database connection established successfully
+[2025-05-03 12:08:52] Processing URI: orders
+[2025-05-03 12:08:52] Session status: 2
+[2025-05-03 12:08:52] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:52] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266926
+)
+
+[2025-05-03 12:08:52] Authenticated user accessing /Salvio2/public/orders
+[2025-05-03 12:08:52] User role: admin
+[2025-05-03 12:08:52] BaseModel initialized with database connection
+[2025-05-03 12:08:52] BaseModel initialized with database connection
+[2025-05-03 12:08:52] BaseModel initialized with database connection
+[2025-05-03 12:08:52] Rendering view: orders/index
+[2025-05-03 12:08:52] View data: Array
+(
+    [title] => Orders
+    [description] => Manage orders and track their status
+    [orders] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [customer_id] => 1
+                    [order_number] => ORD-2024-001
+                    [total_amount] => 150000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => completed
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => Pharmacy Plus
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [customer_id] => 2
+                    [order_number] => ORD-2024-002
+                    [total_amount] => 240000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => in_progress
+                    [payment_type] => installment
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => City Clinic
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [customer_id] => 3
+                    [order_number] => ORD-2024-003
+                    [total_amount] => 375000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => new
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => General Hospital
+                )
+
+        )
+
+)
+
+[2025-05-03 12:08:52] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/orders/index.php
+[2025-05-03 12:08:52] Loading view content
+[2025-05-03 12:08:52] View content length: 6357
+[2025-05-03 12:08:52] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:52] Rendering with layout
+[2025-05-03 12:08:52] Processing URI: orders
+[2025-05-03 12:08:52] Session status: 2
+[2025-05-03 12:08:52] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:52] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266932
+)
+
+[2025-05-03 12:08:52] Authenticated user accessing /Salvio2/public/orders
+[2025-05-03 12:08:52] User role: admin
+[2025-05-03 12:08:52] BaseModel initialized with database connection
+[2025-05-03 12:08:52] BaseModel initialized with database connection
+[2025-05-03 12:08:52] BaseModel initialized with database connection
+[2025-05-03 12:08:52] Rendering view: orders/index
+[2025-05-03 12:08:52] View data: Array
+(
+    [title] => Orders
+    [description] => Manage orders and track their status
+    [orders] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [customer_id] => 1
+                    [order_number] => ORD-2024-001
+                    [total_amount] => 150000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => completed
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => Pharmacy Plus
+                )
+
+            [1] => Array
+                (
+                    [id] => 2
+                    [customer_id] => 2
+                    [order_number] => ORD-2024-002
+                    [total_amount] => 240000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => in_progress
+                    [payment_type] => installment
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => City Clinic
+                )
+
+            [2] => Array
+                (
+                    [id] => 3
+                    [customer_id] => 3
+                    [order_number] => ORD-2024-003
+                    [total_amount] => 375000.00
+                    [discount_amount] => 0.00
+                    [discount_reason] => 
+                    [status] => new
+                    [payment_type] => cash
+                    [created_by] => 1
+                    [created_at] => 2025-05-03 02:34:20
+                    [updated_at] => 2025-05-03 02:34:20
+                    [created_by_name] => admin
+                    [customer_name] => General Hospital
+                )
+
+        )
+
+)
+
+[2025-05-03 12:08:52] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/orders/index.php
+[2025-05-03 12:08:52] Loading view content
+[2025-05-03 12:08:52] View content length: 6357
+[2025-05-03 12:08:52] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:52] Rendering with layout
+[2025-05-03 12:08:53] Database connection established successfully
+[2025-05-03 12:08:53] Processing URI: orders/create
+[2025-05-03 12:08:53] Session status: 2
+[2025-05-03 12:08:53] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:53] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266932
+)
+
+[2025-05-03 12:08:53] Authenticated user accessing /Salvio2/public/orders/create
+[2025-05-03 12:08:53] User role: admin
+[2025-05-03 12:08:53] BaseModel initialized with database connection
+[2025-05-03 12:08:53] BaseModel initialized with database connection
+[2025-05-03 12:08:53] BaseModel initialized with database connection
+[2025-05-03 12:08:53] Rendering view: orders/create
+[2025-05-03 12:08:53] View data: Array
+(
+    [title] => Create Order
+    [description] => Create a new order
+)
+
+[2025-05-03 12:08:53] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/orders/create.php
+[2025-05-03 12:08:53] Loading view content
+[2025-05-03 12:08:53] View content length: 8161
+[2025-05-03 12:08:53] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:53] Rendering with layout
+[2025-05-03 12:08:53] Processing URI: orders/create
+[2025-05-03 12:08:53] Session status: 2
+[2025-05-03 12:08:53] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:08:53] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266933
+)
+
+[2025-05-03 12:08:53] Authenticated user accessing /Salvio2/public/orders/create
+[2025-05-03 12:08:53] User role: admin
+[2025-05-03 12:08:53] BaseModel initialized with database connection
+[2025-05-03 12:08:53] BaseModel initialized with database connection
+[2025-05-03 12:08:53] BaseModel initialized with database connection
+[2025-05-03 12:08:53] Rendering view: orders/create
+[2025-05-03 12:08:53] View data: Array
+(
+    [title] => Create Order
+    [description] => Create a new order
+)
+
+[2025-05-03 12:08:53] View path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/orders/create.php
+[2025-05-03 12:08:53] Loading view content
+[2025-05-03 12:08:53] View content length: 8161
+[2025-05-03 12:08:53] Layout path: C:\xampp\htdocs\Salvio2\app\controllers/../../app/views/layouts/main.php
+[2025-05-03 12:08:53] Rendering with layout
+[2025-05-03 12:12:07] Database connection established successfully
+[2025-05-03 12:12:07] Processing URI: orders/create
+[2025-05-03 12:12:07] Session status: 2
+[2025-05-03 12:12:07] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:12:07] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746266933
+)
+
+[2025-05-03 12:12:07] Authenticated user accessing /Salvio2/public/orders/create
+[2025-05-03 12:12:07] User role: admin
+[2025-05-03 12:15:45] Database connection established successfully
+[2025-05-03 12:15:45] Processing URI: orders/create
+[2025-05-03 12:17:30] Database connection established successfully
+[2025-05-03 12:17:30] Processing URI: orders/create
+[2025-05-03 12:17:30] Session status: 2
+[2025-05-03 12:17:30] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:17:30] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746267127
+)
+
+[2025-05-03 12:17:30] Authenticated user accessing /Salvio2/public/orders/create
+[2025-05-03 12:17:30] User role: admin
+[2025-05-03 12:17:30] Database connection failed: SQLSTATE[HY000] [2019] Unknown character set
+[2025-05-03 12:17:30] Routing error: Database connection failed
+[2025-05-03 12:17:30] Session status: 2
+[2025-05-03 12:17:30] Session ID: 3mlro26bkkbpsit5jsnb2u7ask
+[2025-05-03 12:17:30] Session data: Array
+(
+    [user] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [role] => admin
+            [status] => 1
+        )
+
+    [auth_time] => 1746267450
+)
+
+[2025-05-03 12:17:30] Authenticated user accessing /Salvio2/public/orders/create
+[2025-05-03 12:17:30] User role: admin
+[2025-05-03 12:25:23] Database connection established successfully
+[2025-05-03 12:25:23] Processing URI: orders/create
+[2025-05-03 12:25:49] Database connection established successfully
+[2025-05-03 12:25:49] Processing URI: orders
+[2025-05-03 12:27:20] Database connection established successfully
+[2025-05-03 12:27:20] Processing URI: 
+[2025-05-03 12:31:41] Database connection established successfully
+[2025-05-03 12:31:41] Processing URI: 
+[2025-05-03 12:31:41] Database connection established successfully
+[2025-05-03 12:31:41] Processing URI: login
+[2025-05-03 12:31:41] Database connection failed: SQLSTATE[HY000] [2019] Unknown character set
+[2025-05-03 12:31:41] Routing error: Database connection failed
+[2025-05-03 12:31:41] Processing URI: login
+[2025-05-03 12:31:41] Database connection failed: SQLSTATE[HY000] [2019] Unknown character set
+[2025-05-03 12:31:41] Routing error: Database connection failed
+[2025-05-03 12:36:01] Database connection established successfully
+[2025-05-03 12:36:01] Processing URI: login
+[2025-05-03 12:36:01] Database connection failed: SQLSTATE[HY000] [2019] Unknown character set
+[2025-05-03 12:36:01] Routing error: Database connection failed
+[2025-05-03 12:36:01] Processing URI: login
+[2025-05-03 12:36:01] Database connection failed: SQLSTATE[HY000] [2019] Unknown character set
+[2025-05-03 12:36:01] Routing error: Database connection failed
+[2025-05-03 12:36:05] Database connection established successfully
+[2025-05-03 12:36:05] Processing URI: login
+[2025-05-03 12:36:05] Database connection failed: SQLSTATE[HY000] [2019] Unknown character set
+[2025-05-03 12:36:05] Routing error: Database connection failed
+[2025-05-03 12:36:05] Processing URI: login
+[2025-05-03 12:36:05] Database connection failed: SQLSTATE[HY000] [2019] Unknown character set
+[2025-05-03 12:36:05] Routing error: Database connection failed
+[2025-05-03 12:36:09] Database connection established successfully
+[2025-05-03 12:36:09] Processing URI: 
+[2025-05-03 12:36:09] Database connection established successfully
+[2025-05-03 12:36:09] Processing URI: login
+[2025-05-03 12:36:09] Database connection failed: SQLSTATE[HY000] [2019] Unknown character set
+[2025-05-03 12:36:09] Routing error: Database connection failed
+[2025-05-03 12:36:09] Processing URI: login
+[2025-05-03 12:36:09] Database connection failed: SQLSTATE[HY000] [2019] Unknown character set
+[2025-05-03 12:36:09] Routing error: Database connection failed
+[2025-05-03 12:39:48] Database connection established successfully
+[2025-05-03 12:39:48] Processing URI: login
+[2025-05-03 12:39:48] Database connection established successfully
+[2025-05-03 12:39:48] Processing URI: Salvio2/public
+[2025-05-03 12:39:48] No route found for URI: Salvio2/public
+[2025-05-03 12:39:48] Processing URI: Salvio2/public
+[2025-05-03 12:39:48] No route found for URI: Salvio2/public
+[2025-05-03 12:41:36] Database connection established successfully
+[2025-05-03 12:41:36] Processing URI: 
+[2025-05-03 12:41:36] Database connection established successfully
+[2025-05-03 12:41:36] Processing URI: login
+[2025-05-03 12:41:36] Processing URI: login
+[2025-05-03 12:43:37] Database connection established successfully
+[2025-05-03 12:43:37] Processing URI: login
+[2025-05-03 12:43:37] No route found for URI: login
+[2025-05-03 19:28:17] Error fetching products: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 19:28:17] Error in products index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 19:38:20] Error fetching orders: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 19:38:20] Error in orders index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 19:47:42] Error fetching commissions: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 19:47:42] Error in commissions index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 19:56:28] Error fetching orders: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 19:56:28] Error in orders index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 19:56:31] Error fetching orders: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 19:56:31] Error in orders index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 19:56:31] Error fetching products: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 19:56:31] Error in products index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 19:56:32] Error fetching commissions: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 19:56:32] Error in commissions index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 19:56:34] Error fetching commissions: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 19:56:34] Error in commissions index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 19:56:36] Error fetching monthly profits: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 19:56:36] Error in profit sharing index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 19:56:36] Error fetching monthly profits: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 19:56:36] Error in profit sharing index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 20:00:02] Error fetching orders: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:00:02] Error in orders index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:00:05] Error fetching orders: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:00:05] Error in orders index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:00:06] Error fetching products: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:00:06] Error in products index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:00:07] Error fetching commissions: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 20:00:07] Error in commissions index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 20:00:08] Error fetching products: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:00:08] Error in products index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:00:09] Error fetching orders: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:00:09] Error in orders index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:00:10] Error fetching products: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:00:10] Error in products index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:08:37] Error fetching sales trends: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'st.year' in 'where clause'
+[2025-05-03 20:08:37] Error in analytics dashboard: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'st.year' in 'where clause'
+[2025-05-03 20:11:16] Error fetching products: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:11:16] Error in products index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:11:19] Error fetching orders: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:11:19] Error in orders index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:11:23] Error fetching products: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:11:23] Error in products index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:11:25] Error fetching commissions: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 20:11:25] Error in commissions index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 20:11:27] Error fetching monthly profits: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 20:11:27] Error in profit sharing index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 20:11:30] Error fetching monthly profit: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 20:11:30] Error calculating monthly profit: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 20:11:30] Error calculating profit: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 20:11:30] Error fetching monthly profits: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 20:11:30] Error in profit sharing index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 20:11:32] Error fetching sales trends: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'st.year' in 'where clause'
+[2025-05-03 20:11:32] Error in analytics dashboard: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'st.year' in 'where clause'
+[2025-05-03 20:11:38] Error fetching orders: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:11:38] Error in orders index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:11:58] Error fetching products: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:12:56] Error fetching sales trends: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'st.year' in 'where clause'
+[2025-05-03 20:12:56] Error in analytics dashboard: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'st.year' in 'where clause'
+[2025-05-03 20:15:23] Error fetching commissions: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 20:15:23] Error in commissions index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 20:15:24] Error fetching products: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:15:24] Error in products index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.bpom_references' doesn't exist
+[2025-05-03 20:15:25] Error fetching orders: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:15:25] Error in orders index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:22:45] Error fetching commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'effective_from' in 'order clause'
+[2025-05-03 20:22:45] Error managing commission rates: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'effective_from' in 'order clause'
+[2025-05-03 20:22:50] Error fetching commissions: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 20:22:50] Error in commissions index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 20:22:51] Error fetching commissions: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 20:22:51] Error in commissions index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.sales_commissions' doesn't exist
+[2025-05-03 20:22:52] Error fetching monthly profits: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 20:22:52] Error in profit sharing index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.monthly_profits' doesn't exist
+[2025-05-03 20:22:54] Error fetching sales trends: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'st.year' in 'where clause'
+[2025-05-03 20:22:54] Error in analytics dashboard: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'st.year' in 'where clause'
+[2025-05-03 20:23:02] Error fetching orders: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist
+[2025-05-03 20:23:02] Error in orders index: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'salvio_pos.orders' doesn't exist

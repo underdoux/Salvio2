@@ -1,35 +1,43 @@
-DROP TABLE IF EXISTS profit_distributions;
-DROP TABLE IF EXISTS monthly_profits;
-
-CREATE TABLE monthly_profits (
+-- Create monthly_profits table
+CREATE TABLE IF NOT EXISTS monthly_profits (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    month DATE NOT NULL,
-    total_sales DECIMAL(10,2) NOT NULL DEFAULT 0,
-    total_costs DECIMAL(10,2) NOT NULL DEFAULT 0,
-    total_commissions DECIMAL(10,2) NOT NULL DEFAULT 0,
-    total_expenses DECIMAL(10,2) NOT NULL DEFAULT 0,
-    net_profit DECIMAL(10,2) NOT NULL DEFAULT 0,
-    status ENUM('draft', 'final') NOT NULL DEFAULT 'draft',
+    year INT NOT NULL,
+    month INT NOT NULL,
+    total_sales DECIMAL(15,2) NOT NULL DEFAULT 0,
+    total_costs DECIMAL(15,2) NOT NULL DEFAULT 0,
+    total_expenses DECIMAL(15,2) NOT NULL DEFAULT 0,
+    total_commissions DECIMAL(15,2) NOT NULL DEFAULT 0,
+    net_profit DECIMAL(15,2) NOT NULL DEFAULT 0,
+    status ENUM('draft', 'finalized') NOT NULL DEFAULT 'draft',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_month (month)
-);
+    UNIQUE KEY unique_year_month (year, month)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE profit_distributions (
+-- Create profit_distribution table
+CREATE TABLE IF NOT EXISTS profit_distribution (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    profit_id INT NOT NULL,
+    monthly_profit_id INT NOT NULL,
     investor_id INT NOT NULL,
-    percentage DECIMAL(5,2) NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    status ENUM('pending', 'approved', 'paid') NOT NULL DEFAULT 'pending',
+    distribution_amount DECIMAL(15,2) NOT NULL,
+    status ENUM('pending', 'paid') NOT NULL DEFAULT 'pending',
+    payment_date DATE NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (profit_id) REFERENCES monthly_profits(id) ON DELETE CASCADE,
-    FOREIGN KEY (investor_id) REFERENCES investors(id) ON DELETE CASCADE,
-    CHECK (percentage >= 0 AND percentage <= 100)
-);
+    FOREIGN KEY (monthly_profit_id) REFERENCES monthly_profits(id),
+    FOREIGN KEY (investor_id) REFERENCES investors(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO monthly_profits (month, total_sales, total_costs, total_commissions, total_expenses, net_profit, status) VALUES
-('2024-01-01', 100000.00, 60000.00, 5000.00, 10000.00, 25000.00, 'final'),
-('2024-02-01', 120000.00, 70000.00, 6000.00, 12000.00, 32000.00, 'final'),
-('2024-03-01', 110000.00, 65000.00, 5500.00, 11000.00, 28500.00, 'draft');
+-- Create profit_calculation_logs table
+CREATE TABLE IF NOT EXISTS profit_calculation_logs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    monthly_profit_id INT NOT NULL,
+    log_message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (monthly_profit_id) REFERENCES monthly_profits(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Add indexes for performance
+CREATE INDEX idx_monthly_profits_year_month ON monthly_profits(year, month);
+CREATE INDEX idx_profit_distribution_status ON profit_distribution(status);
+CREATE INDEX idx_profit_calculation_logs_monthly_profit ON profit_calculation_logs(monthly_profit_id);

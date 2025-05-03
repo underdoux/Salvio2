@@ -1,147 +1,188 @@
 <?php
 
-require_once __DIR__ . '/../helpers/Logger.php';
-
 class BaseController {
-    protected $db;
-    protected $view;
-    protected $requiresAuth = true;
+    protected $requiresAuth = false;
+    protected $config;
+    protected $baseUrl;
+    protected $debug = false;
+    protected $layout = 'layouts/main';
 
     public function __construct() {
-        global $db;
-        $this->db = $db;
-
-        // Ensure session is started
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        Logger::log("Session status: " . session_status());
-        Logger::log("Session ID: " . session_id());
-        Logger::log("Session data: " . print_r($_SESSION, true));
-
-        // Temporarily disable auth check for test_session.php to avoid redirect loop
-        $currentScript = basename($_SERVER['SCRIPT_NAME']);
-        if ($currentScript === 'test_session.php') {
-            return;
-        }
-
-        // Check authentication if required
+        $this->loadConfig();
+        
         if ($this->requiresAuth) {
-            if (!$this->isAuthenticated()) {
-                $requestUri = $_SERVER['REQUEST_URI'] ?? 'unknown';
-                Logger::log("Unauthorized access attempt to {$requestUri}");
-                Logger::log("User session data: " . print_r($_SESSION['user'] ?? 'no user data', true));
-                $this->redirect('/Salvio2/public/auth');
+            $this->checkAuth();
+        }
+    }
+
+    protected function loadConfig() {
+        $defaultConfig = [
+            'base_url' => 'http://localhost/Salvio2/public',
+            'site_name' => 'POS & Pharmaceutical Distribution System',
+            'timezone' => 'Asia/Jakarta',
+            'debug' => false,
+            'session' => [
+                'lifetime' => 7200,
+                'path' => '/',
+                'domain' => '',
+                'secure' => false,
+                'httponly' => true
+            ]
+        ];
+
+        $configFile = __DIR__ . '/../../config/app.php';
+        if (file_exists($configFile)) {
+            $fileConfig = require $configFile;
+            if (is_array($fileConfig)) {
+                $this->config = array_merge($defaultConfig, $fileConfig);
             } else {
-                Logger::log("Authenticated user accessing {$_SERVER['REQUEST_URI']}");
-                Logger::log("User role: " . ($_SESSION['user']['role'] ?? 'no role'));
+                $this->config = $defaultConfig;
             }
+        } else {
+            $this->config = $defaultConfig;
+        }
+
+        $this->baseUrl = $this->config['base_url'];
+        $this->debug = $this->config['debug'];
+    }
+
+    protected function checkAuth() {
+        if (!isset($_SESSION['user_id'])) {
+            $this->redirect('/login');
         }
     }
 
-    protected function isAuthenticated() {
-        if (!isset($_SESSION['user']) || !isset($_SESSION['auth_time'])) {
-            return false;
+    public function render($view, $data = []) {
+        // Add base URL and debug info to data array
+        $data['baseUrl'] = $this->baseUrl;
+        if ($this->debug) {
+            $data['debugInfo'] = $this->getDebugInfo();
+        }
+        
+        // Extract data to make variables available in view
+        extract($data);
+
+        // Start output buffering
+        ob_start();
+
+        // Include the view file
+        $viewFile = __DIR__ . "/../views/{$view}.php";
+        if (!file_exists($viewFile)) {
+            throw new Exception("View file not found: {$view}");
         }
 
-        // Check if session has expired (1 hour)
-        $sessionTimeout = 3600; // 1 hour in seconds
-        if (time() - $_SESSION['auth_time'] > $sessionTimeout) {
-            // Session expired, destroy it
-            session_destroy();
-            return false;
-        }
+        require $viewFile;
 
-        // Update last activity time
-        $_SESSION['auth_time'] = time();
-        return true;
-    }
+        // Get the contents and clean the buffer
+        $content = ob_get_clean();
 
-    protected function getCurrentUser() {
-        return $_SESSION['user'] ?? null;
-    }
-
-    protected function render($view, $data = []) {
-        try {
-            Logger::log("Rendering view: {$view}");
-            Logger::log("View data: " . print_r($data, true));
-            
-            // Clean any existing output buffers
-            while (ob_get_level()) {
-                ob_end_clean();
+        // Include the layout if it exists and not disabled
+        if ($this->layout !== null) {
+            $layoutFile = __DIR__ . "/../views/{$this->layout}.php";
+            if (file_exists($layoutFile)) {
+                require $layoutFile;
+            } else {
+                echo $content;
             }
-            
-            extract($data);
-            
-            if ($view === 'layouts/main') {
-                Logger::log("Rendering main layout directly");
-                require __DIR__ . "/../../app/views/layouts/main.php";
-                return;
-            }
-            
-            // Start buffering for view content
-            ob_start();
-            
-            $viewPath = __DIR__ . "/../../app/views/{$view}.php";
-            Logger::log("View path: {$viewPath}");
-            
-            if (!file_exists($viewPath)) {
-                throw new Exception("View file not found: {$viewPath}");
-            }
-            
-            Logger::log("Loading view content");
-            require $viewPath;
-            
-            // Get view content and clean buffer
-            $content = ob_get_clean();
-            Logger::log("View content length: " . strlen($content));
-            
-            // Start new buffer for final output
-            ob_start();
-            
-            $layoutPath = __DIR__ . "/../../app/views/layouts/main.php";
-            Logger::log("Layout path: {$layoutPath}");
-            
-            if (!file_exists($layoutPath)) {
-                throw new Exception("Layout file not found: {$layoutPath}");
-            }
-            
-            Logger::log("Rendering with layout");
-            require $layoutPath;
-            
-            // Flush final output
-            ob_end_flush();
-            
-        } catch (Exception $e) {
-            // Clean any remaining buffers
-            while (ob_get_level()) {
-                ob_end_clean();
-            }
-            Logger::log("Error rendering view: " . $e->getMessage());
-            echo "Error rendering view: " . $e->getMessage();
+        } else {
+            echo $content;
         }
     }
 
-    protected function json($data, $status = 200) {
+    protected function getDebugInfo() {
+        return [
+            'uri' => $_SERVER['REQUEST_URI'],
+            'method' => $_SERVER['REQUEST_METHOD'],
+            'script' => $_SERVER['SCRIPT_NAME'],
+            'path' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+            'query' => $_SERVER['QUERY_STRING'] ?? '',
+            'baseUrl' => $this->baseUrl,
+            'fullUrl' => $this->getFullUrl(),
+            'segments' => $this->getUriSegments(),
+            'params' => $this->getAllParams()
+        ];
+    }
+
+    protected function getFullUrl() {
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+        return $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    }
+
+    protected function getUriSegments() {
+        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $path = trim($path, '/');
+        return $path ? explode('/', $path) : [];
+    }
+
+    protected function getAllParams() {
+        return [
+            'get' => $_GET,
+            'post' => $_POST,
+            'files' => $_FILES,
+            'cookie' => $_COOKIE,
+            'session' => $_SESSION ?? []
+        ];
+    }
+
+    protected function json($data, $statusCode = 200) {
+        http_response_code($statusCode);
         header('Content-Type: application/json');
-        http_response_code($status);
         echo json_encode($data);
         exit;
     }
 
-    protected function redirect($url) {
+    protected function redirect($path) {
+        $url = $this->baseUrl . $path;
         header("Location: {$url}");
         exit;
     }
 
-    protected function getStatusBadgeClass($status) {
-        return match($status) {
-            'new' => 'primary',
-            'in_progress' => 'warning',
-            'completed' => 'success',
-            'paid' => 'info',
-            default => 'secondary'
-        };
+    protected function url($path = '') {
+        return $this->baseUrl . $path;
+    }
+
+    protected function asset($path) {
+        return $this->baseUrl . '/assets/' . ltrim($path, '/');
+    }
+
+    protected function getCurrentUser() {
+        if (isset($_SESSION['user_id'])) {
+            $db = Database::getInstance()->getConnection();
+            $sql = "SELECT * FROM users WHERE id = ?";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$_SESSION['user_id']]);
+            return $stmt->fetch();
+        }
+        return null;
+    }
+
+    protected function isPost() {
+        return $_SERVER['REQUEST_METHOD'] === 'POST';
+    }
+
+    protected function isGet() {
+        return $_SERVER['REQUEST_METHOD'] === 'GET';
+    }
+
+    protected function getPost($key = null, $default = null) {
+        if ($key === null) {
+            return $_POST;
+        }
+        return $_POST[$key] ?? $default;
+    }
+
+    protected function getQuery($key = null, $default = null) {
+        if ($key === null) {
+            return $_GET;
+        }
+        return $_GET[$key] ?? $default;
+    }
+
+    protected function debug($data) {
+        if ($this->debug) {
+            echo '<pre>';
+            var_dump($data);
+            echo '</pre>';
+        }
     }
 }

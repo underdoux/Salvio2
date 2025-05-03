@@ -1,272 +1,467 @@
-<div class="container mt-4">
-    <h1><?php echo $title; ?></h1>
-    <p class="lead"><?php echo $description; ?></p>
-
-    <!-- Chart Controls -->
-    <div class="row mb-4">
-        <!-- Comparison Controls -->
-        <div class="col-md-12 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Comparative Analysis</h5>
-                    <!-- Analysis Controls -->
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label for="analysisType" class="form-label">Analysis Type</label>
-                            <select class="form-select" id="analysisType">
-                                <option value="trend">Trend Analysis</option>
-                                <option value="variance">Variance Analysis</option>
-                                <option value="correlation">Correlation Analysis</option>
-                                <option value="forecast">Forecast Analysis</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="comparisonType" class="form-label">Comparison Type</label>
-                            <select class="form-select" id="comparisonType">
-                                <option value="period">Time Period</option>
-                                <option value="category">Category</option>
-                                <option value="product">Product</option>
-                                <option value="benchmark">Benchmark</option>
-                                <option value="custom">Custom Range</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="aggregationType" class="form-label">Aggregation</label>
-                            <select class="form-select" id="aggregationType">
-                                <option value="sum">Sum</option>
-                                <option value="average">Average</option>
-                                <option value="median">Median</option>
-                                <option value="growth">Growth Rate</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="metricType" class="form-label">Metric</label>
-                            <select class="form-select" id="metricType">
-                                <option value="revenue">Revenue</option>
-                                <option value="units">Units Sold</option>
-                                <option value="profit">Profit</option>
-                                <option value="growth">Growth Rate</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Period Controls -->
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label for="primaryPeriod" class="form-label">Primary Period</label>
-                            <select class="form-select" id="primaryPeriod">
-                                <option value="current">Current Period</option>
-                                <option value="previous">Previous Period</option>
-                                <option value="lastYear">Last Year</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="comparisonPeriod" class="form-label">Comparison Period</label>
-                            <select class="form-select" id="comparisonPeriod">
-                                <option value="previousPeriod">Previous Period</option>
-                                <option value="lastYear">Last Year</option>
-                                <option value="custom">Custom</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <button class="btn btn-primary" onclick="updateComparison()">Update Comparison</button>
-                            <button class="btn btn-outline-secondary" onclick="resetComparison()">Reset</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Visualization Options</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="colorScheme" class="form-label">Color Scheme</label>
-                            <select class="form-select" id="colorScheme">
-                                <option value="default">Default</option>
-                                <option value="warm">Warm</option>
-                                <option value="cool">Cool</option>
-                                <option value="monochrome">Monochrome</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="dateRange" class="form-label">Date Range</label>
-                            <select class="form-select" id="dateRange">
-                                <option value="7">Last 7 days</option>
-                                <option value="30">Last 30 days</option>
-                                <option value="90">Last 90 days</option>
-                                <option value="180" selected>Last 6 months</option>
-                                <option value="365">Last year</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Export Options</h5>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-outline-primary" onclick="exportCharts('png')">Export as PNG</button>
-                        <button type="button" class="btn btn-outline-primary" onclick="exportCharts('jpg')">Export as JPG</button>
-                        <button type="button" class="btn btn-outline-primary" onclick="exportCharts('pdf')">Export as PDF</button>
-                    </div>
+<div class="analytics-page">
+    <div class="page-header">
+        <h2>Analytics Dashboard</h2>
+        <div class="actions">
+            <button type="button" 
+                    class="btn btn-primary"
+                    onclick="showCalculateModal()">
+                <i class="fas fa-calculator"></i> Calculate Analytics
+            </button>
+            <div class="btn-group">
+                <button type="button" 
+                        class="btn btn-success dropdown-toggle" 
+                        data-toggle="dropdown">
+                    <i class="fas fa-file-export"></i> Export
+                </button>
+                <div class="dropdown-menu">
+                    <a href="<?= $baseUrl ?>/analytics/export?type=sales" class="dropdown-item">
+                        Sales Trends
+                    </a>
+                    <a href="<?= $baseUrl ?>/analytics/export?type=market" class="dropdown-item">
+                        Market Response
+                    </a>
+                    <a href="<?= $baseUrl ?>/analytics/export?type=performance" class="dropdown-item">
+                        Performance Metrics
+                    </a>
+                    <a href="<?= $baseUrl ?>/analytics/export?type=predictions" class="dropdown-item">
+                        Predictive Analytics
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Include Predictive Analytics Controls -->
-    <?php include 'predictive-controls.php'; ?>
+    <!-- Filters -->
+    <div class="filters-section">
+        <form method="GET" action="<?= $baseUrl ?>/analytics" class="filters-form">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <select name="year" class="form-control">
+                        <?php 
+                        $currentYear = date('Y');
+                        for ($y = $currentYear; $y >= $currentYear - 5; $y--): 
+                        ?>
+                            <option value="<?= $y ?>" 
+                                    <?= ($filters['year'] ?? '') == $y ? 'selected' : '' ?>>
+                                <?= $y ?>
+                            </option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
 
-    <!-- Charts and other content -->
+                <div class="form-group col-md-3">
+                    <select name="month" class="form-control">
+                        <option value="">All Months</option>
+                        <?php for ($m = 1; $m <= 12; $m++): ?>
+                            <option value="<?= $m ?>" 
+                                    <?= ($filters['month'] ?? '') == $m ? 'selected' : '' ?>>
+                                <?= date('F', mktime(0, 0, 0, $m, 1)) ?>
+                            </option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                    <a href="<?= $baseUrl ?>/analytics" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <?php if (isset($error)): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+
+    <!-- Performance Summary -->
+    <div class="summary-section">
+        <div class="summary-cards">
+            <?php
+            $metrics = [
+                'sales' => ['icon' => 'shopping-cart', 'color' => 'primary'],
+                'profit' => ['icon' => 'chart-line', 'color' => 'success'],
+                'commission' => ['icon' => 'percentage', 'color' => 'info'],
+                'expense' => ['icon' => 'money-bill-wave', 'color' => 'danger']
+            ];
+
+            if (!empty($performanceMetrics) && is_array($performanceMetrics)):
+                foreach ($performanceMetrics as $metric):
+                    $config = $metrics[$metric['metric_type']] ?? ['icon' => 'chart-bar', 'color' => 'secondary'];
+            ?>
+                <div class="summary-card">
+                    <div class="card-icon text-<?= $config['color'] ?>">
+                        <i class="fas fa-<?= $config['icon'] ?>"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">
+                            <?= ucfirst($metric['metric_type']) ?>
+                        </div>
+                        <div class="card-value">
+                            <?= CurrencyFormatter::getInstance()->format($metric['metric_value']) ?>
+                        </div>
+                        <?php if ($metric['growth_rate']): ?>
+                            <div class="card-trend <?= $metric['growth_rate'] >= 0 ? 'text-success' : 'text-danger' ?>">
+                                <i class="fas fa-<?= $metric['growth_rate'] >= 0 ? 'arrow-up' : 'arrow-down' ?>"></i>
+                                <?= abs(round($metric['growth_rate'], 1)) ?>%
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <?php foreach ($metrics as $type => $config): ?>
+                <div class="summary-card">
+                    <div class="card-icon text-<?= $config['color'] ?>">
+                        <i class="fas fa-<?= $config['icon'] ?>"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">
+                            <?= ucfirst($type) ?>
+                        </div>
+                        <div class="card-value">
+                            <?= CurrencyFormatter::getInstance()->format(0) ?>
+                        </div>
+                        <div class="card-trend text-muted">
+                            <i class="fas fa-minus"></i>
+                            No data
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <div class="row">
+            <!-- Sales Trends Chart -->
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Sales Trends</h3>
+                        <a href="<?= $baseUrl ?>/analytics/trends" class="btn btn-sm btn-outline-secondary">
+                            View Details
+                        </a>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="salesTrendsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Response Chart -->
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Market Response</h3>
+                        <a href="<?= $baseUrl ?>/analytics/market-response" class="btn btn-sm btn-outline-secondary">
+                            View Details
+                        </a>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="marketResponseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <!-- Performance Metrics Chart -->
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Performance Metrics</h3>
+                        <a href="<?= $baseUrl ?>/analytics/performance" class="btn btn-sm btn-outline-secondary">
+                            View Details
+                        </a>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Predictive Analytics Chart -->
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Sales Predictions</h3>
+                        <a href="<?= $baseUrl ?>/analytics/predictions" class="btn btn-sm btn-outline-secondary">
+                            View Details
+                        </a>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="predictionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Include Required Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-<script src="/assets/js/predictive-analytics.js"></script>
+<!-- Calculate Modal -->
+<div class="modal fade" id="calculateModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Calculate Analytics</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form action="<?= $baseUrl ?>/analytics/calculate" method="POST">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="calc_year">Year</label>
+                        <select id="calc_year" name="year" class="form-control" required>
+                            <?php 
+                            $currentYear = date('Y');
+                            for ($y = $currentYear; $y >= $currentYear - 5; $y--): 
+                            ?>
+                                <option value="<?= $y ?>"><?= $y ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
 
-<script>
-// Initialize prediction chart
-let forecastChart = null;
+                    <div class="form-group">
+                        <label for="calc_month">Month</label>
+                        <select id="calc_month" name="month" class="form-control" required>
+                            <?php for ($m = 1; $m <= 12; $m++): ?>
+                                <option value="<?= $m ?>" <?= $m == date('n') ? 'selected' : '' ?>>
+                                    <?= date('F', mktime(0, 0, 0, $m, 1)) ?>
+                                </option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Calculate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-// Update prediction when controls change
-function updatePrediction() {
-    const type = document.getElementById('predictionType').value;
-    const period = parseInt(document.getElementById('forecastPeriod').value);
-    const confidenceLevel = parseFloat(document.getElementById('confidenceLevel').value);
-    const seasonality = parseInt(document.getElementById('seasonalityPeriod').value);
-
-    // Get historical data from the sales trends chart
-    const historicalData = charts.salesTrends.data.datasets[0].data;
-    
-    // Generate forecast
-    const forecast = generateForecast(historicalData, type, period);
-    
-    // Update forecast chart
-    updateForecastChart(forecast, historicalData);
-    
-    // Update metrics
-    updateForecastMetrics(forecast);
+<style>
+.analytics-page {
+    padding: 20px;
 }
 
-function updateForecastChart(forecast, historicalData) {
-    const labels = [...charts.salesTrends.data.labels];
-    for (let i = 1; i <= forecast.predictions.length; i++) {
-        labels.push(`Forecast ${i}`);
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filters-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.summary-section {
+    margin-bottom: 30px;
+}
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.summary-card {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.card-icon {
+    font-size: 2em;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 50%;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.card-title {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+.card-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.card-trend {
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.charts-section .row {
+    margin-bottom: 20px;
+}
+
+.chart-card {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    height: 100%;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.chart-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.chart-body {
+    position: relative;
+    height: 300px;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 15px;
     }
 
-    const datasets = [
-        {
-            label: 'Historical',
-            data: [...historicalData, ...Array(forecast.predictions.length).fill(null)],
-            borderColor: colorSchemes.default.borderColor[0],
-            backgroundColor: colorSchemes.default.backgroundColor[0],
-            type: 'line'
-        },
-        {
-            label: 'Forecast',
-            data: [...Array(historicalData.length).fill(null), ...forecast.predictions],
-            borderColor: colorSchemes.default.borderColor[1],
-            backgroundColor: colorSchemes.default.backgroundColor[1],
-            borderDash: [5, 5],
-            type: 'line'
-        },
-        {
-            label: 'Upper Bound',
-            data: [...Array(historicalData.length).fill(null), ...forecast.confidenceIntervals.upper],
-            borderColor: 'rgba(200, 200, 200, 0.3)',
-            backgroundColor: 'rgba(200, 200, 200, 0.1)',
-            borderDash: [2, 2],
-            fill: '+1',
-            type: 'line'
-        },
-        {
-            label: 'Lower Bound',
-            data: [...Array(historicalData.length).fill(null), ...forecast.confidenceIntervals.lower],
-            borderColor: 'rgba(200, 200, 200, 0.3)',
-            backgroundColor: 'rgba(200, 200, 200, 0.1)',
-            borderDash: [2, 2],
-            fill: false,
-            type: 'line'
+    .actions {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+    }
+
+    .actions .btn {
+        flex: 1;
+    }
+
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Helper function to create chart
+    function createChart(elementId, data, config) {
+        const ctx = document.getElementById(elementId);
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            ctx.parentElement.innerHTML = '<div class="text-center text-muted py-5">No data available</div>';
+            return;
         }
-    ];
-
-    if (forecastChart) {
-        forecastChart.destroy();
+        new Chart(ctx, config);
     }
 
-    forecastChart = new Chart(document.getElementById('forecastChart'), {
+    // Sales Trends Chart
+    const salesTrendsData = <?= json_encode($salesTrends ?? []) ?>;
+    createChart('salesTrendsChart', salesTrendsData, {
         type: 'line',
         data: {
-            labels: labels,
-            datasets: datasets
+            labels: salesTrendsData.map(d => `${d.year}-${d.month}`),
+            datasets: [{
+                label: 'Sales Amount',
+                data: salesTrendsData.map(d => d.total_amount),
+                borderColor: '#007bff',
+                tension: 0.1
+            }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            },
-            plugins: {
-                legend: {
-                    position: 'top'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const value = context.parsed.y;
-                            if (value === null) return '';
-                            return `${context.dataset.label}: ${value.toLocaleString()}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return value.toLocaleString();
-                        }
-                    }
-                }
-            }
+            maintainAspectRatio: false
         }
     });
-}
 
-function updateForecastMetrics(forecast) {
-    // Update model metrics
-    document.getElementById('modelMetrics').innerHTML = generateMetricsHTML(forecast.metrics);
+    // Market Response Chart
+    const marketResponseData = <?= json_encode($marketResponse ?? []) ?>;
+    createChart('marketResponseChart', marketResponseData, {
+        type: 'bar',
+        data: {
+            labels: marketResponseData.map(d => d.customer_type),
+            datasets: [{
+                label: 'Response Score',
+                data: marketResponseData.map(d => d.response_score),
+                backgroundColor: '#28a745'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
 
-    // Update forecast summary
-    document.getElementById('forecastSummary').innerHTML = `
-        <p>Next Period: ${forecast.predictions[0].toFixed(2)}</p>
-        <p>Average Forecast: ${(forecast.predictions.reduce((a,b) => a + b, 0) / forecast.predictions.length).toFixed(2)}</p>
-        <p>Trend: ${getTrendDescription(forecast)}</p>
-    `;
+    // Performance Metrics Chart
+    const performanceData = <?= json_encode($performanceMetrics ?? []) ?>;
+    createChart('performanceChart', performanceData, {
+        type: 'line',
+        data: {
+            labels: performanceData.map(d => `${d.year}-${d.month}`),
+            datasets: [{
+                label: 'Growth Rate',
+                data: performanceData.map(d => d.growth_rate),
+                borderColor: '#17a2b8',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
 
-    // Update confidence intervals
-    document.getElementById('confidenceIntervals').innerHTML = `
-        <p>Upper Bound: ${forecast.confidenceIntervals.upper[0].toFixed(2)}</p>
-        <p>Lower Bound: ${forecast.confidenceIntervals.lower[0].toFixed(2)}</p>
-        <p>Range: ${(forecast.confidenceIntervals.upper[0] - forecast.confidenceIntervals.lower[0]).toFixed(2)}</p>
-    `;
-}
-
-// Initialize prediction on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait for charts to be initialized
-    setTimeout(updatePrediction, 1000);
+    // Predictive Analytics Chart
+    const predictionsData = <?= json_encode($predictiveAnalytics ?? []) ?>;
+    createChart('predictionsChart', predictionsData, {
+        type: 'line',
+        data: {
+            labels: predictionsData.map(d => d.prediction_date),
+            datasets: [{
+                label: 'Predicted Sales',
+                data: predictionsData.map(d => d.predicted_sales),
+                borderColor: '#ffc107',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
 });
+
+function showCalculateModal() {
+    $('#calculateModal').modal('show');
+}
 </script>

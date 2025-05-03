@@ -1,327 +1,254 @@
 <?php
 
-require_once __DIR__ . '/../models/Commission.php';
-
 class CommissionsController extends BaseController {
     protected $requiresAuth = true;
-    protected $commission;
+    private $commissionModel;
+    private $productModel;
 
     public function __construct() {
         parent::__construct();
-        $this->commission = new Commission();
+        $this->commissionModel = new Commission();
+        $this->productModel = new Product();
+    }
+
+    public function index() {
+        try {
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $limit = 10;
+
+            $filters = [
+                'user_id' => $_GET['user_id'] ?? null,
+                'status' => $_GET['status'] ?? null,
+                'date_from' => $_GET['date_from'] ?? null,
+                'date_to' => $_GET['date_to'] ?? null
+            ];
+
+            $commissions = $this->commissionModel->getAll($filters, $page, $limit);
+
+            return $this->render('commissions/index', [
+                'title' => 'Commission Management',
+                'commissions' => $commissions,
+                'filters' => $filters,
+                'currentPage' => $page
+            ]);
+        } catch (Exception $e) {
+            Logger::log("Error in commissions index: " . $e->getMessage(), 'ERROR');
+            return $this->render('commissions/index', [
+                'title' => 'Commission Management',
+                'error' => 'An error occurred while loading commissions.'
+            ]);
+        }
+    }
+
+    public function view($id) {
+        try {
+            $commission = $this->commissionModel->getById($id);
+            if (!$commission) {
+                throw new Exception("Commission not found");
+            }
+
+            return $this->render('commissions/view', [
+                'title' => "Commission Details",
+                'commission' => $commission
+            ]);
+        } catch (Exception $e) {
+            Logger::log("Error viewing commission {$id}: " . $e->getMessage(), 'ERROR');
+            $this->redirect('/commissions');
+        }
     }
 
     public function rates() {
         try {
-            $data = [
-                'title' => 'Commission Rates',
-                'description' => 'View and manage commission rates',
-                'rates' => $this->commission->getCommissionRates(),
-                'categories' => $this->commission->getCategories(),
-                'products' => $this->commission->getProducts()
-            ];
-            
-            $this->render('commissions/rates', $data);
-        } catch (Exception $e) {
-            Logger::log("Error loading commission rates: " . $e->getMessage(), 'ERROR');
-            $this->redirect('/commissions', [
-                'error' => 'Failed to load commission rates'
-            ]);
-        }
-    }
-
-    public function saveRate() {
-        try {
-            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-                throw new Exception('Invalid request method');
-            }
-
-            $data = [
-                'rate' => $_POST['rate'] ?? null,
-                'rate_type' => $_POST['rate_type'] ?? null
-            ];
-
-            // Add target ID based on rate type
-            switch ($data['rate_type']) {
-                case 'category':
-                    $data['category_id'] = $_POST['category_id'] ?? null;
-                    break;
-                case 'product':
-                    $data['product_id'] = $_POST['product_id'] ?? null;
-                    break;
-            }
-
-            // Validate required fields
-            if (!$data['rate'] || !$data['rate_type']) {
-                throw new Exception('Rate and type are required');
-            }
-
-            // Save rate
-            $rateId = $this->commission->saveCommissionRate($data);
-            Logger::log("Commission rate saved successfully. ID: {$rateId}");
-
-            $this->json([
-                'success' => true,
-                'message' => 'Commission rate saved successfully',
-                'rate_id' => $rateId
-            ]);
-
-        } catch (Exception $e) {
-            Logger::log("Error saving commission rate: " . $e->getMessage(), 'ERROR');
-            $this->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function getRate($id) {
-        try {
-            $rate = $this->commission->getCommissionRate($id);
-            
-            if (!$rate) {
-                throw new Exception('Commission rate not found');
-            }
-
-            $this->json([
-                'success' => true,
-                'rate' => $rate
-            ]);
-
-        } catch (Exception $e) {
-            Logger::log("Error fetching commission rate: " . $e->getMessage(), 'ERROR');
-            $this->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function deleteRate($id) {
-        try {
-            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-                throw new Exception('Invalid request method');
-            }
-
-            $this->commission->deleteCommissionRate($id);
-            Logger::log("Commission rate #{$id} deleted successfully");
-
-            $this->json([
-                'success' => true,
-                'message' => 'Commission rate deleted successfully'
-            ]);
-
-        } catch (Exception $e) {
-            Logger::log("Error deleting commission rate: " . $e->getMessage(), 'ERROR');
-            $this->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    protected function getStatusBadgeClass($status) {
-        switch ($status) {
-            case 'pending':
-                return 'warning';
-            case 'approved':
-                return 'success';
-            case 'paid':
-                return 'primary';
-            default:
-                return 'secondary';
-        }
-    }
-
-    public function index() {
-        $filters = [
-            'start_date' => $_GET['date_from'] ?? date('Y-m-01'),
-            'end_date' => $_GET['date_to'] ?? date('Y-m-t'),
-            'status' => $_GET['status'] ?? null
-        ];
-
-        $commissions = $this->commission->getAll($filters);
-        
-        // Group commissions by user and calculate totals
-        $summary = [];
-        foreach ($commissions as $commission) {
-            $userId = $commission['user_id'];
-            if (!isset($summary[$userId])) {
-                $summary[$userId] = [
-                    'id' => $userId,
-                    'user_id' => $userId,
-                    'username' => $commission['user_name'],
-                    'total_orders' => 0,
-                    'total_commission' => 0,
-                    'status' => $commission['status']
+            if ($this->isPost()) {
+                $data = [
+                    'id' => $this->getPost('id'),
+                    'type' => $this->getPost('type'),
+                    'reference_id' => $this->getPost('reference_id'),
+                    'rate_percent' => $this->getPost('rate_percent'),
+                    'min_amount' => $this->getPost('min_amount'),
+                    'max_amount' => $this->getPost('max_amount'),
+                    'effective_from' => $this->getPost('effective_from'),
+                    'effective_to' => $this->getPost('effective_to')
                 ];
+
+                $this->commissionModel->saveRate($data);
+                
+                if ($this->isAjax()) {
+                    return $this->json(['success' => true]);
+                }
+                
+                $this->redirect('/commissions/rates');
             }
-            $summary[$userId]['total_orders']++;
-            $summary[$userId]['total_commission'] += $commission['amount'];
+
+            $rates = $this->commissionModel->getRates();
+            $products = $this->productModel->getAll();
+
+            return $this->render('commissions/rates', [
+                'title' => 'Commission Rates',
+                'rates' => $rates,
+                'products' => $products
+            ]);
+        } catch (Exception $e) {
+            Logger::log("Error managing commission rates: " . $e->getMessage(), 'ERROR');
+            if ($this->isAjax()) {
+                return $this->json(['error' => $e->getMessage()], 400);
+            }
+            return $this->render('commissions/rates', [
+                'title' => 'Commission Rates',
+                'error' => 'An error occurred while managing commission rates.'
+            ]);
         }
-
-        $data = [
-            'title' => 'Commissions',
-            'description' => 'View and manage commission records',
-            'summary' => array_values($summary),
-            'filters' => $filters,
-            'metrics' => $this->commission->getCommissionPerformanceMetrics(null, 30) // Last 30 days
-        ];
-        
-        $this->render('commissions/index', $data);
     }
 
-    public function reports() {
-        $filters = [
-            'start_date' => $_GET['start_date'] ?? date('Y-m-01'),
-            'end_date' => $_GET['end_date'] ?? date('Y-m-t'),
-            'status' => $_GET['status'] ?? null,
-            'user_id' => $_GET['user_id'] ?? null
-        ];
-
-        $period = $_GET['period'] ?? 'monthly';
-        $year = $_GET['year'] ?? date('Y');
-
-        $data = [
-            'title' => 'Commission Reports',
-            'description' => 'View detailed commission reports and analytics',
-            'filters' => $filters,
-            'commissions' => $this->commission->getCommissionReport($filters),
-            'summary' => $this->commission->getCommissionSummaryByPeriod($period, $year),
-            'trends' => $this->commission->getCommissionTrendsByProduct($filters['start_date'], $filters['end_date']),
-            'metrics' => $this->commission->getCommissionPerformanceMetrics(null, 30) // Last 30 days
-        ];
-
-        $this->render('commissions/reports', $data);
-    }
-
-    public function exportReport() {
-        $filters = [
-            'start_date' => $_GET['start_date'] ?? null,
-            'end_date' => $_GET['end_date'] ?? null,
-            'status' => $_GET['status'] ?? null,
-            'user_id' => $_GET['user_id'] ?? null
-        ];
-
-        $data = $this->commission->exportCommissionReport($filters);
-        
-        // Set headers for CSV download
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="commission_report_' . date('Y-m-d') . '.csv"');
-        
-        // Open output stream
-        $output = fopen('php://output', 'w');
-        
-        // Add headers
-        if (!empty($data)) {
-            fputcsv($output, array_keys($data[0]));
-        }
-        
-        // Add data rows
-        foreach ($data as $row) {
-            fputcsv($output, $row);
-        }
-        
-        fclose($output);
-        exit;
-    }
-
-    public function performanceMetrics($userId = null) {
-        $period = $_GET['period'] ?? 30; // Default to last 30 days
-        $metrics = $this->commission->getCommissionPerformanceMetrics($userId, $period);
-        
-        $this->json([
-            'success' => true,
-            'metrics' => $metrics
-        ]);
-    }
-
-    public function productTrends() {
-        $startDate = $_GET['start_date'] ?? date('Y-m-01');
-        $endDate = $_GET['end_date'] ?? date('Y-m-t');
-        
-        $trends = $this->commission->getCommissionTrendsByProduct($startDate, $endDate);
-        
-        $this->json([
-            'success' => true,
-            'trends' => $trends
-        ]);
-    }
-
-    public function periodSummary() {
-        $period = $_GET['period'] ?? 'monthly';
-        $year = $_GET['year'] ?? date('Y');
-        
-        $summary = $this->commission->getCommissionSummaryByPeriod($period, $year);
-        
-        $this->json([
-            'success' => true,
-            'summary' => $summary
-        ]);
-    }
-
-    public function recordPayment($id) {
+    public function updateStatus($id) {
         try {
-            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-                throw new Exception('Invalid request method');
+            if (!$this->isPost()) {
+                throw new Exception("Invalid request method");
             }
 
-            $data = [
-                'amount' => $_POST['amount'] ?? null,
-                'payment_date' => $_POST['payment_date'] ?? date('Y-m-d'),
-                'payment_method' => $_POST['payment_method'] ?? null,
-                'reference_number' => $_POST['reference_number'] ?? null,
-                'notes' => $_POST['notes'] ?? null
+            $status = $this->getPost('status');
+            $notes = $this->getPost('notes');
+
+            $this->commissionModel->updateStatus($id, $status, $notes);
+            
+            if ($this->isAjax()) {
+                return $this->json(['success' => true]);
+            }
+            
+            $this->redirect('/commissions/view/' . $id);
+        } catch (Exception $e) {
+            Logger::log("Error updating commission status {$id}: " . $e->getMessage(), 'ERROR');
+            if ($this->isAjax()) {
+                return $this->json(['error' => $e->getMessage()], 400);
+            }
+            $this->redirect('/commissions/view/' . $id);
+        }
+    }
+
+    public function addAdjustment($id) {
+        try {
+            if (!$this->isPost()) {
+                throw new Exception("Invalid request method");
+            }
+
+            $type = $this->getPost('type');
+            $amount = $this->getPost('amount');
+            $reason = $this->getPost('reason');
+
+            $this->commissionModel->addAdjustment($id, $type, $amount, $reason, $_SESSION['user_id']);
+            
+            if ($this->isAjax()) {
+                return $this->json(['success' => true]);
+            }
+            
+            $this->redirect('/commissions/view/' . $id);
+        } catch (Exception $e) {
+            Logger::log("Error adding commission adjustment {$id}: " . $e->getMessage(), 'ERROR');
+            if ($this->isAjax()) {
+                return $this->json(['error' => $e->getMessage()], 400);
+            }
+            $this->redirect('/commissions/view/' . $id);
+        }
+    }
+
+    public function processPayment() {
+        try {
+            if (!$this->isPost()) {
+                throw new Exception("Invalid request method");
+            }
+
+            $userId = $this->getPost('user_id');
+            $commissions = json_decode($this->getPost('commissions'), true);
+            
+            $paymentData = [
+                'amount' => $this->getPost('amount'),
+                'payment_date' => $this->getPost('payment_date'),
+                'payment_method' => $this->getPost('payment_method'),
+                'reference_number' => $this->getPost('reference_number'),
+                'notes' => $this->getPost('notes')
             ];
 
-            // Validate required fields
-            if (!$data['amount'] || !$data['payment_method']) {
-                throw new Exception('Amount and payment method are required');
+            $this->commissionModel->processPayment($userId, $commissions, $paymentData);
+            
+            if ($this->isAjax()) {
+                return $this->json(['success' => true]);
             }
-
-            $paymentId = $this->commission->recordPayment($id, $data);
-            Logger::log("Commission payment recorded for commission #{$id}");
-
-            $this->json([
-                'success' => true,
-                'message' => 'Payment recorded successfully',
-                'payment_id' => $paymentId
-            ]);
-
+            
+            $this->redirect('/commissions');
         } catch (Exception $e) {
-            Logger::log("Error recording commission payment: " . $e->getMessage(), 'ERROR');
-            $this->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            Logger::log("Error processing commission payment: " . $e->getMessage(), 'ERROR');
+            if ($this->isAjax()) {
+                return $this->json(['error' => $e->getMessage()], 400);
+            }
+            $this->redirect('/commissions');
         }
     }
 
-    public function voidPayment($id) {
+    public function report() {
         try {
-            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-                throw new Exception('Invalid request method');
+            $filters = [
+                'user_id' => $_GET['user_id'] ?? null,
+                'status' => $_GET['status'] ?? null,
+                'date_from' => $_GET['date_from'] ?? null,
+                'date_to' => $_GET['date_to'] ?? null
+            ];
+
+            $format = $_GET['format'] ?? 'html';
+            $commissions = $this->commissionModel->getAll($filters);
+
+            if ($format === 'csv') {
+                $this->exportToCsv($commissions);
+                exit;
             }
 
-            $reason = $_POST['reason'] ?? null;
-            if (!$reason) {
-                throw new Exception('Void reason is required');
-            }
-
-            $this->commission->voidPayment($id, $reason);
-            Logger::log("Commission payment #{$id} voided");
-
-            $this->json([
-                'success' => true,
-                'message' => 'Payment voided successfully'
+            return $this->render('commissions/report', [
+                'title' => 'Commission Report',
+                'commissions' => $commissions,
+                'filters' => $filters
             ]);
-
         } catch (Exception $e) {
-            Logger::log("Error voiding commission payment: " . $e->getMessage(), 'ERROR');
-            $this->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            Logger::log("Error generating commission report: " . $e->getMessage(), 'ERROR');
+            return $this->render('commissions/report', [
+                'title' => 'Commission Report',
+                'error' => 'An error occurred while generating the report.'
+            ]);
         }
+    }
+
+    private function exportToCsv($commissions) {
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="commission_report.csv"');
+
+        $output = fopen('php://output', 'w');
+        fputcsv($output, [
+            'Order #',
+            'Sales Person',
+            'Product',
+            'Original Price',
+            'Commission Rate',
+            'Commission Amount',
+            'Status',
+            'Created Date'
+        ]);
+
+        foreach ($commissions as $commission) {
+            fputcsv($output, [
+                $commission['order_number'],
+                $commission['sales_person'],
+                $commission['product_name'],
+                $commission['original_price'],
+                $commission['rate_percent'] . '%',
+                $commission['commission_amount'],
+                ucfirst($commission['status']),
+                date('Y-m-d', strtotime($commission['created_at']))
+            ]);
+        }
+
+        fclose($output);
+    }
+
+    private function isAjax() {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 }
