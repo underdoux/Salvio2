@@ -21,6 +21,13 @@ RewriteRule ^(.*)$ index.php [QSA,L]
     php_value post_max_size 10M
     php_value max_execution_time 300
     php_value max_input_time 300
+    
+    # Session settings
+    php_value session.cookie_lifetime 3600
+    php_value session.gc_maxlifetime 3600
+    php_value session.cookie_path "/Salvio2/public"
+    php_flag session.cookie_httponly on
+    php_flag session.use_only_cookies on
 </IfModule>
 
 # Enable GZIP compression

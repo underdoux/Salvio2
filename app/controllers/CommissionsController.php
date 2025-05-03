@@ -6,6 +6,16 @@ class CommissionsController extends BaseController {
     public function __construct() {
         parent::__construct();
         $this->commission = new Commission();
+        
+        // Check if user has admin role
+        $user = $this->getCurrentUser();
+if (!$user || $user['role'] !== 'admin') {
+    $_SESSION['flash'] = [
+        'type' => 'danger',
+        'message' => 'Access denied. Admin privileges required.'
+    ];
+    $this->redirect('/Salvio2/public/auth');
+}
     }
 
     public function index() {

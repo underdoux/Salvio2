@@ -37,11 +37,18 @@ class AuthController extends BaseController {
 
         if ($user) {
             Logger::log("User '{$username}' logged in successfully.");
+            
+            // Regenerate session ID for security
+            session_regenerate_id(true);
+            
+            // Store user data in session
             $_SESSION['user'] = $user;
+            $_SESSION['auth_time'] = time();
             $_SESSION['flash'] = [
                 'type' => 'success',
                 'message' => 'Welcome back, ' . $user['username'] . '!'
             ];
+            
             $this->redirect('/Salvio2/public/');
         } else {
             Logger::log("Failed login attempt for username '{$username}'.");

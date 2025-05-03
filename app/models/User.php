@@ -14,6 +14,7 @@ class User extends BaseModel {
         $user = $this->findByUsername($username);
         
         if (!$user) {
+            error_log("Authentication failed: user not found for username '{$username}'");
             return false;
         }
 
@@ -21,6 +22,8 @@ class User extends BaseModel {
             // Remove password from session data
             unset($user['password']);
             return $user;
+        } else {
+            error_log("Authentication failed: password mismatch for username '{$username}'");
         }
 
         return false;

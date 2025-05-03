@@ -1,11 +1,22 @@
 <?php
-// Set session cookie path to /Salvio2/public to ensure cookie is sent on all requests
+// Set session cookie parameters
+ini_set('session.gc_maxlifetime', 3600); // 1 hour
+ini_set('session.cookie_lifetime', 3600); // 1 hour
+
+// Set session cookie path to /Salvio2 to ensure cookie is sent on all requests
 session_set_cookie_params([
+    'lifetime' => 3600,
     'path' => '/Salvio2/public',
+    'domain' => $_SERVER['HTTP_HOST'],
+    'secure' => false,
     'httponly' => true,
     'samesite' => 'Lax'
 ]);
-session_start();
+
+// Start session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Load configuration
 $config = require_once __DIR__ . '/../config/database.php';

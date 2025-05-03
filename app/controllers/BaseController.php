@@ -11,6 +11,17 @@ class BaseController {
         global $db;
         $this->db = $db;
 
+        // Ensure session is started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Temporarily disable auth check for test_session.php to avoid redirect loop
+        $currentScript = basename($_SERVER['SCRIPT_NAME']);
+        if ($currentScript === 'test_session.php') {
+            return;
+        }
+
         // Check authentication if required
         if ($this->requiresAuth && !$this->isAuthenticated()) {
             $requestUri = $_SERVER['REQUEST_URI'] ?? 'unknown';
@@ -20,7 +31,21 @@ class BaseController {
     }
 
     protected function isAuthenticated() {
-        return isset($_SESSION['user']);
+        if (!isset($_SESSION['user']) || !isset($_SESSION['auth_time'])) {
+            return false;
+        }
+
+        // Check if session has expired (1 hour)
+        $sessionTimeout = 3600; // 1 hour in seconds
+        if (time() - $_SESSION['auth_time'] > $sessionTimeout) {
+            // Session expired, destroy it
+            session_destroy();
+            return false;
+        }
+
+        // Update last activity time
+        $_SESSION['auth_time'] = time();
+        return true;
     }
 
     protected function getCurrentUser() {

@@ -5,7 +5,7 @@ $routes = [
     // Auth routes
     'login' => ['AuthController', 'index'],
     'auth' => ['AuthController', 'index'],
-    'logout' => ['AuthController', 'logout'],
+    'auth/logout' => ['AuthController', 'logout'],
     
     // Product routes
     'products' => ['ProductsController', 'index'],
@@ -32,6 +32,18 @@ $routes = [
     'profit-sharing/finalize/{id}' => ['ProfitSharingController', 'finalize'],
     'profit-sharing/report/{id}' => ['ProfitSharingController', 'report'],
     
+    // Reports routes
+    'reports' => ['HomeController', 'reports'],
+    
+    // Analytics routes
+    'analytics' => ['AnalyticsController', 'index'],
+    'analytics/best-selling' => ['AnalyticsController', 'bestSelling'],
+    'analytics/least-performing' => ['AnalyticsController', 'leastPerforming'],
+    'analytics/market-response' => ['AnalyticsController', 'marketResponse'],
+    'analytics/sales-trends' => ['AnalyticsController', 'salesTrends'],
+    'analytics/product/{id}' => ['AnalyticsController', 'productMetrics'],
+    'analytics/category/{id}' => ['AnalyticsController', 'categoryMetrics'],
+
     // Default route
     '' => ['HomeController', 'index']
 ];
@@ -40,10 +52,12 @@ $routes = [
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
 
-// Remove the base path (Salvio2/public)
-$basePath = 'Salvio2/public';
-if (strpos($uri, $basePath) === 0) {
-    $uri = substr($uri, strlen($basePath));
+echo "DEBUG URI: " . $uri . "\n"; // Debug output
+
+// Remove the base path (/Salvio2/public)
+$basePath = '/Salvio2/public';
+if (strpos('/' . $uri, $basePath) === 0) {
+    $uri = substr('/' . $uri, strlen($basePath));
 }
 $uri = trim($uri, '/');
 

@@ -1,5 +1,3 @@
-<?php require_once '../app/views/layouts/header.php'; ?>
-
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Commission Rates</h1>
@@ -173,5 +171,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
-<?php require_once '../app/views/layouts/footer.php'; ?>
