@@ -482,3 +482,6 @@
 [2025-05-03 07:25:52] User 'admin' accessed products list.
 [2025-05-03 07:33:29] User 'admin' accessed products list.
 [2025-05-03 07:48:21] User 'admin' accessed products list.
+[2025-05-03 08:37:32] Unauthorized access attempt to /Salvio2/public/
+[2025-05-03 08:37:33] User 'admin' logged in successfully.
+[2025-05-03 08:37:35] User 'admin' accessed products list.

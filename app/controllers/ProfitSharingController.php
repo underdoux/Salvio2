@@ -12,12 +12,114 @@ class ProfitSharingController extends BaseController {
     }
 
     public function index() {
+        $filters = [
+            'status' => $_GET['status'] ?? null,
+            'year' => $_GET['year'] ?? date('Y')
+        ];
+
         $data = [
             'title' => 'Profit Sharing',
             'description' => 'Manage profit sharing and distributions',
-            'profits' => $this->profitSharing->getMonthlyProfits()
+            'profits' => $this->profitSharing->getMonthlyProfits($filters)
         ];
+        
         $this->render('profit_sharing/index', $data);
+    }
+
+    public function calculate() {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('Invalid request method');
+            }
+
+            $month = $_POST['month'] ?? null;
+            if (!$month) {
+                throw new Exception('Month is required');
+            }
+
+            // Calculate profits for the month
+            $profitId = $this->profitSharing->calculateMonthlyProfit($month);
+
+            $_SESSION['success'] = 'Monthly profit calculated successfully';
+            header('Location: /Salvio2/public/profit-sharing');
+            exit;
+
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+            header('Location: /Salvio2/public/profit-sharing');
+            exit;
+        }
+    }
+
+    public function finalize() {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('Invalid request method');
+            }
+
+            $profitId = $_POST['profit_id'] ?? null;
+            if (!$profitId) {
+                throw new Exception('Profit ID is required');
+            }
+
+            // Finalize the profit record
+            $this->profitSharing->finalizeProfitRecord($profitId);
+
+            $_SESSION['success'] = 'Monthly profit finalized successfully';
+            header('Location: /Salvio2/public/profit-sharing');
+            exit;
+
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+            header('Location: /Salvio2/public/profit-sharing');
+            exit;
+        }
+    }
+
+    public function view($id) {
+        try {
+            $profit = $this->profitSharing->getProfitDetails($id);
+            $distributions = $this->profitSharing->getProfitDistributions($id);
+
+            $data = [
+                'title' => 'Profit Details - ' . date('F Y', strtotime($profit['month'])),
+                'description' => 'View profit details and distributions',
+                'profit' => $profit,
+                'distributions' => $distributions
+            ];
+
+            $this->render('profit_sharing/view', $data);
+
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+            header('Location: /Salvio2/public/profit-sharing');
+            exit;
+        }
+    }
+
+    public function export($id) {
+        try {
+            $profit = $this->profitSharing->getProfitDetails($id);
+            $month = date('Y-m', strtotime($profit['month']));
+            
+            $data = $this->profitSharing->exportProfitReport($month);
+            $filename = "profit_report_{$month}.csv";
+            
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            
+            $fp = fopen('php://output', 'w');
+            foreach ($data as $row) {
+                fputcsv($fp, $row);
+            }
+            fclose($fp);
+            exit;
+
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+            header('Location: /Salvio2/public/profit-sharing');
+            exit;
+        }
     }
 
     public function trends() {
@@ -67,79 +169,5 @@ class ProfitSharingController extends BaseController {
         ];
 
         $this->render('profit_sharing/trends', $data);
-    }
-
-    public function exportProfitReport($month) {
-        try {
-            $data = $this->profitSharing->exportProfitReport($month);
-            $filename = "profit_report_" . $month . ".csv";
-            
-            header('Content-Type: text/csv');
-            header('Content-Disposition: attachment; filename="' . $filename . '"');
-            
-            $fp = fopen('php://output', 'w');
-            foreach ($data as $row) {
-                fputcsv($fp, $row);
-            }
-            fclose($fp);
-            exit;
-
-        } catch (Exception $e) {
-            $this->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function exportDistributionHistory() {
-        try {
-            $startDate = $_GET['start_date'] ?? null;
-            $endDate = $_GET['end_date'] ?? null;
-            
-            $data = $this->profitSharing->exportDistributionHistory($startDate, $endDate);
-            $filename = "distribution_history.csv";
-            
-            header('Content-Type: text/csv');
-            header('Content-Disposition: attachment; filename="' . $filename . '"');
-            
-            $fp = fopen('php://output', 'w');
-            foreach ($data as $row) {
-                fputcsv($fp, $row);
-            }
-            fclose($fp);
-            exit;
-
-        } catch (Exception $e) {
-            $this->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function exportInvestorReport($investorId) {
-        try {
-            $year = $_GET['year'] ?? date('Y');
-            
-            $data = $this->profitSharing->exportInvestorReport($investorId, $year);
-            $filename = "investor_report_{$investorId}_{$year}.csv";
-            
-            header('Content-Type: text/csv');
-            header('Content-Disposition: attachment; filename="' . $filename . '"');
-            
-            $fp = fopen('php://output', 'w');
-            foreach ($data as $row) {
-                fputcsv($fp, $row);
-            }
-            fclose($fp);
-            exit;
-
-        } catch (Exception $e) {
-            $this->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
     }
 }

@@ -11,6 +11,57 @@ class CommissionsController extends BaseController {
         $this->commission = new Commission();
     }
 
+    protected function getStatusBadgeClass($status) {
+        switch ($status) {
+            case 'pending':
+                return 'warning';
+            case 'approved':
+                return 'success';
+            case 'paid':
+                return 'primary';
+            default:
+                return 'secondary';
+        }
+    }
+
+    public function index() {
+        $filters = [
+            'start_date' => $_GET['date_from'] ?? date('Y-m-01'),
+            'end_date' => $_GET['date_to'] ?? date('Y-m-t'),
+            'status' => $_GET['status'] ?? null
+        ];
+
+        $commissions = $this->commission->getAll($filters);
+        
+        // Group commissions by user and calculate totals
+        $summary = [];
+        foreach ($commissions as $commission) {
+            $userId = $commission['user_id'];
+            if (!isset($summary[$userId])) {
+                $summary[$userId] = [
+                    'id' => $userId,
+                    'user_id' => $userId,
+                    'username' => $commission['user_name'],
+                    'total_orders' => 0,
+                    'total_commission' => 0,
+                    'status' => $commission['status']
+                ];
+            }
+            $summary[$userId]['total_orders']++;
+            $summary[$userId]['total_commission'] += $commission['amount'];
+        }
+
+        $data = [
+            'title' => 'Commissions',
+            'description' => 'View and manage commission records',
+            'summary' => array_values($summary),
+            'filters' => $filters,
+            'metrics' => $this->commission->getCommissionPerformanceMetrics(null, 30) // Last 30 days
+        ];
+        
+        $this->render('commissions/index', $data);
+    }
+
     public function reports() {
         $filters = [
             'start_date' => $_GET['start_date'] ?? date('Y-m-01'),

@@ -4,13 +4,55 @@ require_once __DIR__ . '/Notification.php';
 
 class Commission extends BaseModel {
     private $notification;
+    protected $table = 'sales_commissions';
 
     public function __construct() {
         parent::__construct();
         $this->notification = new Notification();
     }
 
-    // ... (keep existing calculation and reporting methods) ...
+    public function getAll($filters = []) {
+        $sql = "SELECT c.*, 
+                       u.username as user_name,
+                       o.id as order_id,
+                       o.total_amount as order_amount,
+                       COALESCE(cp.amount, 0) as paid_amount,
+                       cp.payment_date,
+                       cp.payment_method
+                FROM sales_commissions c
+                JOIN users u ON c.user_id = u.id
+                JOIN orders o ON c.order_id = o.id
+                LEFT JOIN commission_payments cp ON c.id = cp.commission_id
+                WHERE 1=1";
+        
+        $params = [];
+
+        if (isset($filters['status'])) {
+            $sql .= " AND c.status = ?";
+            $params[] = $filters['status'];
+        }
+
+        if (isset($filters['user_id'])) {
+            $sql .= " AND c.user_id = ?";
+            $params[] = $filters['user_id'];
+        }
+
+        if (isset($filters['start_date'])) {
+            $sql .= " AND c.created_at >= ?";
+            $params[] = $filters['start_date'];
+        }
+
+        if (isset($filters['end_date'])) {
+            $sql .= " AND c.created_at <= ?";
+            $params[] = $filters['end_date'];
+        }
+
+        $sql .= " ORDER BY c.created_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     public function updateCommissionStatus($commissionId, $status) {
         try {
@@ -18,7 +60,7 @@ class Commission extends BaseModel {
 
             // Get commission details before update
             $sql = "SELECT c.*, u.email, CONCAT(u.first_name, ' ', u.last_name) as recipient_name 
-                    FROM commissions c
+                    FROM sales_commissions c
                     JOIN users u ON c.user_id = u.id
                     WHERE c.id = ?";
             $commission = $this->db->query($sql, [$commissionId])->fetch();
@@ -28,7 +70,7 @@ class Commission extends BaseModel {
             }
 
             // Update status
-            $sql = "UPDATE commissions SET status = ? WHERE id = ?";
+            $sql = "UPDATE sales_commissions SET status = ? WHERE id = ?";
             $this->db->query($sql, [$status, $commissionId]);
 
             // Create notification
@@ -73,7 +115,7 @@ class Commission extends BaseModel {
 
             // Get commission details
             $sql = "SELECT c.*, u.email, CONCAT(u.first_name, ' ', u.last_name) as recipient_name 
-                    FROM commissions c
+                    FROM sales_commissions c
                     JOIN users u ON c.user_id = u.id
                     WHERE c.id = ?";
             $commission = $this->db->query($sql, [$commissionId])->fetch();
@@ -148,13 +190,193 @@ class Commission extends BaseModel {
         }
     }
 
+    public function getCommissionSummaryByPeriod($period, $year) {
+        $sql = "SELECT 
+                    DATE_FORMAT(created_at, '%Y-%m') as period,
+                    COUNT(*) as total_count,
+                    SUM(amount) as total_amount,
+                    MIN(amount) as min_amount,
+                    MAX(amount) as max_amount,
+                    AVG(amount) as avg_amount
+                FROM sales_commissions
+                WHERE YEAR(created_at) = ?
+                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+                ORDER BY period DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$year]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getCommissionPerformanceMetrics($userId = null, $days = 30) {
+        $sql = "SELECT 
+                    COUNT(*) as total_commissions,
+                    SUM(amount) as total_amount,
+                    AVG(amount) as avg_amount,
+                    COUNT(CASE WHEN status = 'paid' THEN 1 END) as paid_count,
+                    SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) as paid_amount
+                FROM sales_commissions
+                WHERE created_at >= DATE_SUB(CURRENT_DATE, INTERVAL ? DAY)";
+        
+        $params = [$days];
+        
+        if ($userId) {
+            $sql .= " AND user_id = ?";
+            $params[] = $userId;
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getCommissionReport($filters) {
+        $sql = "SELECT c.*, 
+                       u.username as user_name,
+                       o.order_number,
+                       o.total_amount as order_amount,
+                       COALESCE(cp.amount, 0) as paid_amount,
+                       cp.payment_date,
+                       cp.payment_method
+                FROM sales_commissions c
+                JOIN users u ON c.user_id = u.id
+                JOIN orders o ON c.order_id = o.id
+                LEFT JOIN commission_payments cp ON c.id = cp.commission_id
+                WHERE 1=1";
+        
+        $params = [];
+
+        if (isset($filters['status'])) {
+            $sql .= " AND c.status = ?";
+            $params[] = $filters['status'];
+        }
+
+        if (isset($filters['user_id'])) {
+            $sql .= " AND c.user_id = ?";
+            $params[] = $filters['user_id'];
+        }
+
+        if (isset($filters['start_date'])) {
+            $sql .= " AND c.created_at >= ?";
+            $params[] = $filters['start_date'];
+        }
+
+        if (isset($filters['end_date'])) {
+            $sql .= " AND c.created_at <= ?";
+            $params[] = $filters['end_date'];
+        }
+
+        $sql .= " ORDER BY c.created_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getCommissionTrendsByProduct($startDate, $endDate) {
+        $sql = "SELECT 
+                    p.name as product_name,
+                    COUNT(*) as commission_count,
+                    SUM(c.amount) as total_commission,
+                    AVG(c.amount) as avg_commission
+                FROM sales_commissions c
+                JOIN orders o ON c.order_id = o.id
+                JOIN order_items oi ON o.id = oi.order_id
+                JOIN products p ON oi.product_id = p.id
+                WHERE c.created_at BETWEEN ? AND ?
+                GROUP BY p.id, p.name
+                ORDER BY total_commission DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$startDate, $endDate]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function exportCommissionReport($filters) {
+        $sql = "SELECT 
+                    c.id as commission_id,
+                    u.username as user_name,
+                    o.order_number,
+                    c.amount as commission_amount,
+                    c.status,
+                    COALESCE(cp.amount, 0) as paid_amount,
+                    cp.payment_date,
+                    cp.payment_method,
+                    c.created_at
+                FROM sales_commissions c
+                JOIN users u ON c.user_id = u.id
+                JOIN orders o ON c.order_id = o.id
+                LEFT JOIN commission_payments cp ON c.id = cp.commission_id
+                WHERE 1=1";
+        
+        $params = [];
+
+        if (isset($filters['status'])) {
+            $sql .= " AND c.status = ?";
+            $params[] = $filters['status'];
+        }
+
+        if (isset($filters['user_id'])) {
+            $sql .= " AND c.user_id = ?";
+            $params[] = $filters['user_id'];
+        }
+
+        if (isset($filters['start_date'])) {
+            $sql .= " AND c.created_at >= ?";
+            $params[] = $filters['start_date'];
+        }
+
+        if (isset($filters['end_date'])) {
+            $sql .= " AND c.created_at <= ?";
+            $params[] = $filters['end_date'];
+        }
+
+        $sql .= " ORDER BY c.created_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function voidPayment($paymentId, $reason) {
+        try {
+            $this->db->beginTransaction();
+
+            // Get payment details
+            $sql = "SELECT * FROM commission_payments WHERE id = ?";
+            $payment = $this->db->query($sql, [$paymentId])->fetch();
+
+            if (!$payment) {
+                throw new Exception("Payment not found");
+            }
+
+            // Delete payment record
+            $sql = "DELETE FROM commission_payments WHERE id = ?";
+            $this->db->query($sql, [$paymentId]);
+
+            // Update commission status back to approved
+            $sql = "UPDATE sales_commissions SET status = 'approved' WHERE id = ?";
+            $this->db->query($sql, [$payment['commission_id']]);
+
+            // Log the void
+            Logger::log("Commission payment #{$paymentId} voided. Reason: {$reason}");
+
+            $this->db->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
     public function calculateOrderCommission($orderId) {
         try {
             $result = parent::calculateOrderCommission($orderId);
 
             // Get commission details
             $sql = "SELECT c.*, u.email, CONCAT(u.first_name, ' ', u.last_name) as recipient_name 
-                    FROM commissions c
+                    FROM sales_commissions c
                     JOIN users u ON c.user_id = u.id
                     WHERE c.id = ?";
             $commission = $this->db->query($sql, [$result['commission_id']])->fetch();

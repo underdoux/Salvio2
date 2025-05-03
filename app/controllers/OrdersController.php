@@ -53,7 +53,7 @@ class OrdersController extends BaseController {
         $data = [
             'title' => 'Orders',
             'description' => 'Manage orders and track their status',
-            'orders' => $this->order->getAllOrders()
+            'orders' => $this->order->getAll()
         ];
         $this->render('orders/index', $data);
     }
@@ -62,7 +62,7 @@ class OrdersController extends BaseController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $orderData = $_POST;
-                $orderId = $this->order->createOrder($orderData);
+                $orderId = $this->order->create($orderData);
                 
                 $this->json([
                     'success' => true,
@@ -86,7 +86,7 @@ class OrdersController extends BaseController {
     }
 
     public function view($id) {
-        $order = $this->order->getOrder($id);
+        $order = $this->order->getById($id);
         if (!$order) {
             http_response_code(404);
             die('Order not found');
@@ -96,7 +96,7 @@ class OrdersController extends BaseController {
             'title' => "Order #{$id}",
             'description' => 'View order details',
             'order' => $order,
-            'items' => $this->order->getOrderItems($id)
+            'items' => $order['items'] // Items are already included in getById()
         ];
 
         // If order is completed, get commission details
